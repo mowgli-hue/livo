@@ -270,6 +270,11 @@
       <div id="sparkBody" style="margin-top:6px"></div>
     </div>
 
+    <div class="card" id="forYouCard">
+      <div style="display:flex;align-items:center;gap:6px;color:var(--pink);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.6px">✨ For you</div>
+      <div id="forYouOut" style="margin-top:8px"></div>
+    </div>
+
     <div class="card">
       <h3>🌅 Plan my day</h3>
       <p class="sub">Tell me your day — I'll build a schedule around it. The more you share, the better it fits.</p>
@@ -337,7 +342,11 @@
       <div class="card">
         <div class="grid controls">
           <div>
-            <label class="fld"><b>📍 Where are you based?</b><input id="loc" type="text" value="Surrey, BC"></label>
+            <label class="fld"><b>📍 Where are you based?</b><input id="loc" type="text" value="Surrey, BC">
+              <button class="btn ghost sm" id="geoBtn" style="margin-top:8px">📍 Use my location</button></label>
+            <label class="fld"><b>🧭 How you get around</b>
+              <div class="opts" data-group="travel"><div class="opt sel" data-v="driving">🚗 Drive</div><div class="opt" data-v="transit">🚆 Transit</div><div class="opt" data-v="walking">🚶 Walk</div><div class="opt" data-v="bicycling">🚲 Bike</div></div>
+            </label>
             <label class="fld"><b>🧘 Mood</b>
               <div class="opts" data-group="mood">
                 <div class="opt sel" data-v="any">Surprise me</div><div class="opt" data-v="calm">Calm</div>
@@ -571,7 +580,7 @@
 <script>
 const state={who:"couple",budget:"low",mood:"any",dist:"near",loc:"Surrey, BC",
   tmood:"any",tier:"budget",mvibe:"calm",msize:"small",occ:"office",gvibe:"any",ghead:"50",defshare:"private",
-  intent:"productive",energy:"med"};
+  intent:"productive",energy:"med",travel:"driving",coords:null};
 let curMain="today",curSub="weekend";
 /* ▼▼▼ LIVE DATA: paste your deployed engine URL here to pull real Google Maps data.
    Leave empty ("") to use the built-in curated lists. Example:
@@ -777,7 +786,23 @@ function nextSaturday(){const t=new Date(),x=new Date(t);x.setDate(t.getDate()+(
 function slug(s){return s.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'me';}
 function ago(ts){const s=(Date.now()-ts)/1000;if(s<3600)return Math.max(1,Math.round(s/60))+"m ago";if(s<86400)return Math.round(s/3600)+"h ago";return Math.round(s/86400)+"d ago";}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
-function mapA(name,area){return `<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name+', '+(area||state.loc||'Surrey BC'))}">🗺️ Maps</a>`;}
+function mapA(name,area){
+  const dest=encodeURIComponent(name+', '+(area||state.loc||'Surrey BC'));
+  const search=`https://www.google.com/maps/search/?api=1&query=${dest}`;
+  const origin=state.coords?`&origin=${state.coords.lat},${state.coords.lng}`:'';
+  const dir=`https://www.google.com/maps/dir/?api=1&destination=${dest}${origin}&travelmode=${state.travel||'driving'}`;
+  return `<a class="maplink" target="_blank" rel="noopener" href="${search}">🗺️ Maps</a> <a class="maplink" style="background:#e7f7ec;color:#15803d;border-color:#c6efd3" target="_blank" rel="noopener" href="${dir}">🧭 Directions</a>`;
+}
+function useMyLocation(){
+  if(!navigator.geolocation){toast("Location not supported here");return;}
+  toast("📍 Getting your location…");
+  navigator.geolocation.getCurrentPosition(p=>{
+    state.coords={lat:+p.coords.latitude.toFixed(5),lng:+p.coords.longitude.toFixed(5)};
+    state.loc="my area";const el=document.getElementById('loc');if(el)el.value="📍 Near me";
+    toast("📍 Got it — showing what's nearby");
+    if(curSub==="eats")genEats(eatsCuisine);if(curSub==="explore")genExplore(exploreCat);if(curMain==="today")renderToday();
+  },()=>toast("Couldn't get location — check permissions"),{enableHighAccuracy:true,timeout:8000});
+}
 function saveBtn(title,sub,type,date){return `<button class="btn ghost savebtn" data-save-title="${esc(title)}" data-save-sub="${esc(sub)}" data-save-type="${type}" data-save-date="${date}">＋ Save to calendar</button>`;}
 function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){toast("Storage full — try a smaller photo");return false;}}
 function readImage(file,cb){if(!file){cb(null);return;}const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const max=900;let w=img.width,h=img.height;const sc=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7));};img.src=e.target.result;};r.readAsDataURL(file);}
@@ -791,6 +816,7 @@ function filterSpots(types,useMood){
 
 /* ===== WEEKEND ===== */
 function genPlan(){
+  if(["calm","nature","water","cozy","party","easy"].includes(state.mood))bumpPref([state.mood]);
   if(state.mood==="lazy"){genLazy();return;}
   const cap=budgetCap[state.budget],out=document.getElementById('planOut');
   let trails=filterSpots(["trail"],true),foods=filterSpots(["food"],true),recs=filterSpots(["rec"],true),easy=filterSpots(["easy"],true);
@@ -903,7 +929,7 @@ async function genEats(cuisine){
   cuisine=cuisine||eatsCuisine;
   // live "browse all near me" Maps link, built from the user's location
   const allBtn=document.getElementById('mapAll');
-  if(allBtn)allBtn.href="https://www.google.com/maps/search/"+encodeURIComponent("restaurants near "+(state.loc||"Surrey BC"));
+  if(allBtn)allBtn.href=state.coords?`https://www.google.com/maps/search/restaurants/@${state.coords.lat},${state.coords.lng},14z`:"https://www.google.com/maps/search/"+encodeURIComponent("restaurants near "+(state.loc||"Surrey BC"));
   const out=document.getElementById('eatsOut');
   // LIVE: pull real Google Maps restaurants from the engine when configured
   if(LIVO_API){
@@ -950,7 +976,7 @@ function addCmt(id,text){const a=getCmts(id);a.push({name:(getProfile()?.name||"
 
 function refreshAvatar(){/* no top avatar now; keep for compat */}
 
-function addItem(title,sub,type,date){const a=getItems();a.push({id:'c_'+Date.now()+Math.random().toString(36).slice(2,5),title,sub,type,date});saveItems(a);toast("Saved to your calendar ✓");if(curMain==="calendar")renderCalendar();}
+function addItem(title,sub,type,date){const a=getItems();a.push({id:'c_'+Date.now()+Math.random().toString(36).slice(2,5),title,sub,type,date});saveItems(a);const sp=SPOTS.find(s=>s.n===title);if(sp)bumpPref(sp.vibes);toast("Saved to your calendar ✓");if(curMain==="calendar")renderCalendar();}
 function removeItem(id){saveItems(getItems().filter(x=>x.id!==id));renderCalendar();}
 function setItemDate(id,d){const a=getItems(),it=a.find(x=>x.id===id);if(it){it.date=d;saveItems(a);renderCalendar();}}
 
@@ -1119,7 +1145,7 @@ function renderToday(){
   // prefill the day-start with the current time, rounded to the next 30 min
   const ds=document.getElementById('dayStart');
   if(ds&&!ds._touched){const nowM=Math.ceil((hour*60+new Date().getMinutes())/30)*30;const hh=Math.min(23,Math.floor(nowM/60)),mm=nowM%60;ds.value=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');}
-  renderGuides();renderSpark();renderMood();renderHabits();
+  renderGuides();renderSpark();renderForYou();renderMood();renderHabits();
   // suggestion
   let t=filterSpots(["trail"],true),f=filterSpots(["food"],true);
   const a=t[0],b=f[0];
@@ -1155,6 +1181,21 @@ function renderNotifs(){
   ];
   document.getElementById('notifOut').innerHTML=n.map(x=>`<div class="nrow"><div class="ni">${x.ic}</div><div><p>${x.t}</p><div class="tm">${x.tm}</div></div></div>`).join("");
   document.querySelector('#bellBtn .dot')?.remove();
+}
+
+/* ===== PERSONALIZATION ("For You") ===== */
+function prefKey(){return 'le_prefs_'+handle();}
+function getPrefs(){try{return JSON.parse(localStorage.getItem(prefKey()))||{};}catch(e){return{};}}
+function bumpPref(vibes){if(!vibes||!vibes.length)return;const p=getPrefs();vibes.forEach(v=>{p[v]=(p[v]||0)+1;});lsSet(prefKey(),JSON.stringify(p));}
+function topVibes(n){return Object.entries(getPrefs()).sort((a,b)=>b[1]-a[1]).slice(0,n||3).map(x=>x[0]);}
+function renderForYou(){
+  const out=document.getElementById('forYouOut');if(!out)return;
+  const top=topVibes(3);
+  if(!top.length){out.innerHTML=`<p class="muted" style="font-size:14px">Plan a weekend or save a few spots — Livo learns what you love and your picks show up here. 🌿</p>`;return;}
+  let pool=SPOTS.filter(s=>s.vibes.some(v=>top.includes(v)));
+  pool=shuffle(pool).slice(0,3);
+  out.innerHTML=`<p class="muted" style="font-size:13px;margin:0 0 10px">Because you lean <b style="color:var(--ink)">${top.join(" · ")}</b></p><div class="spotgrid">`+
+    pool.map(s=>`<div class="spot"><div class="cat">${s.cat}</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.loc}</span>${costChip(s.cost)}${mapA(s.n,s.loc)}${saveBtn(s.n,s.cat+" · "+s.loc,"plan",nextSaturday())}</div></div>`).join("")+`</div>`;
 }
 
 /* ===== MOOD ===== */
@@ -1227,6 +1268,7 @@ document.getElementById('groupBtn').addEventListener('click',genGroup);
 document.getElementById('meetBtn').addEventListener('click',genMeet);
 document.getElementById('dayBtn').addEventListener('click',buildDay);
 document.getElementById('dayStart').addEventListener('input',e=>{e.target._touched=true;});
+document.getElementById('geoBtn').addEventListener('click',useMyLocation);
 document.getElementById('habitAdd').addEventListener('click',addHabit);
 document.getElementById('habitInput').addEventListener('keydown',e=>{if(e.key==='Enter')addHabit();});
 document.getElementById('goalAdd').addEventListener('click',addGoal);
