@@ -1,0 +1,61 @@
+// LIVE provider adapters. Activate per-provider via env (e.g. PROVIDER_MAPS=live)
+// and supply the matching API key. Each function returns the SAME shape as the
+// mock provider, so nothing else in the app changes.
+//
+// Google Places API (New) setup — 5 minutes:
+//   1. console.cloud.google.com  ->  create a project
+//   2. APIs & Services -> Enable "Places API (New)"
+//   3. Credentials -> Create API key -> restrict it to Places API
+//   4. Put the key in .env:  GOOGLE_PLACES_API_KEY=AIza...
+//   5. Set PROVIDER_MAPS=live  (and PROVIDER_EATS uses the same maps adapter)
+// Pricing: Google gives a generous monthly free tier; cache results (see provider_cache).
+
+const PLACES_URL = 'https://places.googleapis.com/v1/places:searchText';
+
+// maps.searchPlaces({ near, type, vibe }) -> [Place]
+export const maps = {
+  async searchPlaces({ near = 'Surrey, BC', type = 'restaurant', vibe } = {}) {
+    const key = process.env.GOOGLE_PLACES_API_KEY;
+    if (!key) throw new Error('GOOGLE_PLACES_API_KEY missing');
+    const query = `${vibe && vibe !== 'any' ? vibe + ' ' : ''}${type} in ${near}`;
+    const res = await fetch(PLACES_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': key,
+        // Field mask controls cost — only ask for what we use.
+        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.location,places.types',
+      },
+      body: JSON.stringify({ textQuery: query, maxResultCount: 20 }),
+    });
+    if (!res.ok) throw new Error(`Places API ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    const priceMap = { PRICE_LEVEL_FREE: 0, PRICE_LEVEL_INEXPENSIVE: 1, PRICE_LEVEL_MODERATE: 2, PRICE_LEVEL_EXPENSIVE: 3, PRICE_LEVEL_VERY_EXPENSIVE: 3 };
+    return (data.places || []).map((p, i) => ({
+      id: 'g_' + i,
+      name: p.displayName?.text || 'Unknown',
+      category: type,
+      vibes: vibe && vibe !== 'any' ? [vibe] : [],
+      area: p.formattedAddress || near,
+      priceLevel: priceMap[p.priceLevel] ?? 1,
+      rating: p.rating || null,
+      ratingCount: p.userRatingCount || 0,
+      lat: p.location?.latitude, lng: p.location?.longitude,
+      url: p.googleMapsUri || '',
+      source: 'google-places',
+    }));
+  },
+};
+
+// Restaurants are just a Places search with type=restaurant; expose a convenience.
+export const eats = {
+  search: (opts) => maps.searchPlaces({ ...opts, type: 'restaurant' }),
+};
+
+// Stays / Events / Social live adapters go here the same way when you add those keys.
+// stays  -> Booking.com / Airbnb partner API
+// events -> Ticketmaster Discovery / Eventbrite
+// social -> Instagram Graph + your own ranking
+export const stays = null;
+export const events = null;
+export const social = null;

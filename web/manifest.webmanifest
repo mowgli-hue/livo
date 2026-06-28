@@ -1,0 +1,17 @@
+{
+  "name": "Livo — plan your days, escapes & hidden gems",
+  "short_name": "Livo",
+  "description": "Plan your day, weekends, trips, stays, eats, events and hidden gems — and remember it all. Your colourful life planner.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef6fc",
+  "theme_color": "#7c6bff",
+  "categories": ["lifestyle", "travel", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

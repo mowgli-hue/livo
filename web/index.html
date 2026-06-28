@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livo — plan your days, escapes & hidden gems</title>
+<style>
+  :root{
+    --bg:#eef6fc;--bg2:#f6fbff;--surface:#ffffff;--surface2:#f2f8fd;
+    --ink:#0f2a40;--muted:#5f7c93;--line:#dceaf4;
+    --brand:#0ea5e9;--brand-d:#0284c7;--brand2:#38bdf8;--brand-soft:#e0f2fe;--sky:#bae6fd;
+    --gold:#f59e0b;--green:#10b981;--pink:#ec4899;--violet:#7c3aed;--warn:#ef4444;
+    --shadow:0 10px 30px rgba(3,105,161,.10);--shadow-sm:0 4px 14px rgba(3,105,161,.08);--r:20px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;
+    background:linear-gradient(180deg,#ffe9f3 0%,#eaf1ff 26%,#e9fbf2 62%,#fff6e6 100%) fixed;min-height:100vh}
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;background:linear-gradient(110deg,#ff7eb3,#7c6bff 52%,#36c5f0);color:#fff;box-shadow:0 6px 18px rgba(124,107,255,.28)}
+  .brand{font-weight:800;font-size:19px;letter-spacing:.2px;display:flex;align-items:center;gap:7px}
+  .tb-actions{display:flex;align-items:center;gap:8px}
+  .iconbtn{width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+  .iconbtn:hover{background:rgba(255,255,255,.28)}
+  .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;background:var(--pink);border-radius:50%;border:2px solid var(--brand)}
+  .wrap{max-width:880px;margin:0 auto;padding:16px 16px 110px}
+  /* sub-nav */
+  .subnav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
+  .sb{flex:none;background:var(--surface);border:1px solid var(--line);color:var(--muted);padding:8px 15px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm)}
+  .sb.active{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border-color:transparent}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+  .grid{display:grid;gap:14px}@media(min-width:720px){.controls{grid-template-columns:repeat(2,1fr)}}
+  label.fld{display:block;margin-bottom:14px}
+  label.fld b{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:8px 13px;border-radius:11px;cursor:pointer;font-size:13px;transition:.12s;user-select:none}
+  .opt.sel{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border-color:transparent;font-weight:700}
+  input,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:12px;border-radius:12px;font-size:14px;font-family:inherit}
+  input:focus,textarea:focus{outline:none;border-color:var(--brand);background:#fff}
+  textarea{resize:vertical}
+  .btn{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border:none;padding:13px 20px;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:.15s;box-shadow:0 8px 20px rgba(99,102,241,.32)}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--brand);box-shadow:none}
+  .btn.pink{background:var(--pink);box-shadow:0 6px 16px rgba(236,72,153,.28)}
+  .btn.violet{background:var(--violet);box-shadow:0 6px 16px rgba(124,58,237,.28)}
+  .btn.sm{width:auto;padding:9px 14px;font-size:13px}
+  .muted{color:var(--muted)}.sub{color:var(--muted);font-size:14px;margin:0 0 12px}
+  h2{font-size:22px;margin:0 0 4px}h3{margin:0 0 10px;font-size:18px}
+  .plan-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .badge{background:var(--brand-soft);border:1px solid var(--sky);padding:5px 11px;border-radius:999px;font-size:12px;color:var(--brand-d);font-weight:600}
+  .timeline{position:relative;margin:8px 0 0;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--sky)}
+  .slot{position:relative;margin-bottom:16px}
+  .slot::before{content:"";position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+  .slot .time{font-size:12px;color:var(--brand-d);font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+  .slot h4{margin:3px 0 4px;font-size:17px}.slot p{margin:0;color:var(--muted);font-size:14px}
+  .slot .meta{margin-top:7px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .pill{font-size:11px;background:var(--surface2);border:1px solid var(--line);padding:4px 9px;border-radius:999px;color:var(--muted)}
+  .pill.cost{color:var(--gold);background:#fff7ec;border-color:#fde9c8}
+  .maplink{font-size:11px;color:var(--brand-d);text-decoration:none;font-weight:700;background:var(--brand-soft);padding:4px 9px;border-radius:999px;border:1px solid var(--sky)}
+  .total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .total b{font-size:22px;color:var(--gold)}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.row2 .btn{width:auto;flex:1;min-width:150px}
+  .spotgrid{display:grid;gap:12px}@media(min-width:680px){.spotgrid{grid-template-columns:repeat(2,1fr)}}
+  .spot{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .spot h4{margin:0 0 4px;font-size:15px}.spot .cat{font-size:11px;color:var(--brand-d);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .spot p{margin:6px 0 0;font-size:13px;color:var(--muted)}
+  .dest{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px}
+  .dest h4{margin:0;font-size:16px}.dest .flag{font-size:20px}
+  .dest .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .dest .price{font-size:13px;color:var(--gold);font-weight:800;white-space:nowrap}
+  .dest p{margin:6px 0 0;font-size:12px;color:var(--muted)}
+  .vibetags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+  .vt{font-size:10px;padding:3px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-d);border:1px solid var(--sky)}
+  .vt:nth-child(3n+1){background:#ffe4ef;color:#be185d;border-color:#fbcfe1}
+  .vt:nth-child(3n+2){background:#e7f7ec;color:#15803d;border-color:#c6efd3}
+  .vt:nth-child(3n){background:#efe9ff;color:#6d28d9;border-color:#ddd2fb}
+  .evt{display:flex;gap:14px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+  .evt .date{min-width:56px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 4px;height:fit-content}
+  .evt .date .m{font-size:11px;color:var(--brand-d);text-transform:uppercase;font-weight:800}
+  .evt .date .d{font-size:20px;font-weight:800}
+  .evt h4{margin:0 0 3px;font-size:15px}.evt p{margin:0 0 6px;font-size:13px;color:var(--muted)}
+  .savebtn{width:auto;padding:8px 12px;font-size:12px;margin-top:10px}
+  /* home */
+  .hero{background:linear-gradient(120deg,#ff9a6b,#ff6fae 38%,#a06bff 70%,#5fa8ff 100%);color:#fff;border-radius:var(--r);padding:22px;box-shadow:0 14px 34px rgba(160,107,255,.28);margin-bottom:16px;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:-40px;bottom:-50px;width:140px;height:140px;background:rgba(255,255,255,.12);border-radius:50%}
+  /* guide characters */
+  .guiderow{display:flex;gap:8px;overflow-x:auto;margin-top:12px;-webkit-overflow-scrolling:touch}
+  .guidec{flex:none;display:flex;align-items:center;gap:7px;background:var(--surface2);border:1.5px solid var(--line);border-radius:999px;padding:6px 13px 6px 8px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;color:var(--ink)}
+  .guidec .ge{font-size:20px}
+  .guidec.sel{border-color:var(--gc);color:var(--gc);background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+  .guidec:hover{transform:translateY(-2px)}
+  .sparktalk{display:flex;gap:11px;align-items:flex-start;background:var(--surface2);border-left:4px solid var(--gc,var(--brand));border-radius:14px;padding:13px;margin-top:10px}
+  .sparktalk .gav{font-size:30px;line-height:1;flex:none}
+  .sparktalk .gn{font-size:12px;font-weight:800;color:var(--gc,var(--brand-d));margin-bottom:2px}
+  .sparktalk .gt{font-size:15px}
+  /* explore categories */
+  .ecatrow{display:flex;gap:7px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+  .ecat{flex:none;background:var(--surface2);border:1px solid var(--line);color:var(--muted);padding:7px 13px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:700;transition:.15s}
+  .ecat.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .expl-scenic{border-left:4px solid #14b8a6}
+  .expl-campfire{border-left:4px solid #f97316}
+  .expl-road{border-left:4px solid #8b5cf6}
+  .firewarn{background:#fff4ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:12px;font-size:13px;margin-bottom:12px}
+  .firewarn b{color:#7c2d12}
+  .hero::after{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:rgba(255,255,255,.14);border-radius:50%}
+  .hero h2{font-size:24px;margin:0 0 2px}.hero p{margin:0;opacity:.92;font-size:14px}
+  .qa{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  @media(max-width:560px){.qa{grid-template-columns:repeat(2,1fr)}}
+  .qchip{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow-sm);transition:.15s}
+  .qchip:hover{transform:translateY(-3px)}
+  .qchip .ic{font-size:24px;width:46px;height:46px;line-height:46px;margin:0 auto;border-radius:14px}
+  .qchip .lb{font-size:12px;font-weight:700;margin-top:8px;color:var(--ink)}
+  .qa .qchip:nth-child(1){background:linear-gradient(160deg,#fff,#fff2f5)}.qa .qchip:nth-child(1) .ic{background:#ffe0ea}
+  .qa .qchip:nth-child(2){background:linear-gradient(160deg,#fff,#eef4ff)}.qa .qchip:nth-child(2) .ic{background:#dceaff}
+  .qa .qchip:nth-child(3){background:linear-gradient(160deg,#fff,#fff6e8)}.qa .qchip:nth-child(3) .ic{background:#ffeccb}
+  .qa .qchip:nth-child(4){background:linear-gradient(160deg,#fff,#eafff4)}.qa .qchip:nth-child(4) .ic{background:#cdf6e3}
+  .sec-h{display:flex;justify-content:space-between;align-items:center;margin:6px 2px 10px}
+  .sec-h a{font-size:13px;color:var(--brand-d);cursor:pointer;font-weight:700}
+  /* calendar */
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+  .cah{text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:4px 0}
+  .cell{min-height:58px;background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:4px 5px;font-size:11px}
+  .cell.empty{background:transparent;border:none}.cell.today{border-color:var(--brand);background:var(--brand-soft)}
+  .cell .num{color:var(--muted);font-weight:700}
+  .cevt{margin-top:3px;background:var(--brand);color:#fff;border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cevt.big{background:var(--violet)}.cevt.event{background:var(--pink)}.cevt.group{background:var(--gold)}
+  .saved-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .saved-item:last-child{border-bottom:none}.saved-item .si-body{flex:1}
+  .saved-item h5{margin:0;font-size:14px}.saved-item p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+  .saved-item input[type=date]{width:auto;padding:6px 8px;font-size:12px}
+  .x{background:#fde8e8;color:var(--warn);border:none;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer}
+  /* profile */
+  .pcover{height:120px;border-radius:var(--r) var(--r) 0 0;background:linear-gradient(120deg,var(--brand),var(--brand2),var(--sky));margin:-18px -18px 0}
+  .pavbig{width:88px;height:88px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,var(--brand),var(--brand2));margin-top:-48px;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .pavbig img{width:100%;height:100%;object-fit:cover}
+  .pstats{display:flex;gap:22px;margin:12px 0}
+  .pstat b{font-size:18px}.pstat span{display:block;font-size:12px;color:var(--muted)}
+  .memgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media(max-width:560px){.memgrid{grid-template-columns:repeat(2,1fr)}}
+  .memtile{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:pointer}
+  .memtile .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px}
+  .memtile img{width:100%;height:100%;object-fit:cover}
+  .memtile .lab{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.7));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .memtile .vis{position:absolute;top:6px;right:6px;font-size:12px;background:rgba(255,255,255,.92);border-radius:999px;padding:2px 7px}
+  .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex:none;color:#fff}
+  .av img{width:100%;height:100%;object-fit:cover}
+  /* feed posts */
+  .post{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow)}
+  .post .phead{display:flex;align-items:center;gap:10px;padding:12px 14px}
+  .post .phead .nm{font-weight:700;font-size:14px}.post .phead .tm{font-size:12px;color:var(--muted)}
+  .post .photo{height:230px;display:flex;align-items:center;justify-content:center;font-size:74px;position:relative;color:#fff}
+  .post .photo img{width:100%;height:100%;object-fit:cover}
+  .post .plabel{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.45);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;color:#fff}
+  .post .pbody{padding:12px 14px}
+  .post .act{font-size:13px;color:var(--brand-d);font-weight:800;margin-bottom:3px}
+  .post .cap{font-size:14px;margin:0}
+  .post .pacts{display:flex;gap:16px;padding:8px 14px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+  .post .pacts button{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:700}
+  .post .pacts button.liked{color:var(--pink)}
+  .cmts{padding:4px 14px 14px}
+  .cmt{font-size:13px;margin:6px 0}.cmt b{color:var(--ink)}
+  .cmtbox{display:flex;gap:8px;margin-top:8px}.cmtbox input{padding:9px 11px}
+  .cmtbox button{flex:none;border:none;background:var(--brand);color:#fff;border-radius:10px;padding:0 14px;font-weight:800;cursor:pointer}
+  .follow-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .follow-row:last-child{border-bottom:none}
+  /* search */
+  .sresult{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .sresult:last-child{border-bottom:none}
+  .sicon{width:40px;height:40px;border-radius:11px;background:var(--brand-soft);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .sresult h5{margin:0;font-size:14px}.sresult p{margin:1px 0 0;font-size:12px;color:var(--muted)}
+  /* notifications */
+  .nrow{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+  .nrow:last-child{border-bottom:none}
+  .nrow .ni{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;background:var(--brand-soft)}
+  .nrow p{margin:0;font-size:14px}.nrow .tm{font-size:12px;color:var(--muted);margin-top:2px}
+  /* bottom nav */
+  .botnav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:space-around;align-items:center;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 6px 10px;box-shadow:0 -6px 20px rgba(3,105,161,.06)}
+  .bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:4px}
+  .bn .bi{font-size:20px;transition:transform .15s}.bn.active{color:var(--brand)}
+  .bn.active .bi{transform:scale(1.18)}
+  .bn.active[data-main="today"]{color:#f97316}.bn.active[data-main="plan"]{color:#0ea5e9}
+  .bn.active[data-main="feed"]{color:#ec4899}.bn.active[data-main="calendar"]{color:#8b5cf6}
+  .bn.active[data-main="profile"]{color:#10b981}
+  .fab{position:fixed;right:18px;bottom:80px;z-index:55;width:58px;height:58px;border-radius:50%;border:none;
+    background:linear-gradient(135deg,#ff6fae,#a06bff 55%,#5fa8ff);color:#fff;font-size:28px;cursor:pointer;box-shadow:0 12px 26px rgba(160,107,255,.5)}
+  .sheet{position:fixed;inset:0;z-index:70;background:rgba(15,42,64,.4);display:none;align-items:flex-end}
+  .sheet.show{display:flex}
+  .sheet .panel{background:#fff;width:100%;border-radius:22px 22px 0 0;padding:14px 16px 24px;max-width:880px;margin:0 auto}
+  .sheet .grab{width:42px;height:5px;background:var(--line);border-radius:99px;margin:2px auto 14px}
+  .sheet .opt-big{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;cursor:pointer}
+  .sheet .opt-big:hover{border-color:var(--brand);background:var(--surface2)}
+  .sheet .opt-big .ic{font-size:24px}
+  .hide{display:none}
+  .note{font-size:12px;color:var(--muted);margin-top:12px;background:var(--surface2);border:1px dashed var(--line);padding:10px 12px;border-radius:12px}
+  #toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:80}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .capok{color:var(--green)}.capwarn{color:var(--warn)}
+  /* polish */
+  .card,.qchip,.dest,.spot{transition:transform .15s, box-shadow .15s, border-color .15s}
+  .btn:active,.qchip:active,.opt:active{transform:scale(.97)}
+  .opt{transition:transform .1s,background .12s,border-color .12s}
+  /* mood */
+  .moodrow{display:flex;gap:8px;justify-content:space-between;margin:4px 0 10px}
+  .moodb{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:10px 0;font-size:26px;cursor:pointer;transition:.15s;text-align:center}
+  .moodb:hover{transform:translateY(-2px)}
+  .moodb.sel{background:var(--brand-soft);border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+  .moodstrip{display:flex;gap:6px;margin-top:12px}
+  .mday{flex:1;text-align:center}.mday .e{font-size:18px}.mday .dl{font-size:10px;color:var(--muted);margin-top:2px}
+  .mday .blank{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px dashed var(--line)}
+  /* habits */
+  .habit{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .habit:last-of-type{border-bottom:none}
+  .hcheck{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:#fff;cursor:pointer;flex:none;font-size:15px;display:flex;align-items:center;justify-content:center;color:transparent;transition:.15s}
+  .hcheck.done{background:var(--green);border-color:var(--green);color:#fff;transform:scale(1.05)}
+  .habit .hn{flex:1;font-size:14px;font-weight:600}
+  .streak{font-size:12px;font-weight:800;color:var(--gold);background:#fff7ec;border:1px solid #fde9c8;border-radius:999px;padding:3px 9px}
+  .streak.zero{color:var(--muted);background:var(--surface2);border-color:var(--line)}
+  .hdel{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px}
+  .addrow{display:flex;gap:8px;margin-top:12px}.addrow input{flex:1}
+  .addrow .btn{flex:none}
+  /* goals */
+  .goal{padding:12px 0;border-bottom:1px solid var(--line)}.goal:last-of-type{border-bottom:none}
+  .goal .gtop{display:flex;align-items:center;gap:8px}
+  .goal .gn{flex:1;font-size:14px;font-weight:600}
+  .gbar{height:9px;background:var(--surface2);border-radius:999px;overflow:hidden;margin:8px 0 6px}
+  .gbar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;transition:width .3s}
+  .gctl{display:flex;gap:6px;align-items:center}
+  .gctl button{border:1px solid var(--line);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-weight:800;color:var(--brand-d)}
+  .gctl .pct{font-size:12px;color:var(--muted);margin-left:auto}
+  /* onboarding */
+  #onboard{position:fixed;inset:0;z-index:90;background:linear-gradient(150deg,#ff9a6b,#ff6fae 40%,#a06bff 75%,#5fa8ff);display:none;align-items:center;justify-content:center;padding:24px}
+  #onboard.show{display:flex}
+  #onboard .ob{background:#fff;border-radius:24px;padding:26px 22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  #onboard h2{font-size:24px;margin:0 0 4px}#onboard .obsub{color:var(--muted);margin:0 0 16px;font-size:14px}
+  .obfeat{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .obfeat .oi{width:40px;height:40px;border-radius:12px;background:var(--brand-soft);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+  .obfeat:nth-of-type(1) .oi{background:#ffe0ea}.obfeat:nth-of-type(2) .oi{background:#fff0d6}.obfeat:nth-of-type(3) .oi{background:#dcfae8}
+  .obfeat b{font-size:14px}.obfeat p{margin:1px 0 0;font-size:12px;color:var(--muted)}
+  .oblink{display:block;text-align:center;margin-top:10px;color:var(--muted);font-size:13px;cursor:pointer}
+  footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+</style>
+<meta name="theme-color" content="#7c6bff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Livo">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">🌿 Livo</div>
+  <div class="tb-actions">
+    <button class="iconbtn" id="searchBtn">🔍</button>
+    <button class="iconbtn" id="bellBtn">🔔<span class="dot"></span></button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== TODAY ===== -->
+  <section id="main-today">
+    <div class="hero"><h2 id="heroHi">Hi there 👋</h2><p id="heroSub">Let's make today a good one.</p></div>
+    <div class="card" id="sparkCard" style="border-color:var(--sky)">
+      <div style="display:flex;align-items:center;gap:6px;color:var(--brand-d);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.6px">✨ Today's spark · pick your guide</div>
+      <div class="guiderow" id="guideRow"></div>
+      <div id="sparkBody" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card">
+      <h3>🌅 Plan my day</h3>
+      <p class="sub">Tell me your day — I'll build a schedule around it. The more you share, the better it fits.</p>
+      <label class="fld"><b>🎯 I want today to be…</b>
+        <div class="opts" data-group="intent">
+          <div class="opt sel" data-v="productive">Productive</div><div class="opt" data-v="balanced">Balanced</div>
+          <div class="opt" data-v="restful">Restful</div><div class="opt" data-v="social">Social</div><div class="opt" data-v="adventurous">Adventurous</div>
+        </div>
+      </label>
+      <label class="fld"><b>🔋 Energy today</b>
+        <div class="opts" data-group="energy"><div class="opt" data-v="low">Low</div><div class="opt sel" data-v="med">Medium</div><div class="opt" data-v="high">High</div></div>
+      </label>
+      <div class="grid controls">
+        <div><label class="fld"><b>Start</b><input id="dayStart" type="time" value="08:00"></label></div>
+        <div><label class="fld"><b>Wind down by</b><input id="dayEnd" type="time" value="22:00"></label></div>
+      </div>
+      <label class="fld"><b>📝 What's happening today? (tasks, meetings, errands — one per line or comma-separated)</b>
+        <textarea id="dayTasks" rows="3" placeholder="Finish the report&#10;Gym&#10;Call mum&#10;Groceries"></textarea></label>
+      <button class="btn" id="dayBtn">🌅 Build my day</button>
+      <div id="dayOut"></div>
+    </div>
+
+    <div class="card" id="moodCard">
+      <h3>How are you feeling today?</h3>
+      <div class="moodrow" data-group="moodpick">
+        <div class="moodb" data-v="1">😞</div><div class="moodb" data-v="2">😕</div>
+        <div class="moodb" data-v="3">😐</div><div class="moodb" data-v="4">🙂</div><div class="moodb" data-v="5">🤩</div>
+      </div>
+      <input id="moodNote" type="text" placeholder="One line about today (optional)">
+      <div class="moodstrip" id="moodStrip"></div>
+    </div>
+
+    <div class="card">
+      <div class="plan-head"><h3 style="margin:0">🎯 Daily habits</h3><span class="muted" id="habitSummary" style="font-size:13px"></span></div>
+      <div id="habitList"></div>
+      <div class="addrow"><input id="habitInput" type="text" placeholder="Add a habit — e.g. Walk 30 min"><button class="btn sm" id="habitAdd">Add</button></div>
+    </div>
+
+    <div class="qa">
+      <div class="qchip" data-go="plan:weekend"><div class="ic">⚡</div><div class="lb">Plan weekend</div></div>
+      <div class="qchip" data-go="plan:trips"><div class="ic">✈️</div><div class="lb">Find a trip</div></div>
+      <div class="qchip" data-go="plan:groups"><div class="ic">🥂</div><div class="lb">Group / office</div></div>
+      <div class="qchip" data-go="plan:events"><div class="ic">🎉</div><div class="lb">What's on</div></div>
+    </div>
+    <div class="sec-h"><h3 style="margin:0">Suggested for you</h3><a data-go="plan:weekend">More ›</a></div>
+    <div id="homeSuggest"></div>
+    <div class="sec-h"><h3 style="margin:0">This week near you</h3><a data-go="plan:events">All ›</a></div>
+    <div id="homeEvents"></div>
+    <div class="sec-h"><h3 style="margin:0">From your feed</h3><a data-go="feed">Open ›</a></div>
+    <div id="homeFeed"></div>
+  </section>
+
+  <!-- ===== PLAN ===== -->
+  <section id="main-plan" class="hide">
+    <div class="subnav">
+      <div class="sb active" data-sub="weekend">⚡ Weekend</div>
+      <div class="sb" data-sub="trips">✈️ Trips</div>
+      <div class="sb" data-sub="stays">🏡 Stays</div>
+      <div class="sb" data-sub="eats">🍽️ Eats</div>
+      <div class="sb" data-sub="groups">🥂 Group & Office</div>
+      <div class="sb" data-sub="events">🎉 Events & Meetups</div>
+      <div class="sb" data-sub="explore">🗺️ Explore</div>
+    </div>
+    <div id="sub-weekend">
+      <div class="card">
+        <div class="grid controls">
+          <div>
+            <label class="fld"><b>📍 Where are you based?</b><input id="loc" type="text" value="Surrey, BC"></label>
+            <label class="fld"><b>🧘 Mood</b>
+              <div class="opts" data-group="mood">
+                <div class="opt sel" data-v="any">Surprise me</div><div class="opt" data-v="calm">Calm</div>
+                <div class="opt" data-v="nature">Nature</div><div class="opt" data-v="water">Near water</div>
+                <div class="opt" data-v="cozy">Cozy</div><div class="opt" data-v="party">Lively</div>
+                <div class="opt" data-v="easy">Simple / all-ages</div><div class="opt" data-v="lazy">🛋️ Lazy night in</div>
+              </div>
+            </label>
+          </div>
+          <div>
+            <label class="fld"><b>👥 Who's coming?</b>
+              <div class="opts" data-group="who"><div class="opt sel" data-v="couple">Me + partner</div><div class="opt" data-v="solo">Just me</div><div class="opt" data-v="friends">Friends</div><div class="opt" data-v="family">Family</div></div>
+            </label>
+            <label class="fld"><b>💸 Budget</b>
+              <div class="opts" data-group="budget"><div class="opt sel" data-v="low">$0–75</div><div class="opt" data-v="med">$75–250</div><div class="opt" data-v="high">$250–600</div></div>
+            </label>
+            <label class="fld"><b>🚗 How far?</b>
+              <div class="opts" data-group="dist"><div class="opt sel" data-v="near">Close</div><div class="opt" data-v="day">Day trip</div><div class="opt" data-v="far">Anywhere</div></div>
+            </label>
+          </div>
+        </div>
+        <div class="row2"><button class="btn" id="genBtn">⚡ Plan my weekend</button><button class="btn ghost" id="reBtn">🔀 Again</button></div>
+      </div>
+      <div class="hide card" id="planOut"></div>
+    </div>
+    <div id="sub-trips" class="hide">
+      <div class="card">
+        <h3>✈️ Bigger trips — full-budget planner</h3>
+        <p class="sub">Mood + nights → ranked destinations with a per-person budget. 2026 illustrative ranges from Vancouver.</p>
+        <div class="grid controls">
+          <div><label class="fld"><b>🧘 Trip mood</b><div class="opts" data-group="tmood"><div class="opt sel" data-v="any">Any</div><div class="opt" data-v="calm">Calm</div><div class="opt" data-v="water">Beach</div><div class="opt" data-v="nature">Nature</div><div class="opt" data-v="cozy">Cultural</div><div class="opt" data-v="party">Party</div></div></label></div>
+          <div><label class="fld"><b>📅 Nights</b><input id="nights" type="number" value="5" min="1" max="21"></label>
+            <label class="fld"><b>🏨 Hotel</b><div class="opts" data-group="tier"><div class="opt sel" data-v="budget">Budget</div><div class="opt" data-v="mid">Comfortable</div></div></label></div>
+        </div>
+        <button class="btn" id="tripBtn">✈️ Show trips + budgets</button>
+      </div>
+      <div id="tripOut"></div>
+    </div>
+
+    <div id="sub-stays" class="hide">
+      <div class="card">
+        <h3>🏡 Nature stays across Canada</h3>
+        <p class="sub">Cabins, lakeside lodges, A-frames & glamping — hand-picked nature spots, coast to coast. Tap to browse real listings on Airbnb or open the area in Maps.</p>
+        <div class="ecatrow">
+          <div class="ecat active" data-sreg="all">🍁 All Canada</div>
+          <div class="ecat" data-sreg="bc">🌲 BC</div>
+          <div class="ecat" data-sreg="rockies">🏔️ Rockies</div>
+          <div class="ecat" data-sreg="ontario">🛶 Ontario</div>
+          <div class="ecat" data-sreg="quebec">⛰️ Québec</div>
+          <div class="ecat" data-sreg="atlantic">🌊 Atlantic</div>
+          <div class="ecat" data-sreg="north">✨ North</div>
+        </div>
+        <div id="staysOut"></div>
+      </div>
+    </div>
+    <div id="sub-eats" class="hide">
+      <div class="card">
+        <h3>🍽️ Eats near you</h3>
+        <p class="sub">Real local favourites across every cuisine. Tap any spot to open its live Google Maps page — ratings, hours, photos & reviews.</p>
+        <a id="mapAll" class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:14px" target="_blank" rel="noopener" href="#">🗺️ Browse ALL restaurants near me on Maps</a>
+        <div class="ecatrow">
+          <div class="ecat active" data-ccat="all">🍴 All</div>
+          <div class="ecat" data-ccat="indian">🇮🇳 Indian / Punjabi</div>
+          <div class="ecat" data-ccat="afghan">🫓 Afghan</div>
+          <div class="ecat" data-ccat="viet">🍜 Vietnamese</div>
+          <div class="ecat" data-ccat="korean">🥢 Korean</div>
+          <div class="ecat" data-ccat="japanese">🍣 Japanese</div>
+          <div class="ecat" data-ccat="filipino">🍢 Filipino</div>
+          <div class="ecat" data-ccat="chinese">🥡 Chinese</div>
+          <div class="ecat" data-ccat="casual">🍔 Casual</div>
+        </div>
+        <div id="eatsOut"></div>
+      </div>
+    </div>
+
+    <div id="sub-groups" class="hide">
+      <div class="card">
+        <h3>🥂 Group & office event finder</h3>
+        <p class="sub">Headcount + occasion + vibe → venues that fit, with totals.</p>
+        <div class="grid controls">
+          <div><label class="fld"><b>👥 How many people?</b><input id="ppl" type="number" value="30" min="2" max="300"></label>
+            <label class="fld"><b>🎯 Occasion</b><div class="opts" data-group="occ"><div class="opt sel" data-v="office">Office party</div><div class="opt" data-v="birthday">Birthday</div><div class="opt" data-v="friends">Friends night</div><div class="opt" data-v="family">Family</div></div></label></div>
+          <div><label class="fld"><b>✨ Vibe</b><div class="opts" data-group="gvibe"><div class="opt sel" data-v="any">Any</div><div class="opt" data-v="party">Party</div><div class="opt" data-v="cozy">Classy</div><div class="opt" data-v="calm">Relaxed</div><div class="opt" data-v="nature">Outdoorsy</div></div></label>
+            <label class="fld"><b>💸 Budget / person</b><div class="opts" data-group="ghead"><div class="opt sel" data-v="50">Up to $50</div><div class="opt" data-v="90">Up to $90</div><div class="opt" data-v="999">Any</div></div></label></div>
+        </div>
+        <button class="btn" id="groupBtn">🥂 Find venues</button>
+      </div>
+      <div id="groupOut"></div>
+    </div>
+    <div id="sub-events" class="hide">
+      <div class="card"><h3>🎉 What's on near you</h3><p class="sub">Real nearby events (sample, Surrey BC). Tap ＋ to save to your calendar.</p><div id="eventsOut"></div></div>
+      <div class="card">
+        <h3>🤝 Create a community meetup</h3>
+        <p class="sub">No organisation needed — describe a get-together and the system drafts a real, joinable event.</p>
+        <label class="fld"><b>💡 Your idea</b><textarea id="mIdea" rows="2">Chill sunset hangout for people who want to meet new friends</textarea></label>
+        <div class="grid controls">
+          <div><label class="fld"><b>Vibe</b><div class="opts" data-group="mvibe"><div class="opt sel" data-v="calm">Calm</div><div class="opt" data-v="water">Waterside</div><div class="opt" data-v="nature">Outdoorsy</div><div class="opt" data-v="cozy">Café</div><div class="opt" data-v="party">Lively</div></div></label></div>
+          <div><label class="fld"><b>Group size</b><div class="opts" data-group="msize"><div class="opt sel" data-v="small">Small (4–8)</div><div class="opt" data-v="med">Medium (10–25)</div><div class="opt" data-v="big">Big (30+)</div></div></label></div>
+        </div>
+        <button class="btn pink" id="meetBtn">🤝 Draft my meetup</button>
+        <div id="meetOut"></div>
+      </div>
+    </div>
+    <div id="sub-explore" class="hide">
+      <div class="card">
+        <h3>🗺️ Explore your region</h3>
+        <p class="sub">Hidden gems, jaw-dropping viewpoints, campfire spots and beautiful road trips.</p>
+        <div class="ecatrow">
+          <div class="ecat active" data-ecat="gems">💎 Hidden gems</div>
+          <div class="ecat" data-ecat="waterfalls">💧 Waterfalls & swims</div>
+          <div class="ecat" data-ecat="scenic">🏔️ Scenic & beautiful</div>
+          <div class="ecat" data-ecat="campfire">🔥 Campfire spots</div>
+          <div class="ecat" data-ecat="roadtrips">🛣️ Road trips</div>
+        </div>
+        <div id="exploreOut"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEED ===== -->
+  <section id="main-feed" class="hide">
+    <div class="card">
+      <h3>📸 Share a memory</h3>
+      <p class="sub">Did something good? Keep it for yourself, or share it with your roamies. Your call, every time.</p>
+      <label class="fld"><b>What did you do?</b><input id="memAct" type="text" placeholder="e.g. Sunset at Crescent Beach"></label>
+      <label class="fld"><b>Add a few words</b><textarea id="memCap" rows="2" placeholder="How was it?"></textarea></label>
+      <label class="fld"><b>📷 Photo (optional)</b><input id="memPhoto" type="file" accept="image/*"></label>
+      <div id="memPrev"></div>
+      <div class="row2"><button class="btn violet sm" id="memPrivate">🔒 Keep private</button><button class="btn pink sm" id="memShare">🌍 Share with roamies</button></div>
+      <div class="note">Private memories show only in your profile, on this device. Shared ones appear in your roamies' feeds.</div>
+    </div>
+    <h3 style="margin:6px 4px 12px">Your feed</h3>
+    <div id="feedOut"></div>
+  </section>
+
+  <!-- ===== CALENDAR ===== -->
+  <section id="main-calendar" class="hide">
+    <div class="card hide" id="calNeedProfile"><h3>🗓️ My Calendar</h3><p class="sub">Set up your profile first and your saved plans will live here.</p><button class="btn sm" id="goProfile">Set up profile</button></div>
+    <div class="card hide" id="calCard">
+      <div class="plan-head">
+        <div><h3 style="margin:0" id="calHi">My month</h3><p class="muted" style="margin:4px 0 0" id="calCount"></p></div>
+        <div style="display:flex;gap:8px"><button class="btn ghost sm" id="prevM">‹</button><button class="btn ghost sm" id="nextM">›</button></div>
+      </div>
+      <div class="calgrid" id="calGrid"></div>
+      <div class="row2"><button class="btn ghost sm" id="fillBtn">📅 Auto-fill 6 months</button><button class="btn ghost sm" id="clearBtn" style="color:var(--warn);border-color:var(--warn)">Clear all</button></div>
+      <h3 style="margin:18px 0 6px">Saved plans</h3>
+      <div id="savedList"></div>
+    </div>
+  </section>
+
+  <!-- ===== PROFILE ===== -->
+  <section id="main-profile" class="hide">
+    <div class="card" id="profSetup">
+      <h3>👤 Create your profile</h3>
+      <p class="sub">This is yours — your plans, your calendar, your memories. You decide what to share.</p>
+      <label class="fld"><b>Name / handle</b><input id="pfName" type="text" placeholder="e.g. Mowgli"></label>
+      <label class="fld"><b>Short bio</b><input id="pfBio" type="text" placeholder="e.g. Weekend wanderer · trails + good food"></label>
+      <label class="fld"><b>📷 Profile photo (optional)</b><input id="pfAvatar" type="file" accept="image/*"></label>
+      <div id="pfAvPrev"></div>
+      <label class="fld" style="margin-top:6px"><b>Default sharing for new memories</b>
+        <div class="opts" data-group="defshare"><div class="opt sel" data-v="private">🔒 Private</div><div class="opt" data-v="public">🌍 Shared</div></div></label>
+      <button class="btn" id="pfSave">Save profile</button>
+    </div>
+    <div class="card hide" id="profView">
+      <div class="pcover"></div>
+      <div class="pavbig" id="pavBig">🙂</div>
+      <h3 style="margin:10px 0 2px" id="pvName">—</h3>
+      <p class="muted" id="pvBio" style="margin:0"></p>
+      <div class="pstats">
+        <div class="pstat"><b id="stMem">0</b><span>memories</span></div>
+        <div class="pstat"><b id="stShared">0</b><span>shared</span></div>
+        <div class="pstat"><b id="stFollowers">0</b><span>roamies</span></div>
+        <div class="pstat"><b id="stFollowing">0</b><span>following</span></div>
+      </div>
+      <div class="row2"><button class="btn ghost sm" id="pfEdit">Edit profile</button><button class="btn ghost sm" id="pfShareJump">📸 Share a memory</button></div>
+      <h3 style="margin:22px 0 8px">🎯 Life goals</h3>
+      <div id="goalsList"></div>
+      <div class="addrow"><input id="goalInput" type="text" placeholder="Add a goal — e.g. Read 12 books this year"><button class="btn sm" id="goalAdd">Add</button></div>
+      <h3 style="margin:22px 0 10px">My memories</h3>
+      <div class="memgrid" id="memGrid"></div>
+      <h3 style="margin:22px 0 6px">Your roamies</h3>
+      <div id="followList"></div>
+    </div>
+  </section>
+
+  <!-- ===== SEARCH ===== -->
+  <section id="main-search" class="hide">
+    <div class="card">
+      <h3>🔍 Search</h3>
+      <input id="searchInput" type="text" placeholder="Search places, food, trips, events...">
+      <div id="searchOut" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- ===== NOTIFICATIONS ===== -->
+  <section id="main-notifs" class="hide">
+    <div class="card"><h3>🔔 Notifications</h3><div id="notifOut"></div></div>
+  </section>
+
+  <footer>Built for Jungle Labs · Prototype — verify hours, prices & bookings before you go. Photos & profile stay on this device.</footer>
+</div>
+
+<button class="fab" id="fab">＋</button>
+<div class="botnav">
+  <button class="bn active" data-main="today"><span class="bi">🌅</span>Today</button>
+  <button class="bn" data-main="plan"><span class="bi">🧭</span>Plan</button>
+  <button class="bn" data-main="feed"><span class="bi">📸</span>Feed</button>
+  <button class="bn" data-main="calendar"><span class="bi">🗓️</span>Calendar</button>
+  <button class="bn" data-main="profile"><span class="bi">👤</span>Profile</button>
+</div>
+
+<div class="sheet" id="sheet"><div class="panel">
+  <div class="grab"></div>
+  <div class="opt-big" data-go="today"><div class="ic">🌅</div><div><b>Plan my day</b><div class="muted" style="font-size:13px">Build today's schedule around your life</div></div></div>
+  <div class="opt-big" data-go="plan:weekend"><div class="ic">⚡</div><div><b>Plan a weekend</b><div class="muted" style="font-size:13px">Get a day plan for your mood & budget</div></div></div>
+  <div class="opt-big" data-go="feed"><div class="ic">📸</div><div><b>Share a memory</b><div class="muted" style="font-size:13px">Post a photo — private or with roamies</div></div></div>
+  <div class="opt-big" data-go="plan:events"><div class="ic">🤝</div><div><b>Create a meetup</b><div class="muted" style="font-size:13px">Draft a joinable community event</div></div></div>
+</div></div>
+<div id="toast"></div>
+
+<div id="onboard"><div class="ob">
+  <h2>Welcome to Livo 🌿</h2>
+  <p class="obsub">Your whole life in one colourful place — plan it, live it, remember it.</p>
+  <div class="obfeat"><div class="oi">🌅</div><div><b>Plan your day</b><p>Tell it your day; get a schedule + a daily spark.</p></div></div>
+  <div class="obfeat"><div class="oi">⚡</div><div><b>Plan your time off</b><p>Weekends, trips, events & office parties on your budget.</p></div></div>
+  <div class="obfeat"><div class="oi">🎯</div><div><b>Grow & remember</b><p>Habits, goals, moods, and photo memories — yours to share or keep.</p></div></div>
+  <button class="btn" id="obStart" style="margin-top:8px">Get started</button>
+  <span class="oblink" id="obSkip">Maybe later</span>
+</div></div>
+
+<script>
+const state={who:"couple",budget:"low",mood:"any",dist:"near",loc:"Surrey, BC",
+  tmood:"any",tier:"budget",mvibe:"calm",msize:"small",occ:"office",gvibe:"any",ghead:"50",defshare:"private",
+  intent:"productive",energy:"med"};
+let curMain="today",curSub="weekend";
+
+/* ===== DATA ===== */
+const SPOTS=[
+  {n:"Crescent Beach Walk",cat:"Beach walk",loc:"South Surrey",cost:0,dist:"near",type:"trail",who:["couple","solo","friends","family"],vibes:["water","calm","nature"],d:"Flat 2.5 km seaside path, a pier, the best sunset around."},
+  {n:"Tynehead Regional Park",cat:"Forest trails",loc:"North Surrey",cost:0,dist:"near",type:"trail",who:["couple","solo","family"],vibes:["nature","calm"],d:"Forest loops, a salmon hatchery and a butterfly garden."},
+  {n:"Serpentine Fen Trail",cat:"Birdwatching",loc:"South Surrey",cost:0,dist:"near",type:"trail",who:["couple","solo","family"],vibes:["nature","calm","water"],d:"3.2 km flat loop with a viewing tower — herons, eagles, river views."},
+  {n:"Redwood Park",cat:"Arboretum",loc:"South Surrey",cost:0,dist:"near",type:"trail",who:["couple","solo","family","friends"],vibes:["nature","cozy","calm"],d:"Giant redwoods, a treehouse and picnic lawns."},
+  {n:"Green Timbers Forest",cat:"Lake loop",loc:"Surrey",cost:0,dist:"near",type:"trail",who:["couple","solo","family"],vibes:["nature","calm","water"],d:"Shaded forest trails around a quiet stocked lake."},
+  {n:"Mud Bay / Boundary Bay",cat:"Shoreline",loc:"Surrey/Delta",cost:0,dist:"near",type:"trail",who:["couple","solo","friends"],vibes:["water","nature","calm"],d:"3 km of open shoreline, huge skies, top birdwatching."},
+  {n:"Barnston Island Loop",cat:"Island cycle/walk",loc:"Surrey (free ferry)",cost:0,dist:"near",type:"trail",who:["couple","friends","family"],vibes:["nature","calm","water"],d:"Free ferry to a flat 10 km farm-and-river loop."},
+  {n:"Golden Ears — Alouette Lake",cat:"Lake & hikes",loc:"Maple Ridge (~50 min)",cost:0,dist:"day",type:"trail",who:["couple","friends","family"],vibes:["nature","water"],d:"Mountain-ringed lake with a swim beach and hikes for all levels."},
+  {n:"Bridal Veil Falls",cat:"Waterfall",loc:"Chilliwack (~1 hr)",cost:0,dist:"day",type:"trail",who:["couple","solo","family"],vibes:["nature","water","calm"],d:"Short 15-min walk to a tall misty cascade."},
+  {n:"Sasquatch — Green Point Beach",cat:"Quiet lake beach",loc:"Harrison (~1.5 hr)",cost:0,dist:"far",type:"trail",who:["couple","solo","friends","family"],vibes:["water","calm","nature"],d:"Calm water, picnic benches, hardly anyone even in summer."},
+  {n:"Othello Tunnels",cat:"Canyon walk",loc:"Hope (~1.5 hr)",cost:0,dist:"far",type:"trail",who:["couple","friends","family"],vibes:["nature","water"],d:"Walk old railway tunnels carved into a turquoise canyon."},
+  {n:"Shannon Falls + Sea-to-Sky",cat:"Waterfall & gondola",loc:"Squamish (~1.5 hr)",cost:0,dist:"far",type:"trail",who:["couple","friends","family"],vibes:["nature","water"],d:"BC's 3rd-tallest falls beside a gondola with fjord views."},
+  {n:"Galini (Greek)",cat:"Casual dinner",loc:"Langley",cost:30,dist:"near",type:"food",who:["couple","friends","family"],vibes:["cozy"],d:"Souvlaki and moussaka, warm hospitality, fair prices."},
+  {n:"Ban Chok Dee (Thai)",cat:"Lunch / dinner",loc:"Langley",cost:22,dist:"near",type:"food",who:["couple","solo","friends","family"],vibes:["cozy"],d:"Where Langley locals actually eat Thai."},
+  {n:"Afghan Kitchen",cat:"Casual eats",loc:"Surrey",cost:20,dist:"near",type:"food",who:["couple","friends","family"],vibes:["cozy"],d:"Genuine Afghan cooking — big flavour, small bill."},
+  {n:"White Rock Waterfront",cat:"Seaside dining",loc:"White Rock",cost:40,dist:"near",type:"food",who:["couple","friends"],vibes:["water","party","cozy"],d:"Pier views and patios — book ahead on weekends."},
+  {n:"Steveston Wharf seafood",cat:"Fish & chips",loc:"Richmond (~40 min)",cost:25,dist:"day",type:"food",who:["couple","friends","family"],vibes:["water","cozy"],d:"Fish & chips on a working wharf, historic village to wander."},
+  {n:"Fort Langley cafés",cat:"Brunch / coffee",loc:"Fort Langley (~30 min)",cost:25,dist:"near",type:"food",who:["couple","solo","friends","family"],vibes:["cozy","calm"],d:"Heritage main street of brunch spots and riverside patios."},
+  {n:"Grandview Aquatic Centre",cat:"Pools & slides",loc:"South Surrey",cost:8,dist:"near",type:"rec",who:["family","friends","couple"],vibes:["water","party"],d:"Award-winning pool, lazy-river vibes, kids' zone — great rainy day."},
+  {n:"Harrison Hot Springs pool",cat:"Hot-springs soak",loc:"Harrison (~1.5 hr)",cost:12,dist:"far",type:"rec",who:["couple","friends","family"],vibes:["water","calm","cozy"],d:"Mineral soak in a storybook lakeside village."},
+  {n:"Sea-to-Sky Gondola",cat:"Mountain viewpoint",loc:"Squamish (~1.5 hr)",cost:65,dist:"far",type:"rec",who:["couple","friends","family"],vibes:["nature"],d:"Suspension bridge and alpine boardwalks with fjord views."},
+  {n:"Bowen Island day-hop",cat:"Island wander",loc:"via Horseshoe Bay",cost:20,dist:"far",type:"rec",who:["couple","solo","friends"],vibes:["water","calm","nature","cozy"],d:"Short ferry to an artsy island — beach, galleries, slow lunch."},
+  {n:"Surrey City Centre Library",cat:"Library & events",loc:"Surrey Central",cost:0,dist:"near",type:"easy",who:["solo","family","couple","friends"],vibes:["easy","calm","cozy"],d:"Free reading lounges, maker space, talks and kids' story time."},
+  {n:"Museum of Surrey",cat:"Museum",loc:"Cloverdale",cost:0,dist:"near",type:"easy",who:["family","couple","solo"],vibes:["easy","cozy","calm"],d:"Free local museum with rotating exhibits — easy indoor outing."},
+  {n:"Darts Hill Garden Park",cat:"Garden stroll",loc:"South Surrey",cost:0,dist:"near",type:"easy",who:["couple","solo","family"],vibes:["easy","calm","nature"],d:"Gentle paths through a heritage garden — senior-friendly."},
+  {n:"Board-game café",cat:"Games & coffee",loc:"Langley",cost:12,dist:"near",type:"easy",who:["friends","family","couple"],vibes:["easy","cozy","party"],d:"Hundreds of games, snacks and coffee — easy social afternoon."},
+  {n:"Community centre drop-in",cat:"Swim / skate / fitness",loc:"Surrey (multiple)",cost:6,dist:"near",type:"easy",who:["family","solo","friends","couple"],vibes:["easy","calm"],d:"Cheap drop-in swims, skates and classes for all ages."},
+  {n:"Indoor playground",cat:"Kids play",loc:"Surrey",cost:14,dist:"near",type:"easy",who:["family"],vibes:["easy","party"],d:"Soft-play and slides — rainy-day energy-burner for kids."},
+  {n:"Harrison Hot Springs village",cat:"Lakeside overnight",loc:"~1.5 hr",cost:160,dist:"far",type:"stay",who:["couple","friends","family"],vibes:["water","calm","cozy"],d:"Hot springs, lagoon beach, cafés, easy lake walks."},
+  {n:"Fort Langley B&B weekend",cat:"Heritage stay",loc:"~30 min",cost:130,dist:"near",type:"stay",who:["couple","solo"],vibes:["cozy","calm"],d:"Cosy B&Bs by the historic fort, river trail and brunch row."},
+  {n:"Squamish adventure base",cat:"Mountain-town stay",loc:"~1.5 hr",cost:150,dist:"far",type:"stay",who:["couple","friends"],vibes:["nature","party"],d:"Gondola, falls, lakes and breweries from one basecamp."},
+  {n:"Hope / Fraser Canyon",cat:"Road-trip overnight",loc:"~1.5 hr",cost:110,dist:"far",type:"stay",who:["couple","friends","family"],vibes:["nature","calm"],d:"Othello Tunnels, Hell's Gate airtram, quirky canyon stops."}
+];
+const DESTS=[
+  {n:"Cancún / Tulum",flag:"🇲🇽",flight:380,hb:40,hm:95,daily:55,vibes:["water","party","calm"],exp:"Cenote swim + Tulum ruins (~$30)",best:"Beach + nightlife on a budget"},
+  {n:"Mexico City",flag:"🇲🇽",flight:300,hb:55,hm:115,daily:45,vibes:["cozy","party"],exp:"Teotihuacán day trip (~$35)",best:"Food, culture, great value"},
+  {n:"Tokyo",flag:"🇯🇵",flight:680,hb:75,hm:140,daily:70,vibes:["cozy","party","calm"],exp:"teamLab digital art (~$30)",best:"Cozy + electric in one"},
+  {n:"Bali",flag:"🇮🇩",flight:720,hb:35,hm:100,daily:40,vibes:["nature","water","calm","cozy"],exp:"Surf lesson + temple (~$30)",best:"Nature + cheap once there"},
+  {n:"Lisbon",flag:"🇵🇹",flight:680,hb:75,hm:120,daily:60,vibes:["cozy","party","water"],exp:"Sintra palaces (~$50)",best:"Walkable, cozy, lively"},
+  {n:"Reykjavik / Iceland",flag:"🇮🇸",flight:620,hb:130,hm:200,daily:90,vibes:["nature","calm"],exp:"Blue Lagoon + Golden Circle (~$120)",best:"Raw nature & calm"},
+  {n:"Bangkok",flag:"🇹🇭",flight:760,hb:30,hm:85,daily:35,vibes:["party","cozy"],exp:"Grand Palace + markets (~$20)",best:"Lively + ultra-affordable"},
+  {n:"Maui, Hawaii",flag:"🌺",flight:520,hb:160,hm:260,daily:85,vibes:["water","calm","nature"],exp:"Road to Hana + snorkel (~$60)",best:"Beach + nature, no passport"},
+  {n:"Las Vegas",flag:"🎰",flight:250,hb:70,hm:160,daily:90,vibes:["party"],exp:"Show + Grand Canyon (~$120)",best:"Pure party weekend"},
+  {n:"Banff, Canada",flag:"🏔️",flight:230,hb:120,hm:200,daily:70,vibes:["nature","calm"],exp:"Lake Louise canoe (~$80)",best:"Mountain calm, short flight"}
+];
+const VENUES=[
+  {n:"Central City Brew Pub",area:"Surrey Central",min:15,max:80,head:45,vibes:["party","cozy"],occ:["office","friends","birthday"],d:"House-brewed beer + shareable food in a lively private space."},
+  {n:"Atlas Steak + Fish (private room)",area:"Langley",min:10,max:30,head:80,vibes:["cozy","party"],occ:["office","birthday"],d:"Upscale steakhouse with a private dining room."},
+  {n:"REVS Bowling + Arcade",area:"Langley",min:10,max:40,head:32,vibes:["party"],occ:["office","friends","birthday","family"],d:"Bowling, arcade and food — easy crowd-pleaser."},
+  {n:"Grand banquet hall + catering",area:"Surrey",min:50,max:300,head:42,vibes:["party","calm"],occ:["office","family","birthday"],d:"Full banquet hall with catering for big events."},
+  {n:"Township 7 Winery",area:"Langley",min:12,max:40,head:55,vibes:["cozy","calm"],occ:["office","birthday","friends"],d:"Tastings and a patio in wine country — relaxed and classy."},
+  {n:"Tynehead picnic shelter",area:"North Surrey",min:15,max:60,head:12,vibes:["nature","calm"],occ:["family","friends","office"],d:"Covered park shelter; BYO food + games — cheapest big-group option."},
+  {n:"Private karaoke lounge",area:"Surrey",min:8,max:30,head:38,vibes:["party"],occ:["office","friends","birthday"],d:"Private rooms to loosen up the team after work."},
+  {n:"Community centre hall rental",area:"Surrey",min:20,max:120,head:16,vibes:["calm","party"],occ:["family","office","birthday"],d:"Affordable rentable hall — bring catering, decorate your way."},
+  {n:"Harrison resort group retreat",area:"Harrison (~1.5 hr)",min:20,max:80,head:185,vibes:["calm","water"],occ:["office"],d:"Turn the party into an overnight retreat."},
+  {n:"Steveston seafood patio",area:"Richmond",min:10,max:35,head:40,vibes:["water","cozy"],occ:["office","friends","birthday"],d:"Waterfront seafood with a relaxed coastal vibe."}
+];
+const EVENTS=[
+  {m:"Jun",d:"6",n:"Fusion Newton Street Festival",area:"Newton, Surrey",v:["party","cozy"],desc:"Multiple music stages, artisan vendors, family day."},
+  {m:"Jun",d:"20",n:"Surrey Pride",area:"Surrey Central",v:["party"],desc:"Live performances, drag shows, food vendors & a maker marketplace."},
+  {m:"Jul",d:"1",n:"Canada Day @ Bill Reid Amphitheatre",area:"Cloverdale",v:["party"],desc:"Rides, food trucks, Indigenous Village and fireworks."},
+  {m:"Jul",d:"12",n:"Cloverdale Station Music Festival",area:"Cloverdale",v:["party","cozy"],desc:"Outdoor live-music festival in historic Cloverdale."},
+  {m:"Aug",d:"15",n:"Greek Festival (North Surrey)",area:"North Surrey",v:["cozy","party"],desc:"Nine nights of Greek cooking, BBQ, performances and desserts."},
+  {m:"Aug",d:"22",n:"Salmon & Trails Riverside Festival",area:"South Surrey",v:["nature","calm"],desc:"Hatchery tours, forest trails, food trucks, riverside stage."},
+  {m:"Sat",d:"Wkly",n:"Cloverdale / Clayton Community Market",area:"Cloverdale",v:["cozy","calm"],desc:"Farmers, food vendors and local makers — easy morning out."}
+];
+const MONTHIDX={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const MOVIES=[
+  {t:"Everything Everywhere All at Once",g:"mind-bending",where:"Prime Video",d:"Chaotic, funny multiverse ride that lands as a family story."},
+  {t:"The Grand Budapest Hotel",g:"feel-good",where:"Disney+",d:"A cosy, candy-coloured caper — pure comfort."},
+  {t:"Spirited Away",g:"cozy",where:"Netflix",d:"Studio Ghibli magic; gentle, gorgeous, any mood."},
+  {t:"Knives Out",g:"fun",where:"Prime Video",d:"A whip-smart whodunit that's endlessly rewatchable."},
+  {t:"La La Land",g:"romantic",where:"Netflix",d:"Dreamy, bittersweet musical — perfect couple's night."},
+  {t:"Paddington 2",g:"family",where:"Netflix",d:"The most wholesome movie ever made — all ages."},
+  {t:"Top Gun: Maverick",g:"thrilling",where:"Prime Video",d:"Crowd-pleasing, big-screen-at-home energy."},
+  {t:"Spider-Man: Into the Spider-Verse",g:"family",where:"Disney+",d:"Stunning animation, huge heart, fun for everyone."}
+];
+const SEED_USERS=[
+  {id:"maya",name:"Maya R.",emoji:"🌲",bio:"Trail-chaser"},{id:"arjun",name:"Arjun P.",emoji:"🍜",bio:"Eats his way around the city"},
+  {id:"priya",name:"Priya K.",emoji:"🌊",bio:"Beach + sunsets"},{id:"leo",name:"Leo M.",emoji:"⛰️",bio:"Weekend wanderer"}
+];
+const SEED_POSTS=[
+  {user:"priya",act:"Crescent Beach sunset",place:"South Surrey",cap:"Best $0 date in the Lower Mainland. 🌅",grad:"linear-gradient(135deg,#fb923c,#fde68a)",emoji:"🌅",daysAgo:1,likes:41},
+  {user:"maya",act:"Tynehead Park loop",place:"North Surrey",cap:"Morning forest air + the salmon hatchery. Reset complete. 🌿",grad:"linear-gradient(135deg,#16a34a,#86efac)",emoji:"🌲",daysAgo:2,likes:24},
+  {user:"arjun",act:"Ban Chok Dee, Langley",place:"Langley",cap:"Green curry that actually slaps. Local secret.",grad:"linear-gradient(135deg,#b45309,#fcd34d)",emoji:"🍛",daysAgo:3,likes:18},
+  {user:"leo",act:"Othello Tunnels",place:"Hope",cap:"Walked through a turquoise canyon. Unreal.",grad:"linear-gradient(135deg,#0369a1,#38bdf8)",emoji:"🚶",daysAgo:5,likes:33}
+];
+
+/* ===== CHARACTERS (guides) ===== */
+const CHARACTERS=[
+  {id:"otter",name:"Sunny",emoji:"🦦",color:"#0ea5e9",line:"Let's make a splash —"},
+  {id:"fox",name:"Pip",emoji:"🦊",color:"#f97316",line:"Adventure's calling —"},
+  {id:"owl",name:"Sage",emoji:"🦉",color:"#7c3aed",line:"A little wisdom —"},
+  {id:"bear",name:"Bruno",emoji:"🐻",color:"#16a34a",line:"Take it easy —"},
+  {id:"bird",name:"Zip",emoji:"🐦",color:"#ec4899",line:"Quick one —"}
+];
+/* ===== SCENIC / CAMPFIRE / ROAD TRIPS ===== */
+const SCENIC=[
+  {n:"Lighthouse Park",loc:"West Vancouver (~50 min)",d:"Old-growth forest trails to Juniper Point — cliff views over Howe Sound, Bowen & Passage Island.",cost:0},
+  {n:"Buntzen Lake (‘Lake Beautiful’)",loc:"Anmore (~50 min)",d:"Mountain-ringed lake with a picnic beach and the famous 10-viewpoint ridge loop.",cost:0},
+  {n:"Whytecliff Park",loc:"West Vancouver (~55 min)",d:"Walk out to a rocky island at low tide; one of the best sunset spots on the coast.",cost:0},
+  {n:"Porteau Cove",loc:"Sea-to-Sky (~1 hr)",d:"Fjord views right off the highway — easy, gorgeous, and a stellar sunset.",cost:0},
+  {n:"Lynn Canyon + suspension bridge",loc:"North Van (~50 min)",d:"Free suspension bridge over a rainforest gorge with swimming holes below.",cost:0},
+  {n:"Joffre Lakes",loc:"Pemberton (~3 hr)",d:"Three electric-turquoise glacier lakes. Free day-use pass required in summer.",cost:0},
+  {n:"Deep Cove",loc:"North Van (~55 min)",d:"Storybook seaside village — kayak Indian Arm, grab a famous Honey doughnut. (Quarry Rock trail currently closed.)",cost:0},
+  {n:"Cleveland Dam viewpoint",loc:"North Van (~50 min)",d:"Stand atop the dam with The Lions framed behind Capilano Lake.",cost:0}
+];
+const CAMPFIRE=[
+  {n:"Centennial Beach fire pits",loc:"Boundary Bay Regional Park, Tsawwassen (~35 min)",d:"Four beachside fire pits, first-come first-served — the rare legal Lower Mainland beach fire.",cost:0},
+  {n:"Golden Ears Park campground",loc:"Maple Ridge (~50 min)",d:"Designated fire pits at lakeside campsites (Alouette Lake) — book ahead in summer.",cost:30},
+  {n:"Cultus Lake Park campground",loc:"Chilliwack (~1.5 hr)",d:"Warm-water lake with campsites and fire pits — classic family bonfire weekend.",cost:30},
+  {n:"Porteau Cove campground",loc:"Sea-to-Sky (~1 hr)",d:"Seaside walk-in sites with fire rings and fjord sunsets.",cost:28},
+  {n:"Chilliwack Lake Park",loc:"Chilliwack (~2 hr)",d:"Forested lakeside campground with fire pits and mountain reflections.",cost:28}
+];
+const ROADTRIPS=[
+  {n:"Sea-to-Sky Highway",loc:"Vancouver → Whistler (~2 hr one-way)",d:"One of Canada's most scenic drives: Britannia Beach, Shannon Falls, the Stawamus Chief, Sea-to-Sky Gondola, then Whistler.",cost:0},
+  {n:"Duffey Lake Road",loc:"Pemberton → Lillooet (~2 hr)",d:"Hwy 99 through narrow canyons past Nairn Falls, Joffre Lakes and turquoise alpine lakes.",cost:0},
+  {n:"Fraser Canyon",loc:"Hope → Boston Bar (~1.5 hr)",d:"Historic canyon drive: Othello Tunnels, Hell's Gate Airtram, and the riverside towns of Yale & Spuzzum.",cost:0},
+  {n:"The Duffey Loop (epic 2–3 day)",loc:"Vancouver → Whistler → Lillooet → Hope (~650 km)",d:"Sea-to-Sky up, Duffey Lake across, Fraser Canyon home — the ultimate BC loop.",cost:0},
+  {n:"Vancouver Island + Tofino",loc:"Ferry + drive (2–3 days)",d:"Cross to the Island, through Cathedral Grove's giant firs, out to Tofino's wild surf beaches.",cost:0}
+];
+const WATERFALLS=[
+  {n:"Bosumarne Falls",loc:"Chilliwack Lake (~2 hr)",swim:true,d:"Short rugged hike through mossy rainforest to two falls with a plunge pool at the base. Barely signed — you'll often have it to yourself."},
+  {n:"Lindeman Lake",loc:"Chilliwack (~2 hr)",swim:true,d:"A 3.4 km uphill trail to a vivid turquoise alpine lake ringed by peaks — bracingly cold but unforgettable for a dip."},
+  {n:"Kanaka Creek — Cliff Falls",loc:"Maple Ridge (~50 min)",swim:true,d:"One of Maple Ridge's best-kept secrets: waterfalls and creek pools in a quiet forest park, easy to reach."},
+  {n:"Norvan Falls",loc:"Lynn Headwaters, North Van (~1 hr)",swim:false,d:"A long, peaceful forest walk (~14 km return) to a tall, uncrowded waterfall — a true hidden gem."},
+  {n:"Flood Falls",loc:"Hope (~1.5 hr)",swim:false,d:"An easy 1 km hike to a surprisingly stunning, rarely-busy waterfall."},
+  {n:"Lynn Canyon 30-Foot Pool",loc:"North Van (~50 min)",swim:true,d:"A gorgeous emerald swimming hole below the free suspension bridge — beautiful, but mind the currents."},
+  {n:"Pool 99 — Seymour River",loc:"North Van (~1 hr)",swim:true,d:"A locals' summer swim and cliff-jump spot off Riverside Drive. Cold, fast water — scout the depth first."},
+  {n:"Greendrop Lake",loc:"Chilliwack (~2 hr + hike)",swim:true,d:"Push past Lindeman along Post Creek to an even quieter turquoise lake — remote and rewarding."},
+  {n:"Teapot Trail, Cultus Lake",loc:"Chilliwack (~1.5 hr)",swim:false,d:"A quirky 6 km hike with 100+ hidden teacups tucked in the trees, near Cultus Lake's warm-water swims."}
+];
+/* ===== NATURE STAYS ACROSS CANADA (area = Airbnb/Maps search) ===== */
+const STAYS_CA=[
+  // BC
+  {n:"Tofino oceanfront cabins",area:"Tofino, BC",region:"bc",lo:250,hi:550,vibes:["water","nature","cozy"],d:"Cedar cabins tucked in ancient rainforest with Pacific surf, hot tubs and wildlife at the door."},
+  {n:"Okanagan lakeside log cabins",area:"Kelowna, BC",region:"bc",lo:180,hi:380,vibes:["water","calm","cozy"],d:"Lakeside cabins and resorts with hot tubs, wood stoves and paddleboards on sunny Okanagan Lake."},
+  {n:"Kootenay off-grid domes",area:"Kootenay Lake, BC",region:"bc",lo:150,hi:300,vibes:["nature","calm"],d:"Geodesic stargazing domes and eco-retreats surrounded by mountains, firepits and cedar hot tubs."},
+  {n:"Salt Spring Island forest cabins",area:"Salt Spring Island, BC",region:"bc",lo:160,hi:320,vibes:["nature","cozy","calm"],d:"Artsy Gulf-Island hideaways among arbutus forest, farm stands and quiet coves."},
+  {n:"Whistler mountain chalets",area:"Whistler, BC",region:"bc",lo:250,hi:600,vibes:["nature","cozy","party"],d:"Alpine chalets and lofts steps from trails, lakes and the village."},
+  {n:"Harrison & Cultus lake cabins",area:"Harrison Hot Springs, BC",region:"bc",lo:150,hi:300,vibes:["water","calm","cozy"],d:"Cosy lakeside cabins near hot springs — the easy close-to-home nature reset."},
+  // Rockies / Alberta
+  {n:"Canmore rustic mountain cabins",area:"Canmore, AB",region:"rockies",lo:200,hi:420,vibes:["nature","cozy"],d:"Wood cabins with Rocky Mountain views, fire pits and trails minutes from Banff."},
+  {n:"Banff park cabins",area:"Banff, AB",region:"rockies",lo:250,hi:520,vibes:["nature","cozy"],d:"Storybook cabins inside the national park — turquoise lakes, gondolas and hot springs."},
+  {n:"Jasper quiet wilderness stays",area:"Jasper, AB",region:"rockies",lo:200,hi:420,vibes:["nature","calm"],d:"Bigger, wilder and quieter than Banff — dark-sky stargazing and glacier drives."},
+  // Ontario
+  {n:"Muskoka lakeside cottages",area:"Muskoka, ON",region:"ontario",lo:250,hi:600,vibes:["water","cozy","calm"],d:"Classic Canadian cottage country — docks, canoes, loons and pine-framed sunsets."},
+  {n:"Algonquin canoe-country cabins",area:"Algonquin Park, ON",region:"ontario",lo:150,hi:350,vibes:["nature","calm"],d:"Forest cabins on the edge of canoe routes, moose sightings and blazing fall colour."},
+  {n:"Prince Edward County BnBs",area:"Prince Edward County, ON",region:"ontario",lo:180,hi:360,vibes:["cozy","water","calm"],d:"Countryside inns and farmhouses among wineries, sandbanks beaches and food."},
+  {n:"Blue Mountain chalets",area:"Collingwood, ON",region:"ontario",lo:200,hi:420,vibes:["nature","cozy","party"],d:"Escarpment chalets near trails, caves and Georgian Bay beaches."},
+  // Québec
+  {n:"Mont-Tremblant chalets",area:"Mont-Tremblant, QC",region:"quebec",lo:200,hi:460,vibes:["nature","cozy"],d:"Laurentian log chalets on lakes and slopes with après-ski village charm."},
+  {n:"Charlevoix riverside cabins",area:"Charlevoix, QC",region:"quebec",lo:180,hi:400,vibes:["nature","calm","cozy"],d:"Mountains tumbling into the St. Lawrence — whales, art villages and cosy cabins."},
+  {n:"Eastern Townships lake cottages",area:"Magog, QC",region:"quebec",lo:170,hi:360,vibes:["water","calm","cozy"],d:"Lakeside cottages and spa-nordic retreats in rolling vineyard country."},
+  // Atlantic
+  {n:"Cape Breton coastal cabins",area:"Cabot Trail, NS",region:"atlantic",lo:150,hi:320,vibes:["water","nature","calm"],d:"Cliffside cabins along the Cabot Trail — whales, highlands and ocean every morning."},
+  {n:"Bay of Fundy forest stays",area:"Fundy National Park, NB",region:"atlantic",lo:140,hi:300,vibes:["nature","calm"],d:"Woodland cabins beside the world's highest tides and covered-bridge backroads."},
+  {n:"Gros Morne fjord cabins",area:"Gros Morne, NL",region:"atlantic",lo:150,hi:340,vibes:["nature","calm","water"],d:"Cabins under dramatic fjords and tablelands — raw, jaw-dropping Newfoundland."},
+  {n:"PEI beach cottages",area:"Cavendish, PE",region:"atlantic",lo:150,hi:320,vibes:["water","cozy","calm"],d:"Red-sand-beach cottages, lighthouses, lobster suppers and gentle island pace."},
+  // North
+  {n:"Yukon aurora cabins",area:"Whitehorse, YT",region:"north",lo:180,hi:420,vibes:["nature","calm"],d:"Off-grid cabins under the northern lights — wilderness, hot springs and silence."}
+];
+/* ===== SURREY RESTAURANTS (tap -> live Google Maps listing) ===== */
+const RESTAURANTS=[
+  {n:"Navraj Sweets & Restaurant",c:"indian",area:"Newton, Surrey",r:4.5,d:"Beloved Punjabi spot — mithai, aloo-paratha thalis and gol gappe."},
+  {n:"Ustaad G",c:"indian",area:"Surrey Central",r:4.4,d:"Punjabi favourite near Surrey Central — hearty, flavour-packed plates."},
+  {n:"Sahota's Live Grill",c:"indian",area:"Surrey",r:4.3,d:"Indian grill house with tandoori and live-fire specialties."},
+  {n:"Spice 72 Indian Restaurant & Lounge",c:"indian",area:"Surrey",r:4.3,d:"Modern Indian dining + lounge — curries, tandoor and cocktails."},
+  {n:"Chacha's Tandoor & Grill",c:"indian",area:"Newton, Surrey",r:4.6,d:"Bold, flavour-heavy North Indian dishes; a Newton standout."},
+  {n:"Afghan Kitchen",c:"afghan",area:"South Surrey",r:4.7,d:"Elite Afghan cooking — qabili palao with tender lamb and addictive mantu dumplings."},
+  {n:"Sunflower Restaurant",c:"viet",area:"King George Blvd, Surrey",r:4.4,d:"Steamy pho, loaded vermicelli plates and generous portions."},
+  {n:"Tuan Hang Deli & Catering",c:"viet",area:"Surrey",r:4.5,d:"Cozy Central-Vietnamese flavours — chicken & bamboo soup, bold salads."},
+  {n:"Pho Tam",c:"viet",area:"Whalley, Surrey",r:4.6,d:"BC top-tier pho — a Whalley institution."},
+  {n:"Dominion Bar + Kitchen",c:"korean",area:"Surrey City Centre",r:4.4,d:"Korean-leaning fusion — fried cauliflower, burgers, striploin, lively room."},
+  {n:"Guildford Korean BBQ (AYCE)",c:"korean",area:"Guildford, Surrey",r:4.3,d:"All-you-can-eat Korean BBQ — marinated beef, pork and chicken at your table."},
+  {n:"Isshin Sushi Bar",c:"japanese",area:"Fleetwood, Surrey",r:4.6,d:"Consistently great sushi, tempura and teriyaki."},
+  {n:"Damiko Sushi",c:"japanese",area:"Cloverdale, Surrey",r:4.7,d:"Cloverdale favourite — fresh, generous sushi and sashimi."},
+  {n:"Jin Sushi",c:"japanese",area:"Newton Village, Surrey",r:4.3,d:"Flavour-packed nigiri and assorted tempura."},
+  {n:"The Filipino Noodle Joint",c:"filipino",area:"Surrey",r:4.4,d:"Traditional Filipino noodles, pork BBQ and Sago't Gulaman — big, fresh portions."},
+  {n:"Hang Lee Wok",c:"chinese",area:"Surrey",r:4.3,d:"Bustling wok house — ginger-garlic chicken and beef lo mein in generous portions."},
+  {n:"Browns Socialhouse",c:"casual",area:"Guildford, Surrey",r:4.2,d:"Reliable casual dining — pasta, fish & chips, salads and patios."}
+];
+const CUISINE_LABEL={indian:"Indian / Punjabi",afghan:"Afghan",viet:"Vietnamese",korean:"Korean",japanese:"Japanese",filipino:"Filipino",chinese:"Chinese",casual:"Casual"};
+
+/* ===== HELPERS ===== */
+const budgetCap={low:75,med:250,high:600},distRank={near:0,day:1,far:2};
+let exploreCat="gems";
+const liked=new Set();
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function costChip(c){return c===0?'<span class="pill cost">Free</span>':'<span class="pill cost">~$'+c+'/person</span>';}
+function moodMatch(s){return state.mood==="any"||s.vibes.includes(state.mood);}
+function esc(s){return String(s==null?"":s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toISO(d){return d.toISOString().slice(0,10);}
+function nextSaturday(){const t=new Date(),x=new Date(t);x.setDate(t.getDate()+((6-t.getDay()+7)%7||7));return toISO(x);}
+function slug(s){return s.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'me';}
+function ago(ts){const s=(Date.now()-ts)/1000;if(s<3600)return Math.max(1,Math.round(s/60))+"m ago";if(s<86400)return Math.round(s/3600)+"h ago";return Math.round(s/86400)+"d ago";}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
+function mapA(name,area){return `<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name+', '+(area||state.loc||'Surrey BC'))}">🗺️ Maps</a>`;}
+function saveBtn(title,sub,type,date){return `<button class="btn ghost savebtn" data-save-title="${esc(title)}" data-save-sub="${esc(sub)}" data-save-type="${type}" data-save-date="${date}">＋ Save to calendar</button>`;}
+function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){toast("Storage full — try a smaller photo");return false;}}
+function readImage(file,cb){if(!file){cb(null);return;}const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const max=900;let w=img.width,h=img.height;const sc=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7));};img.src=e.target.result;};r.readAsDataURL(file);}
+
+function filterSpots(types,useMood){
+  let r=SPOTS.filter(s=>{if(types&&!types.includes(s.type))return false;if(distRank[s.dist]>distRank[state.dist])return false;if(!s.who.includes(state.who))return false;if(useMood&&!moodMatch(s))return false;return true;});
+  if(!r.length&&useMood)r=SPOTS.filter(s=>(!types||types.includes(s.type))&&distRank[s.dist]<=distRank[state.dist]&&s.who.includes(state.who));
+  if(!r.length)r=SPOTS.filter(s=>!types||types.includes(s.type));
+  return shuffle(r);
+}
+
+/* ===== WEEKEND ===== */
+function genPlan(){
+  if(state.mood==="lazy"){genLazy();return;}
+  const cap=budgetCap[state.budget],out=document.getElementById('planOut');
+  let trails=filterSpots(["trail"],true),foods=filterSpots(["food"],true),recs=filterSpots(["rec"],true),easy=filterSpots(["easy"],true);
+  let slots=[];function add(time,s){if(s)slots.push({time,n:s.n,loc:s.loc,sub:s.cat+" · "+s.loc,d:s.d,cost:s.cost});}
+  if(state.mood==="party"){add("Afternoon",recs[0]||trails[0]);add("Dinner",foods.find(f=>f.vibes.includes("party"))||foods[0]);add("Evening",{n:"Out by the water",cat:"Nightlife",loc:"White Rock",cost:35,d:"Patios and a pier stroll as it gets lively."});}
+  else if(state.mood==="easy"){add("Morning",easy[0]);add("Lunch",foods[0]);add("Afternoon",easy[1]||trails[0]);}
+  else if(state.mood==="cozy"){add("Late morning",foods.find(f=>f.vibes.includes("cozy"))||foods[0]);add("Afternoon",trails[0]||easy[0]);add("Evening",easy.find(e=>e.vibes.includes("cozy"))||foods[1]||foods[0]);}
+  else{add("Morning",trails[0]);add("Lunch",foods[0]);add("Afternoon",trails[1]||recs[0]||easy[0]);}
+  let base=slots.reduce((s,x)=>s+(x.cost||0),0),est=base+15,within=est<=cap,title=`Your ${moodLabel()} weekend`;
+  let html=`<div class="plan-head"><div><h3 style="margin:0 0 4px">${title}</h3><span class="muted">${esc(state.loc)} · ${whoLabel()} · $${cap} budget</span></div><span class="badge">${state.dist==="far"?"Worth the drive":state.dist==="day"?"Day trip":"Close to home"}</span></div><div class="timeline">`;
+  slots.forEach(s=>{html+=`<div class="slot"><div class="time">${s.time}</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta"><span class="pill">📍 ${s.sub}</span>${costChip(s.cost)}${mapA(s.n,s.loc)}</div></div>`;});
+  html+=`</div><div class="total"><div><div class="muted" style="font-size:13px">Rough cost / person</div><div style="font-size:12px;color:${within?'var(--green)':'var(--warn)'}">${within?'✓ Inside your budget':'⚠ A bit over — swap a paid stop for a free trail'}</div></div><b>$${est}</b></div>`;
+  html+=saveBtn(title,slots.map(s=>s.n).join(" → "),"plan",nextSaturday());
+  out.innerHTML=html;out.classList.remove('hide');out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function whoLabel(){return {couple:"Me + partner",solo:"Solo",friends:"Friends",family:"Family"}[state.who];}
+function moodLabel(){return {any:"surprise",calm:"calm & relaxed",nature:"near-nature",water:"waterside",cozy:"cozy",party:"lively",easy:"simple all-ages",lazy:"lazy night in"}[state.mood];}
+function genLazy(){
+  const out=document.getElementById('planOut');
+  let pool=MOVIES.slice();if(state.who==="family")pool=MOVIES.filter(m=>["family","feel-good","cozy"].includes(m.g));
+  if(state.who==="couple")pool=shuffle(MOVIES).sort((a,b)=>(b.g==="romantic")-(a.g==="romantic"));
+  const picks=shuffle(pool).slice(0,4);
+  const snack=shuffle(["Order in from Afghan Kitchen or a local Thai spot","Homemade popcorn + a cheese board","Pizza night + ice cream","Dumplings + bubble tea delivery"])[0];
+  let html=`<div class="plan-head"><div><h3 style="margin:0 0 4px">🛋️ Lazy night in</h3><span class="muted">${whoLabel()} · zero effort · stay cosy</span></div><span class="badge">Stay home</span></div><p class="sub">Can't decide what to watch? Here's a shortlist — hit "Again" to reshuffle.</p><div class="timeline">`;
+  picks.forEach(m=>{html+=`<div class="slot"><div class="time">${m.g}</div><h4>${m.t}</h4><p>${m.d}</p><div class="meta"><span class="pill">▶️ Try ${m.where}</span></div></div>`;});
+  html+=`</div><div class="slot"><div class="time">Snack plan</div><h4>${snack}</h4><p>Dim the lights, phones away, make it a proper reset.</p></div>`;
+  html+=saveBtn("Lazy movie night",picks.map(m=>m.t).join(", "),"event",nextSaturday());
+  html+=`<div class="note">▶️ Streaming homes change by region & time — confirm in your apps.</div>`;
+  out.innerHTML=html;out.classList.remove('hide');out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ===== TRIPS ===== */
+function genTrips(){
+  const out=document.getElementById('tripOut'),nights=Math.max(1,parseInt(document.getElementById('nights').value)||5),tier=state.tier;
+  let list=DESTS.filter(d=>state.tmood==="any"||d.vibes.includes(state.tmood));if(!list.length)list=DESTS.slice();
+  list=list.map(d=>{const hotel=(tier==="budget"?d.hb:d.hm)*nights;return {...d,total:d.flight+hotel+d.daily*nights,hotel};}).sort((a,b)=>a.total-b.total);
+  let html=`<div class="card"><p class="sub">${list.length} destinations · ${nights} nights · ${tier==="budget"?"budget":"comfortable"} hotels — cheapest first.</p>`;
+  list.forEach(d=>{html+=`<div class="dest"><div class="row"><h4><span class="flag">${d.flag}</span> ${d.n}</h4><span class="price">~$${d.total.toLocaleString()}/pp</span></div><p>${d.best}. ${d.exp}.</p><p class="muted" style="font-size:11px;margin-top:6px">Flight ~$${d.flight} · Hotel ~$${d.hotel.toLocaleString()} (${nights} nts) · Food/transport ~$${(d.daily*nights).toLocaleString()}</p><div class="vibetags">${d.vibes.map(v=>`<span class="vt">${v}</span>`).join("")}</div><div class="meta" style="margin-top:8px">${mapA(d.n,'')} ${saveBtn(d.n+" trip ("+nights+" nts)","~$"+d.total.toLocaleString()+"/pp · "+d.best,"big",nextSaturday())}</div></div>`;});
+  html+=`<div class="note">💡 Illustrative 2026 ranges from Vancouver. The full app pulls live flight + hotel + Airbnb prices.</div></div>`;
+  out.innerHTML=html;
+}
+
+/* ===== GROUPS ===== */
+function genGroup(){
+  const out=document.getElementById('groupOut'),ppl=Math.max(2,parseInt(document.getElementById('ppl').value)||10),cap=parseInt(state.ghead);
+  let list=VENUES.filter(v=>v.occ.includes(state.occ));if(state.gvibe!=="any")list=list.filter(v=>v.vibes.includes(state.gvibe));
+  if(!list.length)list=VENUES.filter(v=>v.occ.includes(state.occ));
+  list=list.map(v=>({...v,fits:ppl>=v.min&&ppl<=v.max,total:v.head*ppl})).filter(v=>v.head<=cap);
+  if(!list.length){out.innerHTML=`<div class="card"><p class="muted">No venues under $${cap}/person for that group. Try raising the per-person budget.</p></div>`;return;}
+  list.sort((a,b)=>(b.fits-a.fits)||a.head-b.head);
+  let html=`<div class="card"><p class="sub">For ${ppl} people · ${occLabel()} · up to $${cap===999?'any':cap}/person — ${list.length} options.</p>`;
+  list.forEach(v=>{const capTxt=v.fits?`<span class="capok">✓ fits ${ppl}</span>`:(ppl>v.max?`<span class="capwarn">over capacity (max ${v.max})</span>`:`<span class="capwarn">small (min ${v.min})</span>`);
+    html+=`<div class="dest"><div class="row"><h4>${v.n}</h4><span class="price">~$${v.total.toLocaleString()} total</span></div><p>${v.d}</p><p class="muted" style="font-size:11px;margin-top:6px">📍 ${v.area} · ~$${v.head}/person · capacity ${v.min}–${v.max} · ${capTxt}</p><div class="meta" style="margin-top:8px">${mapA(v.n,v.area)} ${saveBtn(v.n+" — "+occLabel(),ppl+" people · ~$"+v.total.toLocaleString()+" total","group",nextSaturday())}</div></div>`;});
+  html+=`<div class="note">💡 Sample venues — confirm real capacity, catering & deposits before booking.</div></div>`;
+  out.innerHTML=html;
+}
+function occLabel(){return {office:"Office party",birthday:"Birthday",friends:"Friends night",family:"Family gathering"}[state.occ];}
+
+/* ===== EVENTS / MEETUP ===== */
+function eventISO(e){if(MONTHIDX[e.m]!==undefined&&/^\d+$/.test(e.d))return toISO(new Date(2026,MONTHIDX[e.m],parseInt(e.d)));return nextSaturday();}
+function genEvents(){document.getElementById('eventsOut').innerHTML=EVENTS.map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p><div class="meta">${mapA(e.n,e.area)} ${saveBtn(e.n,e.desc,"event",eventISO(e))}</div></div></div>`).join("");}
+function genMeet(){
+  const idea=document.getElementById('mIdea').value.trim()||"a casual hangout",vibe=state.mvibe,size=state.msize;
+  const pool=SPOTS.filter(s=>s.vibes.includes(vibe)).concat(SPOTS.filter(s=>s.vibes.includes("cozy")));const venue=pool[0]||SPOTS[0];
+  const today=new Date(),wantSun=(vibe==="calm"||vibe==="nature"),wantDay=wantSun?0:6;let target=new Date(today);target.setDate(today.getDate()+((wantDay-today.getDay()+7)%7||7));
+  const ds=target.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'}),time=wantSun?"10:00 AM":(vibe==="party"?"7:30 PM":"4:30 PM");
+  const capN={small:"4–8",med:"10–25",big:"30+"}[size],interested=({small:6,med:14,big:31})[size]+Math.floor(Math.random()*6);
+  const seed=vibe==="party"?"Lively":vibe==="water"?"Waterside":vibe==="nature"?"Outdoor":vibe==="cozy"?"Cozy":"Easygoing",title=`${seed} ${size==="big"?"city":"local"} meetup — ${capFirst(idea)}`;
+  document.getElementById('meetOut').innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--pink)"><span class="badge" style="border-color:#fbcfe8;color:var(--pink);background:#fdf2f8">AI-generated · not by any organisation</span><h3 style="margin:10px 0 4px">${title}</h3><div class="timeline" style="margin-top:10px"><div class="slot"><div class="time">When</div><h4>${ds} · ${time}</h4><p>Auto-picked for this vibe; the group can vote to shift it.</p></div><div class="slot"><div class="time">Where</div><h4>${venue.n}</h4><p>${venue.cat} · ${venue.loc} — ${venue.d}</p><div class="meta" style="margin-top:6px">${mapA(venue.n,venue.loc)}</div></div><div class="slot"><div class="time">Who it's for</div><h4>${capN} people who want to meet new faces</h4><p>Open to anyone nearby — the system runs it, no host needed.</p></div></div><div class="total"><div><div class="muted" style="font-size:13px">Community interest (simulated)</div><div style="font-size:12px;color:var(--green)">✓ Posts to the city board for others to join</div></div><b style="color:var(--pink)">${interested} interested</b></div>${saveBtn(title,venue.n+" · "+ds+" "+time,"event",toISO(target))}</div>`;
+  document.getElementById('meetOut').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function capFirst(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+/* ===== EXPLORE (gems / scenic / campfire / road trips) ===== */
+function genExplore(cat){
+  const out=document.getElementById('exploreOut');cat=cat||exploreCat;
+  if(cat==="gems"){
+    let g=SPOTS.filter(s=>["trail","rec","stay","easy"].includes(s.type)&&distRank[s.dist]<=distRank[state.dist]);
+    if(g.length<4)g=SPOTS.filter(s=>["trail","rec","stay","easy"].includes(s.type));g=shuffle(g).slice(0,8);
+    out.innerHTML=`<div class="spotgrid">`+g.map(s=>`<div class="spot"><div class="cat">${s.cat}</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.loc}</span>${costChip(s.cost)}${mapA(s.n,s.loc)}</div></div>`).join("")+`</div>`;
+  } else if(cat==="scenic"){
+    out.innerHTML=`<div class="spotgrid">`+SCENIC.map(s=>`<div class="spot expl-scenic"><div class="cat" style="color:#0d9488">Scenic viewpoint</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.loc}</span>${mapA(s.n,s.loc)}${saveBtn(s.n,"Scenic · "+s.loc,"plan",nextSaturday())}</div></div>`).join("")+`</div>`;
+  } else if(cat==="waterfalls"){
+    out.innerHTML=`<div class="firewarn" style="background:#eef6ff;border-color:#cfe4ff;color:#1e3a8a">💧 <b>Water safety first.</b> Mountain water is cold and currents are strong; these pools have no lifeguards and cliff-jumping causes serious injuries. Go with someone, check the depth, and skip it during high or fast water (spring melt).</div>`+WATERFALLS.map(w=>`<div class="dest" style="border-left:4px solid #38bdf8"><div class="row"><h4>💧 ${w.n}</h4>${w.swim?'<span class="price" style="color:#0ea5e9">swimmable</span>':'<span class="price" style="color:#64748b">falls / views</span>'}</div><p>${w.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${w.loc}</span>${mapA(w.n,w.loc)}${saveBtn(w.n,"Waterfall · "+w.loc,"big",nextSaturday())}</div></div>`).join("");
+  } else if(cat==="campfire"){
+    out.innerHTML=`<div class="firewarn">🔥 <b>Fire safety first.</b> Campfires are legal only in designated fire pits, and BC bans fires region-wide during dry spells. Always check the <a href="https://www2.gov.bc.ca/gov/content/safety/wildfire-status/prevention/fire-bans-and-restrictions" target="_blank" rel="noopener">BC Wildfire fire-ban status</a> before you light one.</div>`+CAMPFIRE.map(s=>`<div class="dest expl-campfire"><div class="row"><h4>${s.n}</h4>${s.cost?`<span class="price">~$${s.cost}/site</span>`:`<span class="price">Free</span>`}</div><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.loc}</span>${mapA(s.n,s.loc)}${saveBtn(s.n,"Campfire spot · "+s.loc,"big",nextSaturday())}</div></div>`).join("");
+  } else {
+    out.innerHTML=ROADTRIPS.map(s=>`<div class="dest expl-road"><div class="row"><h4>🛣️ ${s.n}</h4></div><p class="muted" style="font-size:12px;margin:4px 0 0">${s.loc}</p><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">🚗 Scenic drive</span>${mapA(s.n,"BC")}${saveBtn(s.n+" road trip",s.loc,"big",nextSaturday())}</div></div>`).join("");
+  }
+}
+function setExplore(cat){exploreCat=cat;document.querySelectorAll('[data-ecat]').forEach(x=>x.classList.toggle('active',x.dataset.ecat===cat));genExplore(cat);}
+
+/* ===== NATURE STAYS (Canada) ===== */
+let staysRegion="all";
+function airbnbA(area){return `<a class="maplink" style="background:#ffe4ef;color:#be185d;border-color:#fbcfe1" target="_blank" rel="noopener" href="https://www.airbnb.ca/s/${encodeURIComponent(area)}/homes?refinement_paths%5B%5D=%2Fhomes&property_type_id%5B%5D=2">🏠 Browse Airbnb</a>`;}
+function genStays(region){
+  region=region||staysRegion;const out=document.getElementById('staysOut');
+  let list=region==="all"?STAYS_CA:STAYS_CA.filter(s=>s.region===region);
+  out.innerHTML=`<p class="muted" style="font-size:12px;margin:2px 0 10px">${list.length} nature-stay spots${region==="all"?" across Canada":""} · price bands are typical nightly ranges — confirm live.</p>`+
+    list.map(s=>`<div class="dest" style="border-left:4px solid #10b981"><div class="row"><h4>🏡 ${s.n}</h4><span class="price" style="color:#059669">$${s.lo}–$${s.hi}/nt</span></div>
+      <p class="muted" style="font-size:12px;margin:4px 0 0">📍 ${s.area}</p><p>${s.d}</p>
+      <div class="vibetags">${s.vibes.map(v=>`<span class="vt">${v}</span>`).join("")}</div>
+      <div class="meta" style="margin-top:8px">${airbnbA(s.area)}${mapA(s.area,"Canada")}${saveBtn(s.n,"Nature stay · "+s.area,"big",nextSaturday())}</div></div>`).join("");
+}
+function setStays(region){staysRegion=region;document.querySelectorAll('[data-sreg]').forEach(x=>x.classList.toggle('active',x.dataset.sreg===region));genStays(region);}
+
+/* ===== EATS (Surrey restaurants) ===== */
+let eatsCuisine="all";
+function genEats(cuisine){
+  cuisine=cuisine||eatsCuisine;
+  // live "browse all near me" Maps link, built from the user's location
+  const allBtn=document.getElementById('mapAll');
+  if(allBtn)allBtn.href="https://www.google.com/maps/search/"+encodeURIComponent("restaurants near "+(state.loc||"Surrey BC"));
+  const out=document.getElementById('eatsOut');
+  let list=cuisine==="all"?RESTAURANTS:RESTAURANTS.filter(s=>s.c===cuisine);
+  out.innerHTML=`<p class="muted" style="font-size:12px;margin:2px 0 10px">${list.length} local favourite${list.length===1?"":"s"}${cuisine==="all"?"":" · "+CUISINE_LABEL[cuisine]} · tap Maps for live hours, photos & reviews.</p><div class="spotgrid">`+
+    list.map(s=>`<div class="spot"><div class="cat">${CUISINE_LABEL[s.c]||""}</div><h4>${s.n} ${s.r?`<span style="color:#f59e0b;font-size:12px">★ ${s.r}</span>`:""}</h4><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.area}</span>${mapA(s.n,s.area)}${saveBtn(s.n,CUISINE_LABEL[s.c]+" · "+s.area,"event",nextSaturday())}</div></div>`).join("")+`</div>`;
+}
+function setEats(cuisine){eatsCuisine=cuisine;document.querySelectorAll('[data-ccat]').forEach(x=>x.classList.toggle('active',x.dataset.ccat===cuisine));genEats(cuisine);}
+
+/* ===== GUIDE CHARACTERS ===== */
+function getGuide(){try{return localStorage.getItem('le_guide')||'otter';}catch(e){return'otter';}}
+function setGuide(id){try{localStorage.setItem('le_guide',id);}catch(e){}renderGuides();renderSpark();const c=guideObj();toast(`${c.emoji} ${c.name} is now your guide`);}
+function guideObj(){return CHARACTERS.find(c=>c.id===getGuide())||CHARACTERS[0];}
+function renderGuides(){const g=getGuide();document.getElementById('guideRow').innerHTML=CHARACTERS.map(c=>`<div class="guidec ${c.id===g?'sel':''}" data-guide="${c.id}" style="--gc:${c.color}"><span class="ge">${c.emoji}</span>${c.name}</div>`).join("");}
+
+/* ===== PROFILE / STORAGE ===== */
+function getProfile(){try{const raw=localStorage.getItem('le_profile');if(!raw)return null;if(raw[0]==='{')return JSON.parse(raw);return {name:raw,handle:slug(raw),bio:'',avatar:null,defshare:'private'};}catch(e){return null;}}
+function setProfile(o){lsSet('le_profile',JSON.stringify(o));}
+function handle(){const p=getProfile();return p?p.handle:'guest';}
+function itemsKey(){return 'le_items_'+handle();}
+function memKey(){return 'le_mem_'+handle();}
+function followKey(){return 'le_follow_'+handle();}
+function cmtKey(id){return 'le_cmt_'+handle()+'_'+id;}
+function getItems(){try{return JSON.parse(localStorage.getItem(itemsKey()))||[];}catch(e){return[];}}
+function saveItems(a){lsSet(itemsKey(),JSON.stringify(a));}
+function getMems(){try{return JSON.parse(localStorage.getItem(memKey()))||[];}catch(e){return[];}}
+function saveMems(a){return lsSet(memKey(),JSON.stringify(a));}
+function getFollows(){try{const r=localStorage.getItem(followKey());return r?JSON.parse(r):SEED_USERS.map(u=>u.id);}catch(e){return SEED_USERS.map(u=>u.id);}}
+function setFollows(a){lsSet(followKey(),JSON.stringify(a));}
+function getCmts(id){try{return JSON.parse(localStorage.getItem(cmtKey(id)))||[];}catch(e){return[];}}
+function addCmt(id,text){const a=getCmts(id);a.push({name:(getProfile()?.name||"You"),text,ts:Date.now()});lsSet(cmtKey(id),JSON.stringify(a));renderFeed();}
+
+function refreshAvatar(){/* no top avatar now; keep for compat */}
+
+function addItem(title,sub,type,date){const a=getItems();a.push({id:'c_'+Date.now()+Math.random().toString(36).slice(2,5),title,sub,type,date});saveItems(a);toast("Saved to your calendar ✓");if(curMain==="calendar")renderCalendar();}
+function removeItem(id){saveItems(getItems().filter(x=>x.id!==id));renderCalendar();}
+function setItemDate(id,d){const a=getItems(),it=a.find(x=>x.id===id);if(it){it.date=d;saveItems(a);renderCalendar();}}
+
+/* ===== MEMORIES ===== */
+let pendingPhoto=null,pendingAvatar=null;
+function saveMemory(shared){
+  const p=getProfile();if(!p){toast("Create a profile first");showMain('profile');return;}
+  const act=document.getElementById('memAct').value.trim();if(!act){toast("What did you do? Add a title");return;}
+  const cap=document.getElementById('memCap').value.trim();
+  const mems=getMems();mems.unshift({id:'m_'+Date.now(),act,cap,photo:pendingPhoto,ts:Date.now(),shared:!!shared,likes:0});
+  if(saveMems(mems)){toast(shared?"Shared with roamies 🌍":"Saved privately 🔒");
+    document.getElementById('memAct').value='';document.getElementById('memCap').value='';document.getElementById('memPhoto').value='';document.getElementById('memPrev').innerHTML='';pendingPhoto=null;renderFeed();renderProfile();}
+}
+function toggleShare(id){const m=getMems(),it=m.find(x=>x.id===id);if(it){it.shared=!it.shared;saveMems(m);toast(it.shared?"Now shared 🌍":"Now private 🔒");renderProfile();renderFeed();}}
+function delMemory(id){if(!confirm("Delete this memory?"))return;saveMems(getMems().filter(x=>x.id!==id));renderProfile();renderFeed();}
+
+function renderFeed(){
+  const p=getProfile(),follows=getFollows();
+  let posts=SEED_POSTS.filter(sp=>follows.includes(sp.user)).map(sp=>{const u=SEED_USERS.find(x=>x.id===sp.user);
+    return {id:"s_"+sp.user,name:u.name,avatar:null,emoji:u.emoji,act:sp.act,place:sp.place,cap:sp.cap,grad:sp.grad,pemoji:sp.emoji,ts:Date.now()-sp.daysAgo*86400000,likes:sp.likes,mine:false};});
+  if(p)getMems().filter(m=>m.shared).forEach(m=>posts.push({id:m.id,name:p.name+" (you)",avatar:p.avatar,emoji:"🙂",act:m.act,place:"",cap:m.cap,photo:m.photo,ts:m.ts,likes:m.likes||0,mine:true}));
+  posts.sort((a,b)=>b.ts-a.ts);
+  const out=document.getElementById('feedOut');
+  if(!posts.length){out.innerHTML=`<div class="card"><p class="muted">Your feed is quiet. Share a memory above, or follow people from your Profile.</p></div>`;return;}
+  out.innerHTML=posts.map(po=>{
+    const av=po.avatar?`<div class="av"><img src="${po.avatar}"></div>`:`<div class="av">${po.emoji}</div>`;
+    const photo=po.photo?`<div class="photo"><img src="${po.photo}">${po.place?`<div class="plabel">📍 ${esc(po.place)}</div>`:''}</div>`:`<div class="photo" style="background:${po.grad||'linear-gradient(135deg,#38bdf8,#bae6fd)'}">${po.pemoji||"📸"}${po.place?`<div class="plabel">📍 ${esc(po.place)}</div>`:''}</div>`;
+    const isLiked=liked.has(po.id);
+    const cmts=getCmts(po.id);
+    const cHtml=cmts.map(c=>`<div class="cmt"><b>${esc(c.name)}</b> ${esc(c.text)}</div>`).join("");
+    return `<div class="post"><div class="phead">${av}<div><div class="nm">${esc(po.name)}</div><div class="tm">${ago(po.ts)}</div></div></div>${photo}
+      <div class="pbody"><div class="act">${esc(po.act)}</div><p class="cap">${esc(po.cap||"")}</p></div>
+      <div class="pacts"><button class="${isLiked?'liked':''}" data-like="${po.id}">❤️ <span>${po.likes+(isLiked?1:0)}</span></button><button data-cfocus="${po.id}">💬 ${cmts.length||''} Comment</button>${po.mine?'<button data-del="'+po.id+'">🗑️</button>':''}</div>
+      <div class="cmts">${cHtml}<div class="cmtbox"><input type="text" placeholder="Add a comment..." data-cinput="${po.id}"><button data-csend="${po.id}">Post</button></div></div></div>`;
+  }).join("");
+}
+
+function renderProfile(){
+  const p=getProfile();
+  document.getElementById('profSetup').classList.toggle('hide',!!p);
+  document.getElementById('profView').classList.toggle('hide',!p);
+  if(!p)return;
+  document.getElementById('pavBig').innerHTML=p.avatar?`<img src="${p.avatar}">`:'🙂';
+  document.getElementById('pvName').textContent=p.name;
+  document.getElementById('pvBio').textContent=p.bio||"Weekend wanderer";
+  const mems=getMems(),shared=mems.filter(m=>m.shared).length,follows=getFollows();
+  document.getElementById('stMem').textContent=mems.length;
+  document.getElementById('stShared').textContent=shared;
+  document.getElementById('stFollowers').textContent=12+shared*3;
+  document.getElementById('stFollowing').textContent=follows.length;
+  const grid=document.getElementById('memGrid');
+  grid.innerHTML=mems.length?mems.map(m=>`<div class="memtile" data-share="${m.id}">${m.photo?`<img src="${m.photo}">`:`<div class="ph" style="background:linear-gradient(135deg,#38bdf8,#bae6fd)">📍</div>`}<div class="vis">${m.shared?'🌍':'🔒'}</div><div class="lab">${esc(m.act)}</div></div>`).join(""):`<p class="muted" style="grid-column:1/-1">No memories yet. Tap "Share a memory" to add your first.</p>`;
+  document.getElementById('followList').innerHTML=SEED_USERS.map(u=>{const f=follows.includes(u.id);return `<div class="follow-row"><div class="av">${u.emoji}</div><div style="flex:1"><div style="font-weight:700;font-size:14px">${u.name}</div><div class="muted" style="font-size:12px">${u.bio}</div></div><button class="btn ${f?'ghost':''} sm" data-follow="${u.id}">${f?'Following':'Follow'}</button></div>`;}).join("");
+  renderGoals();
+}
+
+/* ===== CALENDAR ===== */
+let calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+function showCalendar(){const p=getProfile();document.getElementById('calNeedProfile').classList.toggle('hide',!!p);document.getElementById('calCard').classList.toggle('hide',!p);if(p)renderCalendar();}
+function renderCalendar(){
+  const p=getProfile();document.getElementById('calHi').textContent=(p?p.name:"My")+"'s "+calMonth.toLocaleDateString('en-CA',{month:'long',year:'numeric'});
+  const items=getItems();document.getElementById('calCount').textContent=items.length+" saved plan"+(items.length===1?"":"s");
+  const byDate={};items.forEach(it=>{(byDate[it.date]=byDate[it.date]||[]).push(it);});
+  const y=calMonth.getFullYear(),m=calMonth.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),todayISO=toISO(new Date());
+  let g=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="cah">${d}</div>`).join("");
+  for(let i=0;i<first;i++)g+=`<div class="cell empty"></div>`;
+  for(let d=1;d<=days;d++){const iso=toISO(new Date(y,m,d)),evs=byDate[iso]||[];g+=`<div class="cell${iso===todayISO?' today':''}"><div class="num">${d}</div>${evs.map(e=>`<div class="cevt ${e.type}" title="${esc(e.title)}">${esc(e.title)}</div>`).join("")}</div>`;}
+  document.getElementById('calGrid').innerHTML=g;
+  const sorted=items.slice().sort((a,b)=>a.date<b.date?-1:1);
+  document.getElementById('savedList').innerHTML=sorted.length?sorted.map(it=>`<div class="saved-item"><div class="si-body"><h5>${esc(it.title)}</h5><p>${esc(it.sub||"")}</p></div><input type="date" value="${it.date}" onchange="setItemDate('${it.id}',this.value)"><button class="x" onclick="removeItem('${it.id}')">✕</button></div>`).join(""):`<p class="muted">Nothing saved yet — generate a weekend, trip or event and tap "Save to calendar".</p>`;
+}
+function sixMonthItems(){const start=new Date();start.setDate(start.getDate()+((6-start.getDay()+7)%7||7));const cycle=["nature","food","rec","nature","food","big"];const nP=shuffle(SPOTS.filter(s=>s.type==="trail")),fP=shuffle(SPOTS.filter(s=>s.type==="food")),rP=shuffle(SPOTS.filter(s=>s.type==="rec")),bP=shuffle(SPOTS.filter(s=>s.type==="stay"));let ni=0,fi=0,ri=0,bi=0,items=[];for(let i=0;i<26;i++){const dt=new Date(start);dt.setDate(start.getDate()+i*7);const t=cycle[i%cycle.length];let s,type;if(t==="nature"){s=nP[ni++%nP.length];type="plan";}else if(t==="food"){s=fP[fi++%fP.length];type="plan";}else if(t==="rec"){s=rP[ri++%rP.length];type="plan";}else{s=bP[bi++%bP.length];type="big";}items.push({title:s.n,sub:s.cat+" · "+s.loc,type,date:toISO(dt)});}return items;}
+
+/* ===== TODAY / DAILY PLANNER ===== */
+function dayOfYear(d){return Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);}
+function fmtTime(mins){let h=Math.floor(mins/60),m=mins%60;const ap=h>=12?'PM':'AM';let hh=h%12;if(hh===0)hh=12;return hh+':'+String(m).padStart(2,'0')+' '+ap;}
+function parseTime(v){if(!v)return 480;const[a,b]=v.split(':').map(Number);return a*60+(b||0);}
+
+const SPARKS=[
+  {ic:"🌅",t:"Catch the sunset tonight at Crescent Beach — phone in pocket, just watch.",map:["Crescent Beach","South Surrey"]},
+  {ic:"🍜",t:"Try somewhere new for lunch — Ban Chok Dee's green curry is a local secret.",map:["Ban Chok Dee","Langley"]},
+  {ic:"🌲",t:"Steal 20 minutes for a forest reset at Tynehead Park.",map:["Tynehead Regional Park","Surrey"]},
+  {ic:"📸",t:"Capture one small beautiful thing today and save it as a memory.",go:"feed"},
+  {ic:"💬",t:"Message someone you haven't seen in a while and plan a coffee.",go:"plan:events"},
+  {ic:"🚶",t:"Take the long way home and walk a part of your city you never have.",map:null},
+  {ic:"📚",t:"Pop into Surrey City Centre Library — pick a book totally outside your usual.",map:["Surrey City Centre Library","Surrey"]},
+  {ic:"🥾",t:"This weekend's dare: the turquoise canyon at Othello Tunnels.",map:["Othello Tunnels","Hope BC"]},
+  {ic:"🫖",t:"Make your evening cosy: a warm drink, no screens, ten quiet minutes.",map:null},
+  {ic:"🌊",t:"Boundary Bay at golden hour — big skies, free, five minutes of calm.",map:["Boundary Bay","Surrey"]}
+];
+function todaysSpark(){const idx=dayOfYear(new Date())%SPARKS.length;return SPARKS[idx];}
+function renderSpark(){
+  const s=todaysSpark(),c=guideObj();
+  const extra=s.map?` ${mapA(s.map[0],s.map[1])}`:(s.go?` <a class="maplink" data-go="${s.go}" style="cursor:pointer">Open ›</a>`:'');
+  document.getElementById('sparkBody').innerHTML=`<div class="sparktalk" style="--gc:${c.color}"><div class="gav">${c.emoji}</div><div><div class="gn">${c.name} says</div><div class="gt">${c.line} ${s.ic} ${s.t}</div><div style="margin-top:8px">${extra}</div></div></div>`;
+}
+
+function buildDay(){
+  const intent=state.intent,energy=state.energy;
+  const start=parseTime(document.getElementById('dayStart').value);
+  const end=parseTime(document.getElementById('dayEnd').value);
+  const raw=document.getElementById('dayTasks').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);
+  if(start>=17*60){buildEvening(intent,start,end,raw);return;}
+  const focusLen=energy==="high"?90:energy==="low"?45:60;
+  const breakLen=energy==="low"?20:10;
+  let t=start,blocks=[];
+  function push(title,detail,kind,len){blocks.push({start:t,title,detail,kind});t+=len;}
+  push("Morning kickstart","Hydrate, 5-min plan, set one main intention for the day.","start",30);
+  // morning focus / tasks
+  let tasks=raw.slice();
+  const morningSlots=intent==="restful"?1:intent==="adventurous"||intent==="social"?1:2;
+  for(let i=0;i<morningSlots;i++){const task=tasks.shift();push(task?("Focus: "+task):(intent==="restful"?"Slow morning — read or stretch":"Deep work block"),task?"Single-task, notifications off.":"Your most important work while energy is fresh.","work",focusLen);push("Break","Walk, water, look out a window.","break",breakLen);}
+  // lunch + reset
+  const food=filterSpots(["food"],false)[0];
+  push("Lunch + reset",food?("Maybe "+food.n+" ("+food.loc+") "):"Step away from the desk — real food, no screen.","food",60);
+  // afternoon based on intent
+  if(intent==="productive"){const task=tasks.shift();push(task?("Focus: "+task):"Second deep-work push",task?"Knock out the next big thing.":"Tackle the next priority.","work",focusLen);push("Break","Stretch + reset.","break",breakLen);const task2=tasks.shift();if(task2)push("Focus: "+task2,"Clear it before the day winds down.","work",focusLen);}
+  else if(intent==="balanced"){const task=tasks.shift();push(task?("Do: "+task):"Light work / admin","Errands and loose ends.","work",focusLen);const sp=filterSpots(["trail","easy"],false)[0];push("Recharge outdoors",sp?(sp.n+" — "+sp.d):"A short walk to reset.","local",60);}
+  else if(intent==="restful"){const sp=filterSpots(["easy","trail"],false).find(x=>x.vibes.includes("calm"))||filterSpots(["easy"],false)[0];push("Gentle outing",sp?(sp.n+" — "+sp.d):"A calm stroll or a café.","local",75);push("Do nothing on purpose","Nap, music, or a long bath. Rest is the point.","break",45);}
+  else if(intent==="social"){const f=filterSpots(["food"],false)[1]||food;push("Reach out","Text a friend, set a time to meet.","work",20);push("Meet up",f?(f.n+" or coffee with someone"):"Coffee or food with someone","local",90);}
+  else{const tr=filterSpots(["trail","rec"],false)[0];push("Adventure block",tr?(tr.n+" — "+tr.d):"Go somewhere new in your city.","local",120);}
+  // remaining tasks dumped into an evening tidy block
+  if(tasks.length)push("Quick wins","Knock these out: "+tasks.join(", ")+".","work",40);
+  // wind down + spark + reflect (fit before end)
+  if(t<end-60){push("Wind down","Dinner, tidy up, screens off soon.","break",Math.max(30,end-t-60));}
+  const sp=todaysSpark();push("Today's spark",sp.t,"spark",30);
+  push("Reflect","One line: what went well? Save a memory if today had a moment.","start",15);
+  renderDayBlocks(capFirst(intent)+" day",intent,energy,start,end,blocks,"🌅");
+}
+
+function buildEvening(intent,start,end,raw){
+  let t=start,blocks=[];function push(title,detail,kind,len){blocks.push({start:t,title,detail,kind});t+=len;}
+  push("Evening kickstart","Shake off the day — change clothes, water, a deep breath.","start",15);
+  const food=filterSpots(["food"],false)[0];
+  if(raw.length&&(intent==="productive"||intent==="balanced")){push("One focused thing","Wrap up: "+raw.slice(0,2).join(", ")+".","work",45);push("Break","Step away for a few minutes.","break",10);}
+  push("Dinner",food?("Cook something good, or "+food.n+" ("+food.loc+")."):"A proper dinner, no rushing.","food",60);
+  if(intent==="social"){const f=filterSpots(["food"],false)[1]||food;push("Go out","Drinks or dessert with someone"+(f?(" — "+f.n+"."):"."),"local",90);}
+  else if(intent==="adventurous"){push("Golden hour","Catch the sunset at Crescent Beach or White Rock pier.","local",75);}
+  else if(intent==="restful"||intent==="balanced"){const picks=shuffle(MOVIES).slice(0,2);push("Cosy in","Movie night — try "+picks.map(m=>m.t).join(" or ")+".","local",120);}
+  else{push("Plan tomorrow","10 min: line up tomorrow's top 3, then switch off.","work",20);push("Unwind","Read, music, or a short walk around the block.","break",60);}
+  if(t<end-45)push("Wind down","Screens off, herbal tea, get ready to rest well.","break",Math.max(30,end-t-30));
+  const sp=todaysSpark();push("Tonight's spark",sp.t,"spark",20);
+  push("Reflect","One good thing about today. Save a memory if it earned one.","start",15);
+  renderDayBlocks(capFirst(intent)+" evening",intent,"",start,end,blocks,"🌙");
+}
+
+function renderDayBlocks(title,intent,energy,start,end,blocks,emoji){
+  const name=getProfile()?getProfile().name:"";
+  let html=`<div class="card" style="margin-top:14px"><div class="plan-head"><div><h3 style="margin:0 0 4px">${emoji} ${name?name+"'s ":""}${title}</h3><span class="muted">${energy?energy+" energy · ":""}${fmtTime(start)}–${fmtTime(end)}</span></div><span class="badge">AI plan</span></div><div class="timeline">`;
+  blocks.forEach(b=>{const icon=b.kind==="work"?"💻":b.kind==="break"?"☕":b.kind==="food"?"🍽️":b.kind==="local"?"📍":b.kind==="spark"?"✨":"🌱";
+    html+=`<div class="slot"><div class="time">${fmtTime(b.start)}</div><h4>${icon} ${esc(b.title)}</h4><p>${esc(b.detail)}</p></div>`;});
+  html+=`</div>`+saveBtn(title,blocks.length+" blocks · "+fmtTime(start)+"–"+fmtTime(end),"plan",toISO(new Date()));
+  html+=`<div class="note">💡 Open in the morning for a full day; open in the evening and it plans just your evening.</div></div>`;
+  document.getElementById('dayOut').innerHTML=html;
+  document.getElementById('dayOut').scrollIntoView({behavior:'smooth',block:'nearest'});
+  toast("Plan ready "+emoji);
+}
+
+function renderToday(){
+  const p=getProfile();
+  const hour=new Date().getHours();const greet=hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+  document.getElementById('heroHi').textContent=(p?`${greet}, ${p.name} 👋`:`${greet} 👋`);
+  const today=new Date().toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+  const evening=hour>=17;
+  document.getElementById('heroSub').textContent=`${today} · ${evening?"evening mode — let's make the most of tonight.":"clear skies — let's plan a good one."}`;
+  // prefill the day-start with the current time, rounded to the next 30 min
+  const ds=document.getElementById('dayStart');
+  if(ds&&!ds._touched){const nowM=Math.ceil((hour*60+new Date().getMinutes())/30)*30;const hh=Math.min(23,Math.floor(nowM/60)),mm=nowM%60;ds.value=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');}
+  renderGuides();renderSpark();renderMood();renderHabits();
+  // suggestion
+  let t=filterSpots(["trail"],true),f=filterSpots(["food"],true);
+  const a=t[0],b=f[0];
+  document.getElementById('homeSuggest').innerHTML=`<div class="card"><div class="plan-head"><h3 style="margin:0">${a?a.n:'A local trail'} + ${b?b.n:'lunch'}</h3><span class="badge">Free-ish</span></div><p class="muted" style="margin:0 0 8px">${a?a.d:''}</p><div class="meta">${a?mapA(a.n,a.loc):''} ${a?saveBtn(a.n+' + '+(b?b.n:'lunch'),'Suggested weekend','plan',nextSaturday()):''}</div></div>`;
+  // events
+  document.getElementById('homeEvents').innerHTML=EVENTS.slice(0,2).map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p></div></div>`).join("");
+  // feed preview
+  const follows=getFollows();const sp=SEED_POSTS.filter(x=>follows.includes(x.user))[0];
+  document.getElementById('homeFeed').innerHTML=sp?`<div class="post"><div class="phead"><div class="av">${SEED_USERS.find(u=>u.id===sp.user).emoji}</div><div><div class="nm">${SEED_USERS.find(u=>u.id===sp.user).name}</div><div class="tm">${sp.daysAgo}d ago</div></div></div><div class="photo" style="background:${sp.grad}">${sp.emoji}<div class="plabel">📍 ${sp.place}</div></div><div class="pbody"><div class="act">${sp.act}</div><p class="cap">${sp.cap}</p></div></div>`:`<div class="card"><p class="muted">Add some roamies to see their adventures here.</p></div>`;
+}
+
+/* ===== SEARCH ===== */
+function runSearch(q){
+  q=q.trim().toLowerCase();const out=document.getElementById('searchOut');
+  if(!q){out.innerHTML=`<p class="muted">Try "beach", "thai", "Tokyo", "office party", "library"...</p>`;return;}
+  const res=[];
+  SPOTS.forEach(s=>{if((s.n+s.cat+s.loc+s.vibes.join()).toLowerCase().includes(q))res.push({ic:s.type==="food"?"🍽️":s.type==="stay"?"🛏️":s.type==="rec"?"🎟️":s.type==="easy"?"📚":"🥾",t:s.n,s:s.cat+" · "+s.loc,name:s.n,area:s.loc});});
+  DESTS.forEach(d=>{if((d.n+d.best+d.vibes.join()).toLowerCase().includes(q))res.push({ic:d.flag,t:d.n,s:"Trip · "+d.best,name:d.n,area:''});});
+  EVENTS.forEach(e=>{if((e.n+e.desc).toLowerCase().includes(q))res.push({ic:"🎉",t:e.n,s:"Event · "+e.area,name:e.n,area:e.area});});
+  VENUES.forEach(v=>{if((v.n+v.d+v.occ.join()).toLowerCase().includes(q))res.push({ic:"🥂",t:v.n,s:"Venue · "+v.area,name:v.n,area:v.area});});
+  out.innerHTML=res.length?res.slice(0,20).map(r=>`<div class="sresult"><div class="sicon">${r.ic}</div><div style="flex:1"><h5>${esc(r.t)}</h5><p>${esc(r.s)}</p></div>${mapA(r.name,r.area)}</div>`).join(""):`<p class="muted">No matches for "${esc(q)}".</p>`;
+}
+
+/* ===== NOTIFICATIONS ===== */
+function renderNotifs(){
+  const p=getProfile(),shared=p?getMems().filter(m=>m.shared).length:0;
+  const n=[
+    {ic:"❤️",t:`Priya and ${4+shared} others liked your shared memory`,tm:"2h ago"},
+    {ic:"🤝",t:"3 people joined your sunset meetup — it's happening!",tm:"5h ago"},
+    {ic:"🌤️",t:"Clear skies this weekend — perfect for Crescent Beach",tm:"1d ago"},
+    {ic:"👤",t:"Maya R. is now one of your roamies",tm:"2d ago"},
+    {ic:"🎉",t:"Fusion Newton Street Festival is near you this Saturday",tm:"3d ago"}
+  ];
+  document.getElementById('notifOut').innerHTML=n.map(x=>`<div class="nrow"><div class="ni">${x.ic}</div><div><p>${x.t}</p><div class="tm">${x.tm}</div></div></div>`).join("");
+  document.querySelector('#bellBtn .dot')?.remove();
+}
+
+/* ===== MOOD ===== */
+const MOOD_E={1:"😞",2:"😕",3:"😐",4:"🙂",5:"🤩"};
+function moodKey(){return 'le_mood_'+handle();}
+function getMood(){try{return JSON.parse(localStorage.getItem(moodKey()))||{};}catch(e){return{};}}
+function setMoodVal(score){const m=getMood();const k=toISO(new Date());m[k]={score,note:document.getElementById('moodNote').value.trim()};lsSet(moodKey(),JSON.stringify(m));renderMood();toast("Mood logged "+MOOD_E[score]);}
+function renderMood(){
+  const m=getMood(),todayK=toISO(new Date()),tv=m[todayK];
+  document.querySelectorAll('[data-group="moodpick"] .moodb').forEach(b=>b.classList.toggle('sel',tv&&String(tv.score)===b.dataset.v));
+  if(tv&&tv.note)document.getElementById('moodNote').value=tv.note;
+  let strip="";for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=toISO(d);const e=m[k]?MOOD_E[m[k].score]:'<span class="blank"></span>';const dl=d.toLocaleDateString('en-CA',{weekday:'short'}).slice(0,2);strip+=`<div class="mday"><div class="e">${e}</div><div class="dl">${dl}</div></div>`;}
+  document.getElementById('moodStrip').innerHTML=strip;
+}
+
+/* ===== HABITS ===== */
+const DEFAULT_HABITS=[{id:'h1',name:'Move 30 minutes',done:[]},{id:'h2',name:'Read or learn',done:[]},{id:'h3',name:'Drink enough water',done:[]}];
+function habitKey(){return 'le_habits_'+handle();}
+function getHabits(){try{const r=localStorage.getItem(habitKey());if(!r){lsSet(habitKey(),JSON.stringify(DEFAULT_HABITS));return JSON.parse(JSON.stringify(DEFAULT_HABITS));}return JSON.parse(r);}catch(e){return JSON.parse(JSON.stringify(DEFAULT_HABITS));}}
+function saveHabits(a){lsSet(habitKey(),JSON.stringify(a));}
+function streakOf(done){let s=0;for(let i=0;;i++){const d=new Date();d.setDate(d.getDate()-i);if(done.includes(toISO(d)))s++;else{if(i===0)continue;break;}}return s;}
+function toggleHabit(id){const a=getHabits(),h=a.find(x=>x.id===id);if(!h)return;const k=toISO(new Date());if(h.done.includes(k))h.done=h.done.filter(x=>x!==k);else h.done.push(k);saveHabits(a);renderHabits();
+  if(a.every(x=>x.done.includes(k))&&a.length){toast("All habits done today 🎉");}}
+function addHabit(){const inp=document.getElementById('habitInput'),name=inp.value.trim();if(!name)return;const a=getHabits();a.push({id:'h'+Date.now(),name,done:[]});saveHabits(a);inp.value='';renderHabits();}
+function delHabit(id){saveHabits(getHabits().filter(x=>x.id!==id));renderHabits();}
+function renderHabits(){
+  const a=getHabits(),k=toISO(new Date()),doneToday=a.filter(h=>h.done.includes(k)).length;
+  document.getElementById('habitSummary').textContent=a.length?`${doneToday}/${a.length} done today`:'';
+  document.getElementById('habitList').innerHTML=a.length?a.map(h=>{const st=streakOf(h.done),done=h.done.includes(k);
+    return `<div class="habit"><div class="hcheck ${done?'done':''}" data-habit="${h.id}">✓</div><div class="hn">${esc(h.name)}</div><span class="streak ${st?'':'zero'}">🔥 ${st}</span><button class="hdel" data-habit-del="${h.id}">✕</button></div>`;}).join(""):`<p class="muted">No habits yet — add one below.</p>`;
+}
+
+/* ===== GOALS ===== */
+function goalKey(){return 'le_goals_'+handle();}
+function getGoals(){try{return JSON.parse(localStorage.getItem(goalKey()))||[];}catch(e){return[];}}
+function saveGoals(a){lsSet(goalKey(),JSON.stringify(a));}
+function addGoal(){const inp=document.getElementById('goalInput'),name=inp.value.trim();if(!name)return;const a=getGoals();a.push({id:'g'+Date.now(),name,progress:0});saveGoals(a);inp.value='';renderGoals();}
+function nudgeGoal(id,delta){const a=getGoals(),g=a.find(x=>x.id===id);if(!g)return;g.progress=Math.max(0,Math.min(100,g.progress+delta));saveGoals(a);renderGoals();if(g.progress===100)toast("Goal complete! 🏆");}
+function delGoal(id){saveGoals(getGoals().filter(x=>x.id!==id));renderGoals();}
+function renderGoals(){
+  const a=getGoals();
+  document.getElementById('goalsList').innerHTML=a.length?a.map(g=>`<div class="goal"><div class="gtop"><div class="gn">${esc(g.name)}</div><button class="hdel" data-goal-del="${g.id}">✕</button></div><div class="gbar"><i style="width:${g.progress}%"></i></div><div class="gctl"><button data-goal-down="${g.id}">−</button><button data-goal-up="${g.id}">+</button><span class="pct">${g.progress}%</span></div></div>`).join(""):`<p class="muted">No goals yet. Add what you're working toward — the app will help you make time for it.</p>`;
+}
+
+/* ===== ONBOARDING ===== */
+function maybeOnboard(){try{if(!localStorage.getItem('le_onboarded')&&!getProfile())document.getElementById('onboard').classList.add('show');}catch(e){}}
+function finishOnboard(goProfile){try{localStorage.setItem('le_onboarded','1');}catch(e){}document.getElementById('onboard').classList.remove('show');if(goProfile)showMain('profile');}
+
+/* ===== NAV ===== */
+function showMain(name){
+  curMain=name;
+  ['today','plan','feed','calendar','profile','search','notifs'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
+  document.querySelectorAll('.bn').forEach(x=>x.classList.toggle('active',x.dataset.main===name));
+  if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();
+  if(name==="search"){document.getElementById('searchOut').innerHTML="";setTimeout(()=>document.getElementById('searchInput').focus(),50);}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showSub(name){curSub=name;document.querySelectorAll('.sb').forEach(x=>x.classList.toggle('active',x.dataset.sub===name));
+  ['weekend','trips','stays','eats','groups','events','explore'].forEach(id=>document.getElementById('sub-'+id).classList.toggle('hide',id!==name));
+  if(name==="trips")genTrips();if(name==="stays")genStays(staysRegion);if(name==="eats")genEats(eatsCuisine);if(name==="groups")genGroup();if(name==="events")genEvents();if(name==="explore")genExplore(exploreCat);}
+function go(target){const[m,s]=target.split(':');showMain(m);if(s){showSub(s);}}
+
+/* ===== WIRE ===== */
+document.querySelectorAll('.opts').forEach(g=>{g.addEventListener('click',e=>{const o=e.target.closest('.opt');if(!o)return;g.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');state[g.dataset.group]=o.dataset.v;});});
+document.getElementById('loc').addEventListener('input',e=>state.loc=e.target.value||"your area");
+document.getElementById('genBtn').addEventListener('click',genPlan);
+document.getElementById('reBtn').addEventListener('click',genPlan);
+document.getElementById('tripBtn').addEventListener('click',genTrips);
+document.getElementById('groupBtn').addEventListener('click',genGroup);
+document.getElementById('meetBtn').addEventListener('click',genMeet);
+document.getElementById('dayBtn').addEventListener('click',buildDay);
+document.getElementById('dayStart').addEventListener('input',e=>{e.target._touched=true;});
+document.getElementById('habitAdd').addEventListener('click',addHabit);
+document.getElementById('habitInput').addEventListener('keydown',e=>{if(e.key==='Enter')addHabit();});
+document.getElementById('goalAdd').addEventListener('click',addGoal);
+document.getElementById('goalInput').addEventListener('keydown',e=>{if(e.key==='Enter')addGoal();});
+document.getElementById('obStart').addEventListener('click',()=>finishOnboard(true));
+document.getElementById('obSkip').addEventListener('click',()=>finishOnboard(false));
+document.querySelectorAll('.bn').forEach(t=>t.addEventListener('click',()=>showMain(t.dataset.main)));
+document.querySelectorAll('.sb').forEach(t=>t.addEventListener('click',()=>showSub(t.dataset.sub)));
+document.getElementById('searchBtn').addEventListener('click',()=>showMain('search'));
+document.getElementById('bellBtn').addEventListener('click',()=>showMain('notifs'));
+document.getElementById('searchInput').addEventListener('input',e=>runSearch(e.target.value));
+document.getElementById('goProfile').addEventListener('click',()=>showMain('profile'));
+document.getElementById('pfShareJump').addEventListener('click',()=>showMain('feed'));
+/* quick-actions + sheet links handled via delegation below (covers dynamic spark link) */
+/* FAB sheet */
+const sheet=document.getElementById('sheet');
+function openSheet(){sheet.classList.add('show');}function closeSheet(){sheet.classList.remove('show');}
+document.getElementById('fab').addEventListener('click',openSheet);
+sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet();});
+/* profile setup */
+document.getElementById('pfAvatar').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingAvatar=d;document.getElementById('pfAvPrev').innerHTML=d?`<div class="pavbig" style="margin-top:8px"><img src="${d}"></div>`:'';});});
+document.getElementById('pfSave').addEventListener('click',()=>{const name=document.getElementById('pfName').value.trim();if(!name){toast("Add a name");return;}const prev=getProfile();const o={name,handle:prev?prev.handle:slug(name),bio:document.getElementById('pfBio').value.trim(),avatar:pendingAvatar||(prev?prev.avatar:null),defshare:state.defshare};setProfile(o);pendingAvatar=null;renderProfile();toast("Profile saved ✓");});
+document.getElementById('pfEdit').addEventListener('click',()=>{const p=getProfile();document.getElementById('pfName').value=p.name;document.getElementById('pfBio').value=p.bio||'';document.getElementById('profSetup').classList.remove('hide');document.getElementById('profView').classList.add('hide');});
+/* memory composer */
+document.getElementById('memPhoto').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingPhoto=d;document.getElementById('memPrev').innerHTML=d?`<img src="${d}" style="width:100%;max-height:240px;object-fit:cover;border-radius:14px;margin-bottom:6px">`:'';});});
+document.getElementById('memPrivate').addEventListener('click',()=>saveMemory(false));
+document.getElementById('memShare').addEventListener('click',()=>saveMemory(true));
+/* calendar */
+document.getElementById('prevM').addEventListener('click',()=>{calMonth.setMonth(calMonth.getMonth()-1);renderCalendar();});
+document.getElementById('nextM').addEventListener('click',()=>{calMonth.setMonth(calMonth.getMonth()+1);renderCalendar();});
+document.getElementById('fillBtn').addEventListener('click',()=>{sixMonthItems().forEach(it=>{const a=getItems();a.push({id:'c_'+Date.now()+Math.random().toString(36).slice(2,5),...it});saveItems(a);});renderCalendar();toast("Added 26 weekends ✓");});
+document.getElementById('clearBtn').addEventListener('click',()=>{if(confirm("Clear all saved plans?")){saveItems([]);renderCalendar();}});
+/* delegated clicks */
+document.addEventListener('click',e=>{
+  const gg=e.target.closest('[data-go]');if(gg){closeSheet();go(gg.dataset.go);return;}
+  const sv=e.target.closest('[data-save-title]');if(sv){addItem(sv.dataset.saveTitle,sv.dataset.saveSub,sv.dataset.saveType,sv.dataset.saveDate);return;}
+  const lk=e.target.closest('[data-like]');if(lk){const id=lk.dataset.like;if(liked.has(id))liked.delete(id);else liked.add(id);renderFeed();return;}
+  const fo=e.target.closest('[data-follow]');if(fo){let f=getFollows();const id=fo.dataset.follow;if(f.includes(id))f=f.filter(x=>x!==id);else f.push(id);setFollows(f);renderProfile();return;}
+  const sh=e.target.closest('[data-share]');if(sh){toggleShare(sh.dataset.share);return;}
+  const dl=e.target.closest('[data-del]');if(dl){delMemory(dl.dataset.del);return;}
+  const cs=e.target.closest('[data-csend]');if(cs){const id=cs.dataset.csend;const inp=document.querySelector('[data-cinput="'+id+'"]');if(inp&&inp.value.trim()){addCmt(id,inp.value.trim());}return;}
+  const cf=e.target.closest('[data-cfocus]');if(cf){const inp=document.querySelector('[data-cinput="'+cf.dataset.cfocus+'"]');if(inp)inp.focus();return;}
+  const mb=e.target.closest('[data-group="moodpick"] .moodb');if(mb){setMoodVal(parseInt(mb.dataset.v));return;}
+  const ht=e.target.closest('[data-habit]');if(ht){toggleHabit(ht.dataset.habit);return;}
+  const hd=e.target.closest('[data-habit-del]');if(hd){delHabit(hd.dataset.habitDel);return;}
+  const gu=e.target.closest('[data-goal-up]');if(gu){nudgeGoal(gu.dataset.goalUp,10);return;}
+  const gdn=e.target.closest('[data-goal-down]');if(gdn){nudgeGoal(gdn.dataset.goalDown,-10);return;}
+  const gx=e.target.closest('[data-goal-del]');if(gx){delGoal(gx.dataset.goalDel);return;}
+  const gd=e.target.closest('[data-guide]');if(gd){setGuide(gd.dataset.guide);return;}
+  const ec=e.target.closest('[data-ecat]');if(ec){setExplore(ec.dataset.ecat);return;}
+  const sr=e.target.closest('[data-sreg]');if(sr){setStays(sr.dataset.sreg);return;}
+  const cc=e.target.closest('[data-ccat]');if(cc){setEats(cc.dataset.ccat);return;}
+});
+/* init */
+renderToday();genPlan();maybeOnboard();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
+</body>
+</html>

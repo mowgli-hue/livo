@@ -1,0 +1,20 @@
+{
+  "name": "localescape-engine",
+  "version": "0.1.0",
+  "description": "Backend engine for LocalEscape — AI-driven local & travel planning, events and community meetups.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "optionalDependencies": {
+    "pg": "^8.11.5",
+    "@anthropic-ai/sdk": "^0.27.0"
+  },
+  "license": "UNLICENSED"
+}
