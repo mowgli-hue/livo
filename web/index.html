@@ -877,7 +877,23 @@ function occLabel(){return {office:"Office party",birthday:"Birthday",friends:"F
 
 /* ===== EVENTS / MEETUP ===== */
 function eventISO(e){if(MONTHIDX[e.m]!==undefined&&/^\d+$/.test(e.d))return toISO(new Date(2026,MONTHIDX[e.m],parseInt(e.d)));return nextSaturday();}
-function genEvents(){document.getElementById('eventsOut').innerHTML=EVENTS.map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p><div class="meta">${mapA(e.n,e.area)} ${saveBtn(e.n,e.desc,"event",eventISO(e))}</div></div></div>`).join("");}
+async function genEvents(){
+  const out=document.getElementById('eventsOut');
+  // LIVE: real events near you from the engine (Ticketmaster) when configured
+  if(LIVO_API){
+    out.innerHTML=`<p class="muted" style="font-size:13px">Loading live events near ${esc(state.loc||"you")}…</p>`;
+    try{
+      const res=await fetch(LIVO_API.replace(/\/$/,"")+"/api/events?near="+encodeURIComponent(state.loc||"Surrey BC"));
+      const data=await res.json();
+      if(Array.isArray(data)&&data.length){
+        out.innerHTML=`<p class="muted" style="font-size:12px;margin:2px 0 10px">${data.length} live events near you · tap Tickets for details.</p>`+data.map(ev=>{const d=new Date(ev.startsAt||Date.now());const ok=!isNaN(d);const mo=ok?d.toLocaleString('en-CA',{month:'short'}):"";const day=ok?d.getDate():"";const iso=ok?toISO(d):nextSaturday();
+          return `<div class="evt"><div class="date"><div class="m">${mo}</div><div class="d">${day}</div></div><div style="flex:1"><h4>${esc(ev.title)}</h4><p>${esc(ev.area||"")}</p><div class="meta">${ev.url?`<a class="maplink" style="background:#fdf2f8;color:#be185d;border-color:#fbcfe1" target="_blank" rel="noopener" href="${esc(ev.url)}">🎟️ Tickets</a>`:""}${mapA(ev.title,ev.area)}${saveBtn(ev.title,"Event · "+(ev.area||""),"event",iso)}</div></div></div>`;}).join("");
+        return;
+      }
+    }catch(e){ /* fall back to curated */ }
+  }
+  out.innerHTML=EVENTS.map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p><div class="meta">${mapA(e.n,e.area)} ${saveBtn(e.n,e.desc,"event",eventISO(e))}</div></div></div>`).join("");
+}
 function genMeet(){
   const idea=document.getElementById('mIdea').value.trim()||"a casual hangout",vibe=state.mvibe,size=state.msize;
   const pool=SPOTS.filter(s=>s.vibes.includes(vibe)).concat(SPOTS.filter(s=>s.vibes.includes("cozy")));const venue=pool[0]||SPOTS[0];

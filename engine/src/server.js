@@ -71,7 +71,8 @@ app.get('/api/places', async (req, res) => {
 
 // --- Events feed (provider-backed) ---
 app.get('/api/events', async (req, res) => {
-  res.json(await eventsProvider.search({ vibe: req.query.vibe }));
+  try { res.json(await eventsProvider.search({ near: req.query.near, vibe: req.query.vibe })); }
+  catch (e) { res.status(502).json({ error: e.message }); }
 });
 
 // --- "Best places" (social/curated) ---

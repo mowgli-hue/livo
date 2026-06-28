@@ -52,10 +52,32 @@ export const eats = {
   search: (opts) => maps.searchPlaces({ ...opts, type: 'restaurant' }),
 };
 
-// Stays / Events / Social live adapters go here the same way when you add those keys.
+// Events — Ticketmaster Discovery API (free key at developer.ticketmaster.com).
+// Put TICKETMASTER_API_KEY in .env and set PROVIDER_EVENTS=live.
+export const events = {
+  async search({ near = 'Surrey, BC', vibe } = {}) {
+    const key = process.env.TICKETMASTER_API_KEY;
+    if (!key) throw new Error('TICKETMASTER_API_KEY missing');
+    const city = String(near).split(',')[0].trim();
+    const params = new URLSearchParams({ apikey: key, city, size: '20', sort: 'date,asc' });
+    if (vibe && vibe !== 'any') params.set('keyword', vibe);
+    const res = await fetch('https://app.ticketmaster.com/discovery/v2/events.json?' + params);
+    if (!res.ok) throw new Error('Ticketmaster ' + res.status);
+    const data = await res.json();
+    return (data._embedded?.events || []).map((e, i) => ({
+      id: e.id || ('tm_' + i),
+      title: e.name,
+      startsAt: e.dates?.start?.dateTime || e.dates?.start?.localDate || '',
+      area: e._embedded?.venues?.[0]?.city?.name || city,
+      vibes: vibe && vibe !== 'any' ? [vibe] : [],
+      url: e.url || '',
+      source: 'ticketmaster',
+    }));
+  },
+};
+
+// Stays / Social live adapters go here the same way when you add those keys.
 // stays  -> Booking.com / Airbnb partner API
-// events -> Ticketmaster Discovery / Eventbrite
 // social -> Instagram Graph + your own ranking
 export const stays = null;
-export const events = null;
 export const social = null;
