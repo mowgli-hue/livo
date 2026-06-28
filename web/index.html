@@ -573,6 +573,10 @@ const state={who:"couple",budget:"low",mood:"any",dist:"near",loc:"Surrey, BC",
   tmood:"any",tier:"budget",mvibe:"calm",msize:"small",occ:"office",gvibe:"any",ghead:"50",defshare:"private",
   intent:"productive",energy:"med"};
 let curMain="today",curSub="weekend";
+/* ▼▼▼ LIVE DATA: paste your deployed engine URL here to pull real Google Maps data.
+   Leave empty ("") to use the built-in curated lists. Example:
+   const LIVO_API = "https://livo-engine.up.railway.app";                       */
+const LIVO_API = "";
 
 /* ===== DATA ===== */
 const SPOTS=[
@@ -895,12 +899,26 @@ function setStays(region){staysRegion=region;document.querySelectorAll('[data-sr
 
 /* ===== EATS (Surrey restaurants) ===== */
 let eatsCuisine="all";
-function genEats(cuisine){
+async function genEats(cuisine){
   cuisine=cuisine||eatsCuisine;
   // live "browse all near me" Maps link, built from the user's location
   const allBtn=document.getElementById('mapAll');
   if(allBtn)allBtn.href="https://www.google.com/maps/search/"+encodeURIComponent("restaurants near "+(state.loc||"Surrey BC"));
   const out=document.getElementById('eatsOut');
+  // LIVE: pull real Google Maps restaurants from the engine when configured
+  if(LIVO_API){
+    out.innerHTML=`<p class="muted" style="font-size:13px">Loading live restaurants near ${esc(state.loc||"you")}…</p>`;
+    try{
+      const q=cuisine==="all"?"":(CUISINE_LABEL[cuisine]||"");
+      const res=await fetch(LIVO_API.replace(/\/$/,"")+"/api/eats?near="+encodeURIComponent(state.loc||"Surrey BC")+"&cuisine="+encodeURIComponent(q));
+      const data=await res.json();
+      if(Array.isArray(data)&&data.length){
+        out.innerHTML=`<p class="muted" style="font-size:12px;margin:2px 0 10px">${data.length} live results from Google Maps · tap for hours, photos & reviews.</p><div class="spotgrid">`+
+          data.map(p=>`<div class="spot"><div class="cat">Restaurant</div><h4>${esc(p.name)} ${p.rating?`<span style="color:#f59e0b;font-size:12px">★ ${p.rating}${p.ratingCount?` (${p.ratingCount})`:""}</span>`:""}</h4><p class="muted" style="font-size:12px">${esc(p.area||"")}</p><div class="meta" style="margin-top:8px">${p.url?`<a class="maplink" target="_blank" rel="noopener" href="${esc(p.url)}">🗺️ Maps</a>`:mapA(p.name,p.area)}${saveBtn(p.name,"Restaurant · "+(p.area||""),"event",nextSaturday())}</div></div>`).join("")+`</div>`;
+        return;
+      }
+    }catch(e){ /* network/key issue → fall back to curated below */ }
+  }
   let list=cuisine==="all"?RESTAURANTS:RESTAURANTS.filter(s=>s.c===cuisine);
   out.innerHTML=`<p class="muted" style="font-size:12px;margin:2px 0 10px">${list.length} local favourite${list.length===1?"":"s"}${cuisine==="all"?"":" · "+CUISINE_LABEL[cuisine]} · tap Maps for live hours, photos & reviews.</p><div class="spotgrid">`+
     list.map(s=>`<div class="spot"><div class="cat">${CUISINE_LABEL[s.c]||""}</div><h4>${s.n} ${s.r?`<span style="color:#f59e0b;font-size:12px">★ ${s.r}</span>`:""}</h4><p>${s.d}</p><div class="meta" style="margin-top:8px"><span class="pill">📍 ${s.area}</span>${mapA(s.n,s.area)}${saveBtn(s.n,CUISINE_LABEL[s.c]+" · "+s.area,"event",nextSaturday())}</div></div>`).join("")+`</div>`;

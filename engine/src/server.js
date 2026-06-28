@@ -1,6 +1,6 @@
 import express from 'express';
 import { generatePlan, budgetTrip } from './engine/aiPlanner.js';
-import { events as eventsProvider, stays as staysProvider, social } from './providers/index.js';
+import { maps, events as eventsProvider, stays as staysProvider, social } from './providers/index.js';
 import * as store from './store.js';
 import { DESTS, VENUES } from './data/seed.js';
 
@@ -49,6 +49,24 @@ app.post('/api/groups', (req, res) => {
   res.json(list.map(v => ({
     ...v, fits: people >= v.min && people <= v.max, total: v.head * people
   })).sort((a, b) => (b.fits - a.fits) || a.head - b.head));
+});
+
+// --- Eats / restaurants (live Google Places when PROVIDER_MAPS=live) ---
+app.get('/api/eats', async (req, res) => {
+  try {
+    const near = req.query.near || 'Surrey, BC';
+    const vibe = req.query.cuisine || undefined; // e.g. "Vietnamese", "Indian"
+    const places = await maps.searchPlaces({ near, type: 'restaurant', vibe });
+    res.json(places);
+  } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+// --- Generic places (trails, cafes, parks, anything) ---
+app.get('/api/places', async (req, res) => {
+  try {
+    const places = await maps.searchPlaces({ near: req.query.near || 'Surrey, BC', type: req.query.type || 'restaurant', vibe: req.query.vibe });
+    res.json(places);
+  } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
 // --- Events feed (provider-backed) ---
