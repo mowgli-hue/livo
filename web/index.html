@@ -212,6 +212,14 @@
   .chip-s{background:var(--brand-soft);color:var(--brand-d);border:1px solid var(--sky);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
   .chip-s:hover{filter:brightness(.97)}
   .typing{font-size:13px;color:var(--muted);font-style:italic}
+  /* settings + legal pages */
+  .setlinks{display:flex;flex-direction:column;gap:2px}
+  .setlink{text-align:left;background:none;border:none;border-bottom:1px solid var(--line);padding:13px 2px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;width:100%}
+  .setlink:last-child{border-bottom:none}.setlink:hover{color:var(--brand-d)}
+  .legal{font-size:14px;color:var(--ink)}
+  .legal h4{margin:16px 0 4px;font-size:15px}
+  .legal p{margin:0 0 10px;color:var(--muted)}
+  .legal a{color:var(--brand-d)}
   /* polish */
   .card,.qchip,.dest,.spot{transition:transform .15s, box-shadow .15s, border-color .15s}
   .btn:active,.qchip:active,.opt:active{transform:scale(.97)}
@@ -269,6 +277,7 @@
   <div class="tb-actions">
     <button class="iconbtn" id="searchBtn">🔍</button>
     <button class="iconbtn" id="bellBtn">🔔<span class="dot"></span></button>
+    <button class="iconbtn" id="settingsBtn">⚙️</button>
   </div>
 </div>
 
@@ -576,6 +585,105 @@
     <div class="card"><h3>🔔 Notifications</h3><div id="notifOut"></div></div>
   </section>
 
+  <!-- ===== SETTINGS ===== -->
+  <section id="main-settings" class="hide">
+    <div class="card">
+      <h3>⚙️ Settings</h3>
+      <label class="fld"><b>👤 Account</b><div id="setAccount" class="muted" style="font-size:14px">Not set up yet</div></label>
+      <button class="btn ghost sm" data-go="profile">Edit profile</button>
+      <label class="fld" style="margin-top:16px"><b>🧭 Default way to get around</b>
+        <div class="opts" data-group="travel"><div class="opt" data-v="driving">🚗 Drive</div><div class="opt" data-v="transit">🚆 Transit</div><div class="opt" data-v="walking">🚶 Walk</div><div class="opt" data-v="bicycling">🚲 Bike</div></div></label>
+      <label class="fld"><b>📍 Home location</b><input id="setLoc" type="text" placeholder="e.g. Surrey, BC"></label>
+      <div class="note">Sets where "nearby" centres, and the start point for directions. If you don't drive, pick Transit and plans will be bus/SkyTrain friendly.</div>
+    </div>
+    <div class="card">
+      <h3>Your data</h3>
+      <p class="sub">Everything lives on this device — you're in control.</p>
+      <div class="row2"><button class="btn ghost sm" id="exportData">⬇️ Export my data</button><button class="btn ghost sm" id="clearData" style="color:var(--warn);border-color:var(--warn)">🗑️ Clear all data</button></div>
+    </div>
+    <div class="card">
+      <h3>About & legal</h3>
+      <div class="setlinks">
+        <button class="setlink" data-go="privacy">🔒 Privacy Policy ›</button>
+        <button class="setlink" data-go="terms">📄 Terms of Use ›</button>
+        <button class="setlink" data-go="support">✉️ Contact Support ›</button>
+        <button class="setlink" data-go="about">ℹ️ About ›</button>
+      </div>
+      <p class="muted" style="font-size:12px;margin-top:12px">Livo v1.0 · Built by Jungle Labs</p>
+    </div>
+  </section>
+
+  <!-- ===== PRIVACY ===== -->
+  <section id="main-privacy" class="hide">
+    <div class="card">
+      <button class="btn ghost sm" data-go="settings">‹ Back</button>
+      <h3 style="margin:14px 0 4px">🔒 Privacy Policy</h3>
+      <div class="legal">
+        <p>Last updated: June 2026</p>
+        <p>Livo is built to respect your privacy. In plain language:</p>
+        <h4>What we store</h4>
+        <p>Your profile, calendar, habits, goals, moods, memories and photos are saved <b>only on your device</b> (in your browser's local storage). We don't upload them to a server, and we can't see them.</p>
+        <h4>Location</h4>
+        <p>If you tap "Use my location," your device shares your coordinates <b>only</b> to centre nearby suggestions and directions. We don't store or transmit your location to us.</p>
+        <h4>Live data services</h4>
+        <p>To show real restaurants, places and events, Livo's server fetches data from Google Places, Ticketmaster, and (for the assistant) Anthropic. Your search terms (like a city name) are sent to these services to return results, governed by their own privacy policies. We don't send them your personal data.</p>
+        <h4>No ads, no selling data</h4>
+        <p>Livo shows no ads and never sells your information.</p>
+        <h4>Your control</h4>
+        <p>You can export or permanently delete all your data anytime from Settings → Your data.</p>
+        <h4>Contact</h4>
+        <p>Questions? Email <a href="mailto:mowgli@junglelabsworld.com">mowgli@junglelabsworld.com</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SUPPORT ===== -->
+  <section id="main-support" class="hide">
+    <div class="card">
+      <button class="btn ghost sm" data-go="settings">‹ Back</button>
+      <h3 style="margin:14px 0 4px">✉️ Contact Support</h3>
+      <p class="sub">We're a small team and we read everything. Tell us what's up — a bug, an idea, a spot we should add.</p>
+      <label class="fld"><b>Your message</b><textarea id="supMsg" rows="4" placeholder="What can we help with?"></textarea></label>
+      <button class="btn" id="supSend">Send message</button>
+      <div class="note">This opens your email app to send to <b>mowgli@junglelabsworld.com</b>. You can also email us directly anytime.</div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section id="main-about" class="hide">
+    <div class="card">
+      <button class="btn ghost sm" data-go="settings">‹ Back</button>
+      <h3 style="margin:14px 0 4px">ℹ️ About Livo</h3>
+      <div class="legal">
+        <p>Livo helps you plan your days, weekends, trips and time off — and remember it all. It's the friendly companion that makes life feel a little more planned, a little more lively, and a lot less lonely.</p>
+        <p>Tell the assistant your day and it organises it. Explore hidden gems, real eats and what's on near you. Save memories. Roam with the people you love.</p>
+        <h4>Version</h4>
+        <p>Livo v1.0</p>
+        <h4>Made by</h4>
+        <p>Jungle Labs · <a href="mailto:mowgli@junglelabsworld.com">mowgli@junglelabsworld.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TERMS ===== -->
+  <section id="main-terms" class="hide">
+    <div class="card">
+      <button class="btn ghost sm" data-go="settings">‹ Back</button>
+      <h3 style="margin:14px 0 4px">📄 Terms of Use</h3>
+      <div class="legal">
+        <p>By using Livo you agree to these simple terms:</p>
+        <h4>Plan responsibly</h4>
+        <p>Livo suggests places, hours, prices and events from third-party data that can change. Always verify details (opening hours, bookings, trail conditions, fire bans, water safety) before you go.</p>
+        <h4>Your safety</h4>
+        <p>Outdoor activities carry risk. Check conditions, go prepared, and never swim or light fires where it's unsafe or prohibited. You're responsible for your own decisions.</p>
+        <h4>No warranty</h4>
+        <p>Livo is provided "as is," without warranties. We're not liable for third-party information or for what happens on your outings.</p>
+        <h4>Contact</h4>
+        <p><a href="mailto:mowgli@junglelabsworld.com">mowgli@junglelabsworld.com</a></p>
+      </div>
+    </div>
+  </section>
+
   <footer>Built for Jungle Labs · Prototype — verify hours, prices & bookings before you go. Photos & profile stay on this device.</footer>
 </div>
 
@@ -861,6 +969,7 @@ function genPlan(){
   slots.forEach(s=>{html+=`<div class="slot"><div class="time">${s.time}</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta"><span class="pill">📍 ${s.sub}</span>${costChip(s.cost)}${mapA(s.n,s.loc)}</div></div>`;});
   html+=`</div><div class="total"><div><div class="muted" style="font-size:13px">Rough cost / person</div><div style="font-size:12px;color:${within?'var(--green)':'var(--warn)'}">${within?'✓ Inside your budget':'⚠ A bit over — swap a paid stop for a free trail'}</div></div><b>$${est}</b></div>`;
   html+=saveBtn(title,slots.map(s=>s.n).join(" → "),"plan",nextSaturday());
+  html+=` <button class="btn ghost savebtn" data-shareplan="${esc(title+' — '+slots.map(s=>s.n).join(', '))}">🔗 Share / invite a roamie</button>`;
   out.innerHTML=html;out.classList.remove('hide');out.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function whoLabel(){return {couple:"Me + partner",solo:"Solo",friends:"Friends",family:"Family"}[state.who];}
@@ -1191,7 +1300,7 @@ function buildEvening(intent,start,end,raw){
 
 function renderDayBlocks(title,intent,energy,start,end,blocks,emoji){
   const name=getProfile()?getProfile().name:"";
-  let html=`<div class="card" style="margin-top:14px"><div class="plan-head"><div><h3 style="margin:0 0 4px">${emoji} ${name?name+"'s ":""}${title}</h3><span class="muted">${energy?energy+" energy · ":""}${fmtTime(start)}–${fmtTime(end)}</span></div><span class="badge">AI plan</span></div><div class="timeline">`;
+  let html=`<div class="card" style="margin-top:14px"><div class="plan-head"><div><h3 style="margin:0 0 4px">${emoji} ${name?name+"'s ":""}${title}</h3><span class="muted">${energy?energy+" energy · ":""}${fmtTime(start)}–${fmtTime(end)} · ${travelLabel()}</span></div><span class="badge">AI plan</span></div><div class="timeline">`;
   blocks.forEach(b=>{const icon=b.kind==="work"?"💻":b.kind==="break"?"☕":b.kind==="food"?"🍽️":b.kind==="local"?"📍":b.kind==="spark"?"✨":"🌱";
     html+=`<div class="slot"><div class="time">${fmtTime(b.start)}</div><h4>${icon} ${esc(b.title)}</h4><p>${esc(b.detail)}</p></div>`;});
   html+=`</div>`+saveBtn(title,blocks.length+" blocks · "+fmtTime(start)+"–"+fmtTime(end),"plan",toISO(new Date()));
@@ -1408,12 +1517,30 @@ function saveSchedule(items){
   toast("Added "+items.length+" to your calendar ✓");if(curMain==="calendar")renderCalendar();
 }
 
+/* ===== SETTINGS / DATA / SHARE ===== */
+function travelLabel(){return {driving:'🚗 by car',transit:'🚆 by bus / transit',walking:'🚶 on foot',bicycling:'🚲 by bike'}[state.travel]||'';}
+function renderSettings(){
+  const p=getProfile();
+  document.getElementById('setAccount').textContent=p?(p.name+(p.bio?' · '+p.bio:'')):'Not set up yet';
+  const li=document.getElementById('setLoc');if(li)li.value=(state.loc==='my area'||state.loc==='your area')?'':state.loc;
+  document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));
+}
+function exportData(){const d={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('le_')===0)d[k]=localStorage.getItem(k);}
+  const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='livo-data.json';document.body.appendChild(a);a.click();a.remove();toast('Exported ✓');}
+function clearAllData(){if(!confirm('Delete ALL your Livo data on this device? This cannot be undone.'))return;
+  const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('le_')===0)ks.push(k);}ks.forEach(k=>localStorage.removeItem(k));toast('All data cleared');setTimeout(()=>location.reload(),700);}
+function sendSupport(){const m=(document.getElementById('supMsg').value||'').trim();window.location.href='mailto:mowgli@junglelabsworld.com?subject='+encodeURIComponent('Livo support')+'&body='+encodeURIComponent(m);}
+function sharePlan(text){const full=text+'\n\nWant to come? Planned with Livo 🌿';
+  if(navigator.share){navigator.share({title:'My Livo plan',text:full}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(full).then(()=>toast('Plan copied — paste to invite a roamie ✓')).catch(()=>toast('Copy not supported here'));}
+  else toast('Sharing not supported here');}
+
 /* ===== NAV ===== */
 function showMain(name){
   curMain=name;
-  ['today','plan','feed','calendar','profile','search','notifs','assistant'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
+  ['today','plan','feed','calendar','profile','search','notifs','assistant','settings','privacy','support','about','terms'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
   document.querySelectorAll('.bn').forEach(x=>x.classList.toggle('active',x.dataset.main===name));
-  if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();if(name==="assistant")chatInit();
+  if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();if(name==="assistant")chatInit();if(name==="settings")renderSettings();
   if(name==="search"){document.getElementById('searchOut').innerHTML="";setTimeout(()=>document.getElementById('searchInput').focus(),50);}
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1423,8 +1550,15 @@ function showSub(name){curSub=name;document.querySelectorAll('.sb').forEach(x=>x
 function go(target){const[m,s]=target.split(':');showMain(m);if(s){showSub(s);}}
 
 /* ===== WIRE ===== */
-document.querySelectorAll('.opts').forEach(g=>{g.addEventListener('click',e=>{const o=e.target.closest('.opt');if(!o)return;g.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');state[g.dataset.group]=o.dataset.v;});});
-document.getElementById('loc').addEventListener('input',e=>state.loc=e.target.value||"your area");
+document.querySelectorAll('.opts').forEach(g=>{g.addEventListener('click',e=>{const o=e.target.closest('.opt');if(!o)return;g.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');state[g.dataset.group]=o.dataset.v;
+  if(g.dataset.group==='travel'){try{localStorage.setItem('le_travel',o.dataset.v);}catch(_){}
+    document.querySelectorAll('[data-group="travel"] .opt').forEach(x=>x.classList.toggle('sel',x.dataset.v===o.dataset.v));}});});
+document.getElementById('loc').addEventListener('input',e=>{state.loc=e.target.value||"Surrey, BC";try{localStorage.setItem('le_loc',state.loc);}catch(_){}});
+document.getElementById('settingsBtn').addEventListener('click',()=>showMain('settings'));
+document.getElementById('exportData').addEventListener('click',exportData);
+document.getElementById('clearData').addEventListener('click',clearAllData);
+document.getElementById('supSend').addEventListener('click',sendSupport);
+document.getElementById('setLoc').addEventListener('input',e=>{state.loc=e.target.value||"Surrey, BC";try{localStorage.setItem('le_loc',state.loc);}catch(_){}const le=document.getElementById('loc');if(le)le.value=e.target.value;});
 document.getElementById('genBtn').addEventListener('click',genPlan);
 document.getElementById('reBtn').addEventListener('click',genPlan);
 document.getElementById('tripBtn').addEventListener('click',genTrips);
@@ -1488,9 +1622,13 @@ document.addEventListener('click',e=>{
   const sr=e.target.closest('[data-sreg]');if(sr){setStays(sr.dataset.sreg);return;}
   const ch=e.target.closest('[data-chat]');if(ch){showMain('assistant');setTimeout(()=>sendChat(ch.dataset.chat),60);return;}
   const ss=e.target.closest('[data-savesched]');if(ss){try{saveSchedule(JSON.parse(ss.dataset.savesched));}catch(_){}return;}
+  const shp=e.target.closest('[data-shareplan]');if(shp){sharePlan(shp.dataset.shareplan);return;}
   const cc=e.target.closest('[data-ccat]');if(cc){setEats(cc.dataset.ccat);return;}
 });
-/* init */
+/* init: restore saved travel mode + location */
+try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
+  const _loc=localStorage.getItem('le_loc');if(_loc){state.loc=_loc;const le=document.getElementById('loc');if(le)le.value=_loc;}
+  document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));}catch(_){}
 renderToday();genPlan();maybeOnboard();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>

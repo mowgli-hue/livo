@@ -24,10 +24,17 @@ Automated audit run on the current build. Status: **PASS**, with notes for the A
 3. **Live data requires keys** (Google, Ticketmaster, Anthropic) set on the engine; without them the app uses curated lists (graceful).
 4. **No automated tests** beyond this smoke audit. Recommend adding before scaling.
 
+## Added since last audit ✅
+- Settings page (default travel mode, home location, export/clear data).
+- Privacy Policy (in-app + standalone `web/privacy.html` for the store URL).
+- Contact Support (message → email), About, Terms of Use pages.
+- Share-a-plan / invite-a-roamie (Web Share API).
+- Transport-aware day plans (uses your default travel mode; persists).
+
 ## Before App Store submission — checklist
 - [ ] Decide final name + bundle ID (lock before first submit).
 - [ ] 1024×1024 app icon + screenshots for store listings.
-- [ ] Privacy policy URL (Apple/Google require one — you collect location + store data locally).
+- [x] Privacy policy — included (`web/privacy.html`); host it and use the URL in store listings.
 - [ ] Location-use description strings (iOS `NSLocationWhenInUseUsageDescription`).
 - [ ] Test the wrapped app on a real device (Capacitor).
 - [ ] Confirm engine keys are set in Railway (Google, Ticketmaster, Anthropic).
