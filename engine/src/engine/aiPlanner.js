@@ -68,7 +68,7 @@ async function assembleWithLLM(req, candidates, cap) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const msg = await client.messages.create({
-    model: process.env.AI_MODEL || 'claude-sonnet-4-6',
+    model: process.env.AI_MODEL || 'claude-opus-4-8',
     max_tokens: 900,
     system: 'You are LocalEscape, a local-getaway planner. Choose ONLY from the provided candidates. ' +
       'Return STRICT JSON: {title, slots:[{time,name,area,why,cost}], estPerPerson, withinBudget, note}. ' +

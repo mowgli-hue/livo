@@ -69,6 +69,36 @@ app.get('/api/places', async (req, res) => {
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
+// --- AI planner assistant (Claude) ---
+app.post('/api/chat', async (req, res) => {
+  const { message = '', history = [], context = {} } = req.body || {};
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.json({ reply: "The assistant needs ANTHROPIC_API_KEY set on the server to chat. (Your schedule parser still works in the app.)", schedule: [] });
+  }
+  try {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const sys = "You are Livo's warm, concise planning assistant. The user may describe a daily routine, ask to plan a day/weekend, or chat. " +
+      "When they describe activities or ask to schedule, ALWAYS return a schedule. " +
+      "Their location is " + (context.loc || 'unknown') + " and their interests are " + ((context.interests || []).join(', ') || 'unknown') + ". " +
+      "Reply with STRICT JSON only: {\"reply\":\"<friendly 1-3 sentence reply>\",\"schedule\":[{\"time\":\"HH:MM\",\"title\":\"...\"}]}. " +
+      "Use 24h HH:MM times. If no scheduling is needed, return an empty schedule array.";
+    const msgs = history.filter(h => h.role === 'user' || h.role === 'assistant')
+      .map(h => ({ role: h.role, content: String(h.content || '') }));
+    msgs.push({ role: 'user', content: message });
+    const out = await client.messages.create({
+      model: process.env.AI_MODEL || 'claude-opus-4-8',
+      max_tokens: 700, system: sys, messages: msgs,
+    });
+    const text = out.content.map(b => b.text || '').join('');
+    let parsed; try { parsed = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); }
+    catch { parsed = { reply: text.trim() || "Here's what I'd suggest.", schedule: [] }; }
+    res.json({ reply: parsed.reply || '', schedule: Array.isArray(parsed.schedule) ? parsed.schedule : [] });
+  } catch (e) {
+    res.status(502).json({ reply: "Assistant error: " + e.message, schedule: [] });
+  }
+});
+
 // --- Events feed (provider-backed) ---
 app.get('/api/events', async (req, res) => {
   try { res.json(await eventsProvider.search({ near: req.query.near, vibe: req.query.vibe })); }
