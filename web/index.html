@@ -1370,15 +1370,33 @@ function renderToday(){
 }
 
 /* ===== SEARCH ===== */
-function runSearch(q){
-  q=q.trim().toLowerCase();const out=document.getElementById('searchOut');
-  if(!q){out.innerHTML=`<p class="muted">Try "beach", "thai", "Tokyo", "office party", "library"...</p>`;return;}
+let _searchSeq=0;
+async function runSearch(qraw){
+  const q=qraw.trim().toLowerCase();const out=document.getElementById('searchOut');
+  if(!q){out.innerHTML=`<p class="muted">Try "park", "beach", "thai", "Tokyo", "office party", "library"…</p>`;return;}
+  const seq=++_searchSeq;
   const res=[];
   SPOTS.forEach(s=>{if((s.n+s.cat+s.loc+s.vibes.join()).toLowerCase().includes(q))res.push({ic:s.type==="food"?"🍽️":s.type==="stay"?"🛏️":s.type==="rec"?"🎟️":s.type==="easy"?"📚":"🥾",t:s.n,s:s.cat+" · "+s.loc,name:s.n,area:s.loc});});
   DESTS.forEach(d=>{if((d.n+d.best+d.vibes.join()).toLowerCase().includes(q))res.push({ic:d.flag,t:d.n,s:"Trip · "+d.best,name:d.n,area:''});});
   EVENTS.forEach(e=>{if((e.n+e.desc).toLowerCase().includes(q))res.push({ic:"🎉",t:e.n,s:"Event · "+e.area,name:e.n,area:e.area});});
   VENUES.forEach(v=>{if((v.n+v.d+v.occ.join()).toLowerCase().includes(q))res.push({ic:"🥂",t:v.n,s:"Venue · "+v.area,name:v.n,area:v.area});});
-  out.innerHTML=res.length?res.slice(0,20).map(r=>`<div class="sresult"><div class="sicon">${r.ic}</div><div style="flex:1"><h5>${esc(r.t)}</h5><p>${esc(r.s)}</p></div>${mapA(r.name,r.area)}</div>`).join(""):`<p class="muted">No matches for "${esc(q)}".</p>`;
+  function render(curated,live){
+    let html=curated.map(r=>`<div class="sresult"><div class="sicon">${r.ic}</div><div style="flex:1"><h5>${esc(r.t)}</h5><p>${esc(r.s)}</p></div>${mapA(r.name,r.area)}</div>`).join("");
+    if(live&&live.length){html+=`<p class="muted" style="font-size:12px;margin:14px 0 6px">📍 ${live.length} live results near ${esc(state.loc||"you")}</p>`+
+      live.map(p=>`<div class="sresult"><div class="sicon">📍</div><div style="flex:1"><h5>${esc(p.name)} ${p.rating?`<span style="color:#f59e0b;font-size:12px">★ ${p.rating}</span>`:""}</h5><p>${esc(p.area||"")}</p></div>${p.url?`<a class="maplink" target="_blank" rel="noopener" href="${esc(p.url)}">🗺️ Maps</a>`:mapA(p.name,p.area)}</div>`).join("");}
+    if(!html)html=`<p class="muted">No matches for "${esc(q)}".</p>`;
+    out.innerHTML=html;
+  }
+  render(res,null);
+  // LIVE: also search real places via the engine (parks, cafes, anything)
+  if(LIVO_API){
+    if(!res.length)out.innerHTML=`<p class="muted">Searching live near ${esc(state.loc||"you")}…</p>`;
+    try{
+      const r=await fetch(LIVO_API.replace(/\/$/,"")+"/api/places?near="+encodeURIComponent(state.loc||"Surrey BC")+"&type="+encodeURIComponent(qraw.trim()));
+      const data=await r.json();
+      if(seq===_searchSeq&&Array.isArray(data))render(res,data);
+    }catch(e){ if(seq===_searchSeq&&!res.length)render(res,null); }
+  }
 }
 
 /* ===== NOTIFICATIONS ===== */
