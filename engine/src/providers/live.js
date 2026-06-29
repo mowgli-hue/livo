@@ -86,8 +86,34 @@ export const events = {
   },
 };
 
-// Stays / Social live adapters go here the same way when you add those keys.
-// stays  -> Booking.com / Airbnb partner API
-// social -> Instagram Graph + your own ranking
+// Discovery — Foursquare Places API (free key at foursquare.com/developers).
+// Set FOURSQUARE_API_KEY and PROVIDER_SOCIAL=live. Great for trending/hidden spots.
+export const social = {
+  async bestPlaces({ near = 'Surrey, BC', type = 'park', vibe } = {}) {
+    const key = process.env.FOURSQUARE_API_KEY;
+    if (!key) return []; // silently skip if not configured (Google still returns results)
+    const q = `${vibe && vibe !== 'any' ? vibe + ' ' : ''}${type}`;
+    const params = new URLSearchParams({ query: q, near, limit: '30', sort: 'POPULARITY' });
+    const res = await fetch('https://api.foursquare.com/v3/places/search?' + params, {
+      headers: { Authorization: key, Accept: 'application/json' },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.results || []).map((p, i) => ({
+      id: 'fsq_' + i,
+      name: p.name,
+      category: p.categories?.[0]?.name || type,
+      vibes: vibe && vibe !== 'any' ? [vibe] : [],
+      area: p.location?.formatted_address || near,
+      priceLevel: p.price ?? 1,
+      rating: p.rating ? +(p.rating / 2).toFixed(1) : null, // FSQ is /10 → /5
+      ratingCount: p.stats?.total_ratings || 0,
+      lat: p.geocodes?.main?.latitude, lng: p.geocodes?.main?.longitude,
+      url: 'https://foursquare.com/v/' + (p.fsq_id || ''),
+      source: 'foursquare',
+    }));
+  },
+};
+
+// Stays live adapter goes here when you add a hotel API key.
 export const stays = null;
-export const social = null;

@@ -25,6 +25,10 @@ Automated audit run on the current build. Status: **PASS**, with notes for the A
 4. **No automated tests** beyond this smoke audit. Recommend adding before scaling.
 
 ## Added since last audit ✅
+- **Email accounts** (signup/login, bcrypt + JWT) and **cross-device sync** of all app data.
+- **Foursquare** discovery merged into `/api/places` for richer hidden gems (alongside Google).
+- **Roam-together invites**: share a plan → others open a `?plan=` link and **RSVP** ("I'm in").
+- **Push** plugin enabled in Capacitor config (needs APNs/FCM setup to go live).
 - Settings page (default travel mode, home location, export/clear data).
 - Privacy Policy (in-app + standalone `web/privacy.html` for the store URL).
 - Contact Support (message → email), About, Terms of Use pages.

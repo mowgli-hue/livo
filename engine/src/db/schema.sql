@@ -2,9 +2,32 @@
 -- psql "$DATABASE_URL" -f src/db/schema.sql
 
 CREATE TABLE IF NOT EXISTS users (
-  id          TEXT PRIMARY KEY DEFAULT ('u_' || gen_random_uuid()),
-  handle      TEXT UNIQUE NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  id            TEXT PRIMARY KEY DEFAULT ('u_' || gen_random_uuid()),
+  handle        TEXT UNIQUE NOT NULL,
+  email         TEXT UNIQUE,
+  password_hash TEXT,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- whole-app data blob per user (cross-device sync)
+CREATE TABLE IF NOT EXISTS user_data (
+  user_id    TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  blob       JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- shared "roam together" plans + RSVPs
+CREATE TABLE IF NOT EXISTS shared_plans (
+  id         TEXT PRIMARY KEY DEFAULT ('p_' || gen_random_uuid()),
+  title      TEXT NOT NULL,
+  items      JSONB NOT NULL DEFAULT '[]',
+  created_by TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS plan_rsvps (
+  plan_id TEXT NOT NULL REFERENCES shared_plans(id) ON DELETE CASCADE,
+  who     TEXT NOT NULL,
+  PRIMARY KEY (plan_id, who)
 );
 
 CREATE TABLE IF NOT EXISTS calendar_items (

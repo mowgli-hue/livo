@@ -1,7 +1,7 @@
 // Persistence layer. Uses Postgres when DATABASE_URL is set, otherwise an
 // in-memory store so the scaffold runs with zero setup. Same async API either way.
 
-const memory = { users: new Map(), items: new Map(), meetups: new Map(), rsvps: new Map() };
+const memory = { users: new Map(), items: new Map(), meetups: new Map(), rsvps: new Map(), data: new Map(), plans: new Map() };
 let pg = null;
 
 export async function init() {
@@ -69,5 +69,58 @@ export const meetups = {
     const key = meetupId + ':' + userId; memory.rsvps.set(key, true);
     const m = memory.meetups.get(meetupId); if (m) m.interested = [...memory.rsvps.keys()].filter(k => k.startsWith(meetupId + ':')).length;
     return m ? m.interested : 0;
+  }
+};
+
+// --- Email accounts ---
+export const auth = {
+  async findByEmail(email) {
+    if (pg) return (await pg.query('SELECT * FROM users WHERE email=$1', [email.toLowerCase()])).rows[0] || null;
+    return [...memory.users.values()].find(u => u.email === email.toLowerCase()) || null;
+  },
+  async create({ email, passwordHash, handle }) {
+    email = email.toLowerCase();
+    if (pg) return (await pg.query(
+      'INSERT INTO users(handle,email,password_hash) VALUES($1,$2,$3) RETURNING *', [handle, email, passwordHash])).rows[0];
+    const u = { id: uid('u'), handle, email, password_hash: passwordHash }; memory.users.set(u.id, u); return u;
+  },
+  async byId(id) {
+    if (pg) return (await pg.query('SELECT * FROM users WHERE id=$1', [id])).rows[0] || null;
+    return memory.users.get(id) || null;
+  }
+};
+
+// --- Per-user data blob (cross-device sync) ---
+export const data = {
+  async get(userId) {
+    if (pg) { const r = await pg.query('SELECT blob FROM user_data WHERE user_id=$1', [userId]); return r.rows[0]?.blob || null; }
+    return memory.data.get(userId) || null;
+  },
+  async put(userId, blob) {
+    if (pg) { await pg.query(
+      'INSERT INTO user_data(user_id,blob,updated_at) VALUES($1,$2,now()) ON CONFLICT(user_id) DO UPDATE SET blob=$2,updated_at=now()',
+      [userId, blob]); return true; }
+    memory.data.set(userId, blob); return true;
+  }
+};
+
+// --- Shared plans ("roam together" invites) ---
+export const plans = {
+  async create({ title, items, by }) {
+    if (pg) return (await pg.query(
+      'INSERT INTO shared_plans(title,items,created_by) VALUES($1,$2,$3) RETURNING *',
+      [title, JSON.stringify(items || []), by || null])).rows[0];
+    const p = { id: uid('p'), title, items: items || [], created_by: by || null, rsvps: [] }; memory.plans.set(p.id, p); return p;
+  },
+  async get(id) {
+    if (pg) { const p = (await pg.query('SELECT * FROM shared_plans WHERE id=$1', [id])).rows[0]; if (!p) return null;
+      const c = (await pg.query('SELECT count(*)::int AS c FROM plan_rsvps WHERE plan_id=$1', [id])).rows[0].c;
+      return { ...p, items: typeof p.items === 'string' ? JSON.parse(p.items) : p.items, going: c }; }
+    const p = memory.plans.get(id); return p ? { ...p, going: p.rsvps.length } : null;
+  },
+  async rsvp(id, who) {
+    if (pg) { await pg.query('INSERT INTO plan_rsvps(plan_id,who) VALUES($1,$2) ON CONFLICT DO NOTHING', [id, who]);
+      return (await pg.query('SELECT count(*)::int AS c FROM plan_rsvps WHERE plan_id=$1', [id])).rows[0].c; }
+    const p = memory.plans.get(id); if (!p) return 0; if (!p.rsvps.includes(who)) p.rsvps.push(who); return p.rsvps.length;
   }
 };

@@ -61,12 +61,73 @@ app.get('/api/eats', async (req, res) => {
   } catch (e) { res.status(502).json({ error: e.message }); }
 });
 
-// --- Generic places (trails, cafes, parks, anything) ---
+// --- Generic places (trails, cafes, parks, anything) — Google + Foursquare merged ---
 app.get('/api/places', async (req, res) => {
   try {
-    const places = await maps.searchPlaces({ near: req.query.near || 'Surrey, BC', type: req.query.type || 'restaurant', vibe: req.query.vibe });
-    res.json(places);
+    const near = req.query.near || 'Surrey, BC', type = req.query.type || 'restaurant', vibe = req.query.vibe;
+    const results = await Promise.allSettled([
+      maps.searchPlaces({ near, type, vibe }),
+      social.bestPlaces ? social.bestPlaces({ near, type, vibe }) : Promise.resolve([]),
+    ]);
+    const merged = [];
+    const seen = new Set();
+    for (const r of results) {
+      if (r.status !== 'fulfilled' || !Array.isArray(r.value)) continue;
+      for (const p of r.value) {
+        const key = (p.name || '').toLowerCase().slice(0, 24);
+        if (seen.has(key)) continue; seen.add(key); merged.push(p);
+      }
+    }
+    res.json(merged);
   } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+// ===== Email accounts =====
+async function hashPw(pw) { const { default: b } = await import('bcryptjs'); return b.hash(pw, 10); }
+async function checkPw(pw, hash) { const { default: b } = await import('bcryptjs'); return b.compare(pw, hash); }
+async function signToken(user) { const { default: jwt } = await import('jsonwebtoken'); return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '60d' }); }
+async function verifyToken(req) {
+  const h = req.header('authorization') || ''; const t = h.startsWith('Bearer ') ? h.slice(7) : null; if (!t) return null;
+  try { const { default: jwt } = await import('jsonwebtoken'); return jwt.verify(t, process.env.JWT_SECRET || 'dev-secret'); } catch { return null; }
+}
+const slug = (s) => (s || 'user').split('@')[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'user';
+
+app.post('/api/auth/signup', async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password || password.length < 6) return res.status(400).json({ error: 'Email and a 6+ char password required.' });
+  if (await store.auth.findByEmail(email)) return res.status(409).json({ error: 'That email is already registered. Try logging in.' });
+  const user = await store.auth.create({ email, passwordHash: await hashPw(password), handle: slug(email) });
+  res.json({ token: await signToken(user), user: { id: user.id, email: user.email, handle: user.handle } });
+});
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body || {};
+  const user = await store.auth.findByEmail(email || '');
+  if (!user || !(await checkPw(password || '', user.password_hash))) return res.status(401).json({ error: 'Wrong email or password.' });
+  res.json({ token: await signToken(user), user: { id: user.id, email: user.email, handle: user.handle } });
+});
+
+// ===== Cross-device data sync (the whole app blob, per user) =====
+app.get('/api/sync', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  res.json({ blob: await store.data.get(tok.id) });
+});
+app.put('/api/sync', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  await store.data.put(tok.id, req.body?.blob || {}); res.json({ ok: true });
+});
+
+// ===== Shared plans — "roam together" invites + RSVP =====
+app.post('/api/plans', async (req, res) => {
+  const { title, items, by } = req.body || {};
+  if (!title) return res.status(400).json({ error: 'title required' });
+  res.json(await store.plans.create({ title, items, by }));
+});
+app.get('/api/plans/:id', async (req, res) => {
+  const p = await store.plans.get(req.params.id); if (!p) return res.status(404).json({ error: 'not found' });
+  res.json(p);
+});
+app.post('/api/plans/:id/rsvp', async (req, res) => {
+  res.json({ going: await store.plans.rsvp(req.params.id, (req.body && req.body.who) || 'someone') });
 });
 
 // --- AI planner assistant (Claude) ---

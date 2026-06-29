@@ -5,6 +5,7 @@
   "server": { "androidScheme": "https" },
   "plugins": {
     "CapacitorUpdater": { "autoUpdate": true },
-    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#7c6bff" }
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#7c6bff" },
+    "PushNotifications": { "presentationOptions": ["badge", "sound", "alert"] }
   }
 }

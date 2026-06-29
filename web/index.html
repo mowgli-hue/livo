@@ -585,8 +585,26 @@
     <div class="card"><h3>🔔 Notifications</h3><div id="notifOut"></div></div>
   </section>
 
+  <!-- ===== ROAM INVITE (shared plan deep-link) ===== -->
+  <section id="main-invite" class="hide">
+    <div class="card" id="inviteOut"></div>
+  </section>
+
   <!-- ===== SETTINGS ===== -->
   <section id="main-settings" class="hide">
+    <div class="card" id="authCard">
+      <h3>👤 Account</h3>
+      <div id="authedView" class="hide">
+        <p class="sub">Signed in as <b id="authEmail"></b>. Your plans, calendar and memories back up and sync across devices.</p>
+        <div class="row2"><button class="btn ghost sm" id="syncNow">🔄 Sync now</button><button class="btn ghost sm" id="logoutBtn" style="color:var(--warn);border-color:var(--warn)">Log out</button></div>
+      </div>
+      <div id="authForm">
+        <p class="sub">Create an account to back up and sync Livo across your devices. Optional — the app works fully without one.</p>
+        <label class="fld"><b>Email</b><input id="authEmailIn" type="email" placeholder="you@email.com" autocomplete="email"></label>
+        <label class="fld"><b>Password</b><input id="authPwIn" type="password" placeholder="6+ characters" autocomplete="current-password"></label>
+        <div class="row2"><button class="btn sm" id="signupBtn">Sign up</button><button class="btn ghost sm" id="loginBtn">Log in</button></div>
+      </div>
+    </div>
     <div class="card">
       <h3>⚙️ Settings</h3>
       <label class="fld"><b>👤 Account</b><div id="setAccount" class="muted" style="font-size:14px">Not set up yet</div></label>
@@ -1521,6 +1539,10 @@ function saveSchedule(items){
 function travelLabel(){return {driving:'🚗 by car',transit:'🚆 by bus / transit',walking:'🚶 on foot',bicycling:'🚲 by bike'}[state.travel]||'';}
 function renderSettings(){
   const p=getProfile();
+  const logged=!!authToken();
+  document.getElementById('authedView').classList.toggle('hide',!logged);
+  document.getElementById('authForm').classList.toggle('hide',logged);
+  if(logged)document.getElementById('authEmail').textContent=authedEmail()||'';
   document.getElementById('setAccount').textContent=p?(p.name+(p.bio?' · '+p.bio:'')):'Not set up yet';
   const li=document.getElementById('setLoc');if(li)li.value=(state.loc==='my area'||state.loc==='your area')?'':state.loc;
   document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));
@@ -1530,15 +1552,69 @@ function exportData(){const d={};for(let i=0;i<localStorage.length;i++){const k=
 function clearAllData(){if(!confirm('Delete ALL your Livo data on this device? This cannot be undone.'))return;
   const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('le_')===0)ks.push(k);}ks.forEach(k=>localStorage.removeItem(k));toast('All data cleared');setTimeout(()=>location.reload(),700);}
 function sendSupport(){const m=(document.getElementById('supMsg').value||'').trim();window.location.href='mailto:mowgli@junglelabsworld.com?subject='+encodeURIComponent('Livo support')+'&body='+encodeURIComponent(m);}
-function sharePlan(text){const full=text+'\n\nWant to come? Planned with Livo 🌿';
+/* ---- accounts + sync ---- */
+function authToken(){try{return localStorage.getItem('le_token');}catch(e){return null;}}
+function authedEmail(){try{return localStorage.getItem('le_email');}catch(e){return null;}}
+async function doAuth(path){
+  if(!LIVO_API){toast('Connect the engine first (LIVO_API)');return;}
+  const email=(document.getElementById('authEmailIn').value||'').trim(),pw=document.getElementById('authPwIn').value||'';
+  if(!email||pw.length<6){toast('Enter email + 6+ char password');return;}
+  try{const res=await fetch(LIVO_API.replace(/\/$/,"")+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+    const data=await res.json();
+    if(data.token){localStorage.setItem('le_token',data.token);localStorage.setItem('le_email',data.user.email);toast('Welcome! ✓');await syncPull();renderSettings();renderToday();}
+    else toast(data.error||'Could not sign in');
+  }catch(e){toast('Network error — is the engine up?');}
+}
+async function syncPush(){if(!authToken()||!LIVO_API)return;const blob={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('le_')===0&&k!=='le_token'&&k!=='le_email')blob[k]=localStorage.getItem(k);}
+  try{await fetch(LIVO_API.replace(/\/$/,"")+'/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','authorization':'Bearer '+authToken()},body:JSON.stringify({blob})});toast('Backed up ✓');}catch(e){toast('Sync failed');}}
+async function syncPull(){if(!authToken()||!LIVO_API)return;
+  try{const res=await fetch(LIVO_API.replace(/\/$/,"")+'/api/sync',{headers:{'authorization':'Bearer '+authToken()}});const data=await res.json();
+    if(data&&data.blob){Object.entries(data.blob).forEach(([k,v])=>{if(k.indexOf('le_')===0)localStorage.setItem(k,v);});}}catch(e){}}
+function logout(){localStorage.removeItem('le_token');localStorage.removeItem('le_email');toast('Logged out');renderSettings();}
+
+/* ---- share / roam-together invite ---- */
+async function sharePlan(text){
+  let full=text+'\n\nWant to come? 🌿';
+  if(LIVO_API){
+    try{const items=text.includes(' — ')?text.split(' — ')[1].split(', '):[];
+      const res=await fetch(LIVO_API.replace(/\/$/,"")+'/api/plans',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({title:text.split(' — ')[0].slice(0,90),items,by:authedEmail()||(getProfile()?getProfile().name:'a friend')})});
+      const p=await res.json();
+      if(p&&p.id){const url=location.origin+location.pathname+'?plan='+p.id;full=text+'\n\nJoin me 🌿 '+url;}
+    }catch(e){}
+  }
   if(navigator.share){navigator.share({title:'My Livo plan',text:full}).catch(()=>{});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(full).then(()=>toast('Plan copied — paste to invite a roamie ✓')).catch(()=>toast('Copy not supported here'));}
+  else if(navigator.clipboard){navigator.clipboard.writeText(full).then(()=>toast('Invite copied — send it to a roamie ✓')).catch(()=>toast('Copy not supported'));}
   else toast('Sharing not supported here');}
+
+/* ---- incoming roam invite (?plan=…) ---- */
+function checkPlanLink(){
+  const m=location.search.match(/[?&]plan=([^&]+)/);if(!m||!LIVO_API)return;
+  fetch(LIVO_API.replace(/\/$/,"")+'/api/plans/'+encodeURIComponent(m[1])).then(r=>r.json()).then(p=>{
+    if(!p||!p.title)return;renderInvite(p,m[1]);showMain('invite');
+  }).catch(()=>{});
+}
+function renderInvite(p,id){
+  const items=(p.items||[]).filter(Boolean);
+  document.getElementById('inviteOut').innerHTML=
+    `<span class="badge" style="background:#fdf2f8;color:var(--pink);border-color:#fbcfe1">🌿 You're invited to roam together</span>
+     <h3 style="margin:12px 0 4px">${esc(p.title)}</h3>
+     <p class="muted" style="margin:0 0 10px">${esc(p.created_by||'A friend')} wants you to come along.</p>
+     ${items.length?`<div class="timeline">${items.map(it=>`<div class="slot"><h4>${esc(it)}</h4></div>`).join("")}</div>`:''}
+     <div class="total"><div class="muted" style="font-size:13px">People going</div><b style="color:var(--pink)">${p.going||0}</b></div>
+     <button class="btn pink" id="rsvpBtn">I'm in 🙌</button>
+     <button class="btn ghost sm" style="margin-top:8px" data-go="today">Explore Livo</button>`;
+  setTimeout(()=>{const b=document.getElementById('rsvpBtn');if(b)b.onclick=()=>{
+    fetch(LIVO_API.replace(/\/$/,"")+'/api/plans/'+encodeURIComponent(id)+'/rsvp',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({who:authedEmail()||(getProfile()?getProfile().name:'a roamie')})}).then(r=>r.json()).then(d=>{toast("You're in! 🙌");p.going=d.going;renderInvite(p,id);});
+  };},30);
+}
 
 /* ===== NAV ===== */
 function showMain(name){
   curMain=name;
-  ['today','plan','feed','calendar','profile','search','notifs','assistant','settings','privacy','support','about','terms'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
+  ['today','plan','feed','calendar','profile','search','notifs','assistant','settings','privacy','support','about','terms','invite'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
   document.querySelectorAll('.bn').forEach(x=>x.classList.toggle('active',x.dataset.main===name));
   if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();if(name==="assistant")chatInit();if(name==="settings")renderSettings();
   if(name==="search"){document.getElementById('searchOut').innerHTML="";setTimeout(()=>document.getElementById('searchInput').focus(),50);}
@@ -1559,6 +1635,10 @@ document.getElementById('exportData').addEventListener('click',exportData);
 document.getElementById('clearData').addEventListener('click',clearAllData);
 document.getElementById('supSend').addEventListener('click',sendSupport);
 document.getElementById('setLoc').addEventListener('input',e=>{state.loc=e.target.value||"Surrey, BC";try{localStorage.setItem('le_loc',state.loc);}catch(_){}const le=document.getElementById('loc');if(le)le.value=e.target.value;});
+document.getElementById('signupBtn').addEventListener('click',()=>doAuth('/api/auth/signup'));
+document.getElementById('loginBtn').addEventListener('click',()=>doAuth('/api/auth/login'));
+document.getElementById('syncNow').addEventListener('click',syncPush);
+document.getElementById('logoutBtn').addEventListener('click',logout);
 document.getElementById('genBtn').addEventListener('click',genPlan);
 document.getElementById('reBtn').addEventListener('click',genPlan);
 document.getElementById('tripBtn').addEventListener('click',genTrips);
@@ -1629,7 +1709,7 @@ document.addEventListener('click',e=>{
 try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
   const _loc=localStorage.getItem('le_loc');if(_loc){state.loc=_loc;const le=document.getElementById('loc');if(le)le.value=_loc;}
   document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));}catch(_){}
-renderToday();genPlan();maybeOnboard();
+renderToday();genPlan();maybeOnboard();checkPlanLink();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
 </body>

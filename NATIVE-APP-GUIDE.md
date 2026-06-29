@@ -70,6 +70,18 @@ npx @capgo/cli bundle upload --channel production
 Users get the new version next time they open Livo. (Native changes — new plugins,
 icons, permissions — still need a normal store release; JS/HTML/CSS go via Capgo.)
 
+## 7. Push notifications
+The config already enables the push plugin. To turn it on:
+```bash
+npm i @capacitor/push-notifications
+npx cap sync
+```
+- **iOS:** enable Push Notifications capability in Xcode; create an APNs key in your Apple Developer account.
+- **Android:** create a Firebase project, add `google-services.json` to `android/app/`.
+- In your app code, register and handle the token (send it to your engine to target users).
+
+> Push needs real Apple (APNs) / Firebase (FCM) credentials — there's no way around the platform setup. Once wired, your engine can send "Your meetup is happening!" or "Clear skies this weekend" nudges.
+
 ## How live data still works
 Nothing changes: the wrapped app is still your `web/` app, so it keeps calling your
 Railway engine (`LIVO_API`) for live Eats / Gems / Events. Capacitor just gives it a
