@@ -26,6 +26,9 @@
   .iconbtn:hover{background:rgba(255,255,255,.28)}
   .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;background:var(--pink);border-radius:50%;border:2px solid var(--brand)}
   .wrap{max-width:880px;margin:0 auto;padding:16px 16px 110px}
+  section{scroll-margin-top:72px}
+  .card>h3:first-child{margin-top:0}
+  .row2{align-items:stretch}
   /* sub-nav */
   .subnav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
   .sb{flex:none;background:var(--surface);border:1px solid var(--line);color:var(--muted);padding:8px 15px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm)}
@@ -136,8 +139,18 @@
   .pcover{height:120px;border-radius:var(--r) var(--r) 0 0;background:linear-gradient(120deg,var(--brand),var(--brand2),var(--sky));margin:-18px -18px 0}
   .pavbig{width:88px;height:88px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,var(--brand),var(--brand2));margin-top:-48px;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden;box-shadow:var(--shadow-sm)}
   .pavbig img{width:100%;height:100%;object-fit:cover}
-  .pstats{display:flex;gap:22px;margin:12px 0}
-  .pstat b{font-size:18px}.pstat span{display:block;font-size:12px;color:var(--muted)}
+  .pstats{display:flex;gap:8px;margin:14px 0;justify-content:space-around;text-align:center}
+  .pstat{flex:1}.pstat b{font-size:18px}.pstat span{display:block;font-size:12px;color:var(--muted)}
+  /* profile header — centered, instagram-style */
+  .phead-center{text-align:center}
+  .phead-center .pavbig{margin:-48px auto 0}
+  .phead-center .row2{justify-content:center}
+  /* editable avatar */
+  .avedit{position:relative;width:104px;height:104px;margin:6px auto 16px;display:block;cursor:pointer}
+  .avedit-img{width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden;color:#fff;border:3px solid #fff;box-shadow:var(--shadow-sm)}
+  .avedit-img img{width:100%;height:100%;object-fit:cover}
+  .avedit-cam{position:absolute;right:0;bottom:0;width:34px;height:34px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;border:3px solid #fff}
+  .avedit-hint{text-align:center;font-size:12px;color:var(--brand-d);font-weight:700;margin:-8px 0 14px;cursor:pointer}
   .memgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   @media(max-width:560px){.memgrid{grid-template-columns:repeat(2,1fr)}}
   .memtile{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:pointer}
@@ -524,28 +537,33 @@
   <!-- ===== PROFILE ===== -->
   <section id="main-profile" class="hide">
     <div class="card" id="profSetup">
-      <h3>👤 Create your profile</h3>
-      <p class="sub">This is yours — your plans, your calendar, your memories. You decide what to share.</p>
-      <label class="fld"><b>Name / handle</b><input id="pfName" type="text" placeholder="e.g. Mowgli"></label>
-      <label class="fld"><b>Short bio</b><input id="pfBio" type="text" placeholder="e.g. Weekend wanderer · trails + good food"></label>
-      <label class="fld"><b>📷 Profile photo (optional)</b><input id="pfAvatar" type="file" accept="image/*"></label>
-      <div id="pfAvPrev"></div>
-      <label class="fld" style="margin-top:6px"><b>Default sharing for new memories</b>
+      <h3 style="text-align:center">👤 Your profile</h3>
+      <p class="sub" style="text-align:center">This is yours — your plans, calendar and memories. You decide what to share.</p>
+      <label class="avedit" for="pfAvatar"><div class="avedit-img" id="pfAvPrev">🙂</div><span class="avedit-cam">📷</span></label>
+      <input id="pfAvatar" type="file" accept="image/*" style="display:none">
+      <div class="avedit-hint" id="avHint">Tap to add a photo</div>
+      <label class="fld"><b>Name</b><input id="pfName" type="text" placeholder="e.g. Mowgli"></label>
+      <label class="fld"><b>Username</b><input id="pfHandle" type="text" placeholder="@yourname"></label>
+      <label class="fld"><b>Bio</b><textarea id="pfBio" rows="2" placeholder="e.g. Weekend wanderer · trails + good food 🌿"></textarea></label>
+      <label class="fld"><b>Default sharing for new memories</b>
         <div class="opts" data-group="defshare"><div class="opt sel" data-v="private">🔒 Private</div><div class="opt" data-v="public">🌍 Shared</div></div></label>
       <button class="btn" id="pfSave">Save profile</button>
     </div>
     <div class="card hide" id="profView">
       <div class="pcover"></div>
-      <div class="pavbig" id="pavBig">🙂</div>
-      <h3 style="margin:10px 0 2px" id="pvName">—</h3>
-      <p class="muted" id="pvBio" style="margin:0"></p>
-      <div class="pstats">
-        <div class="pstat"><b id="stMem">0</b><span>memories</span></div>
-        <div class="pstat"><b id="stShared">0</b><span>shared</span></div>
-        <div class="pstat"><b id="stFollowers">0</b><span>roamies</span></div>
-        <div class="pstat"><b id="stFollowing">0</b><span>following</span></div>
+      <div class="phead-center">
+        <div class="pavbig" id="pavBig">🙂</div>
+        <h3 style="margin:10px 0 1px" id="pvName">—</h3>
+        <p class="muted" id="pvHandle" style="margin:0;font-size:13px"></p>
+        <p class="muted" id="pvBio" style="margin:6px 0 0"></p>
+        <div class="pstats">
+          <div class="pstat"><b id="stMem">0</b><span>memories</span></div>
+          <div class="pstat"><b id="stShared">0</b><span>shared</span></div>
+          <div class="pstat"><b id="stFollowers">0</b><span>roamies</span></div>
+          <div class="pstat"><b id="stFollowing">0</b><span>following</span></div>
+        </div>
+        <div class="row2"><button class="btn ghost sm" id="pfEdit">Edit profile</button><button class="btn ghost sm" id="pfShareJump">📸 Share a memory</button></div>
       </div>
-      <div class="row2"><button class="btn ghost sm" id="pfEdit">Edit profile</button><button class="btn ghost sm" id="pfShareJump">📸 Share a memory</button></div>
       <h3 style="margin:22px 0 8px">🎯 Life goals</h3>
       <div id="goalsList"></div>
       <div class="addrow"><input id="goalInput" type="text" placeholder="Add a goal — e.g. Read 12 books this year"><button class="btn sm" id="goalAdd">Add</button></div>
@@ -1214,7 +1232,8 @@ function renderProfile(){
   if(!p)return;
   document.getElementById('pavBig').innerHTML=p.avatar?`<img src="${p.avatar}">`:'🙂';
   document.getElementById('pvName').textContent=p.name;
-  document.getElementById('pvBio').textContent=p.bio||"Weekend wanderer";
+  document.getElementById('pvHandle').textContent=p.username||('@'+(p.handle||'you'));
+  document.getElementById('pvBio').textContent=p.bio||"Weekend wanderer 🌿";
   const mems=getMems(),shared=mems.filter(m=>m.shared).length,follows=getFollows();
   document.getElementById('stMem').textContent=mems.length;
   document.getElementById('stShared').textContent=shared;
@@ -1669,9 +1688,20 @@ function openSheet(){sheet.classList.add('show');}function closeSheet(){sheet.cl
 document.getElementById('fab').addEventListener('click',openSheet);
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet();});
 /* profile setup */
-document.getElementById('pfAvatar').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingAvatar=d;document.getElementById('pfAvPrev').innerHTML=d?`<div class="pavbig" style="margin-top:8px"><img src="${d}"></div>`:'';});});
-document.getElementById('pfSave').addEventListener('click',()=>{const name=document.getElementById('pfName').value.trim();if(!name){toast("Add a name");return;}const prev=getProfile();const o={name,handle:prev?prev.handle:slug(name),bio:document.getElementById('pfBio').value.trim(),avatar:pendingAvatar||(prev?prev.avatar:null),defshare:state.defshare};setProfile(o);pendingAvatar=null;renderProfile();toast("Profile saved ✓");});
-document.getElementById('pfEdit').addEventListener('click',()=>{const p=getProfile();document.getElementById('pfName').value=p.name;document.getElementById('pfBio').value=p.bio||'';document.getElementById('profSetup').classList.remove('hide');document.getElementById('profView').classList.add('hide');});
+document.getElementById('pfAvatar').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingAvatar=d;document.getElementById('pfAvPrev').innerHTML=d?`<img src="${d}">`:'🙂';const hint=document.getElementById('avHint');if(hint)hint.textContent=d?'Tap to change photo':'Tap to add a photo';});});
+document.getElementById('avHint').addEventListener('click',()=>document.getElementById('pfAvatar').click());
+document.getElementById('pfSave').addEventListener('click',()=>{const name=document.getElementById('pfName').value.trim();if(!name){toast("Add a name");return;}
+  const prev=getProfile();const uname=(document.getElementById('pfHandle').value||'').trim().replace(/^@+/,'');
+  const o={name,handle:prev?prev.handle:slug(uname||name),
+    username:uname?('@'+uname):(prev&&prev.username?prev.username:('@'+slug(name))),
+    bio:document.getElementById('pfBio').value.trim(),avatar:pendingAvatar||(prev?prev.avatar:null),defshare:state.defshare};
+  setProfile(o);pendingAvatar=null;renderProfile();toast("Profile saved ✓");});
+document.getElementById('pfEdit').addEventListener('click',()=>{const p=getProfile();
+  document.getElementById('pfName').value=p.name;document.getElementById('pfBio').value=p.bio||'';
+  document.getElementById('pfHandle').value=(p.username||'').replace(/^@/,'');
+  document.getElementById('pfAvPrev').innerHTML=p.avatar?`<img src="${p.avatar}">`:'🙂';
+  const hint=document.getElementById('avHint');if(hint)hint.textContent=p.avatar?'Tap to change photo':'Tap to add a photo';
+  document.getElementById('profSetup').classList.remove('hide');document.getElementById('profView').classList.add('hide');});
 /* memory composer */
 document.getElementById('memPhoto').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingPhoto=d;document.getElementById('memPrev').innerHTML=d?`<img src="${d}" style="width:100%;max-height:240px;object-fit:cover;border-radius:14px;margin-bottom:6px">`:'';});});
 document.getElementById('memPrivate').addEventListener('click',()=>saveMemory(false));
