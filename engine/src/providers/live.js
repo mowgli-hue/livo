@@ -13,37 +13,47 @@
 const PLACES_URL = 'https://places.googleapis.com/v1/places:searchText';
 
 // maps.searchPlaces({ near, type, vibe }) -> [Place]
+const PRICE_MAP = { PRICE_LEVEL_FREE: 0, PRICE_LEVEL_INEXPENSIVE: 1, PRICE_LEVEL_MODERATE: 2, PRICE_LEVEL_EXPENSIVE: 3, PRICE_LEVEL_VERY_EXPENSIVE: 3 };
+
 export const maps = {
+  // Paginates up to ~60 results (Google returns 20 per page, max 3 pages).
   async searchPlaces({ near = 'Surrey, BC', type = 'restaurant', vibe } = {}) {
     const key = process.env.GOOGLE_PLACES_API_KEY;
     if (!key) throw new Error('GOOGLE_PLACES_API_KEY missing');
     const query = `${vibe && vibe !== 'any' ? vibe + ' ' : ''}${type} in ${near}`;
-    const res = await fetch(PLACES_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': key,
-        // Field mask controls cost — only ask for what we use.
-        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.location,places.types',
-      },
-      body: JSON.stringify({ textQuery: query, maxResultCount: 20 }),
-    });
-    if (!res.ok) throw new Error(`Places API ${res.status}: ${await res.text()}`);
-    const data = await res.json();
-    const priceMap = { PRICE_LEVEL_FREE: 0, PRICE_LEVEL_INEXPENSIVE: 1, PRICE_LEVEL_MODERATE: 2, PRICE_LEVEL_EXPENSIVE: 3, PRICE_LEVEL_VERY_EXPENSIVE: 3 };
-    return (data.places || []).map((p, i) => ({
-      id: 'g_' + i,
-      name: p.displayName?.text || 'Unknown',
-      category: type,
-      vibes: vibe && vibe !== 'any' ? [vibe] : [],
-      area: p.formattedAddress || near,
-      priceLevel: priceMap[p.priceLevel] ?? 1,
-      rating: p.rating || null,
-      ratingCount: p.userRatingCount || 0,
-      lat: p.location?.latitude, lng: p.location?.longitude,
-      url: p.googleMapsUri || '',
-      source: 'google-places',
-    }));
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': key,
+      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.location,places.types,nextPageToken',
+    };
+    const out = [];
+    let pageToken;
+    for (let page = 0; page < 3; page++) {
+      const body = { textQuery: query, maxResultCount: 20 };
+      if (pageToken) body.pageToken = pageToken;
+      const res = await fetch(PLACES_URL, { method: 'POST', headers, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error(`Places API ${res.status}: ${await res.text()}`);
+      const data = await res.json();
+      for (const p of (data.places || [])) {
+        out.push({
+          id: 'g_' + out.length,
+          name: p.displayName?.text || 'Unknown',
+          category: type,
+          vibes: vibe && vibe !== 'any' ? [vibe] : [],
+          area: p.formattedAddress || near,
+          priceLevel: PRICE_MAP[p.priceLevel] ?? 1,
+          rating: p.rating || null,
+          ratingCount: p.userRatingCount || 0,
+          lat: p.location?.latitude, lng: p.location?.longitude,
+          url: p.googleMapsUri || '',
+          source: 'google-places',
+        });
+      }
+      pageToken = data.nextPageToken;
+      if (!pageToken) break;
+      await new Promise((r) => setTimeout(r, 1200)); // token needs a moment to activate
+    }
+    return out;
   },
 };
 
