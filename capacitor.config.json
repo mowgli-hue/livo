@@ -1,0 +1,10 @@
+{
+  "appId": "world.junglelabs.livo",
+  "appName": "Livo",
+  "webDir": "web",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "CapacitorUpdater": { "autoUpdate": true },
+    "SplashScreen": { "launchShowDuration": 800, "backgroundColor": "#7c6bff" }
+  }
+}
