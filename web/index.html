@@ -1754,6 +1754,8 @@ document.addEventListener('click',e=>{
   const shp=e.target.closest('[data-shareplan]');if(shp){sharePlan(shp.dataset.shareplan);return;}
   const cc=e.target.closest('[data-ccat]');if(cc){setEats(cc.dataset.ccat);return;}
 });
+/* Capgo: tell the native updater the bundle started OK (no-op on web) */
+window.addEventListener('load',function(){try{var C=window.Capacitor;if(C&&C.Plugins&&C.Plugins.CapacitorUpdater){C.Plugins.CapacitorUpdater.notifyAppReady();}}catch(e){}});
 /* init: restore saved travel mode + location */
 try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
   const _loc=localStorage.getItem('le_loc');if(_loc){state.loc=_loc;const le=document.getElementById('loc');if(le)le.value=_loc;}

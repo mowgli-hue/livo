@@ -12,6 +12,7 @@
   "dependencies": {
     "@capacitor/cli": "^6.2.1",
     "@capacitor/core": "^6.2.1",
-    "@capacitor/ios": "^6.2.1"
+    "@capacitor/ios": "^6.2.1",
+    "@capgo/capacitor-updater": "^6.50.1"
   }
 }
