@@ -968,16 +968,18 @@ function mapA(name,area){
   const dir=`https://www.google.com/maps/dir/?api=1&destination=${dest}${origin}&travelmode=${state.travel||'driving'}`;
   return `<a class="maplink" target="_blank" rel="noopener" href="${search}">🗺️ Maps</a> <a class="maplink" style="background:#e7f7ec;color:#15803d;border-color:#c6efd3" target="_blank" rel="noopener" href="${dir}">🧭 Directions</a>`;
 }
-function useMyLocation(){
-  if(!navigator.geolocation){toast("Location not supported here");return;}
-  toast("📍 Getting your location…");
+function useMyLocation(silent){
+  if(!navigator.geolocation){if(!silent)toast("Location not supported here");return;}
+  if(!silent)toast("📍 Getting your location…");
   navigator.geolocation.getCurrentPosition(p=>{
     state.coords={lat:+p.coords.latitude.toFixed(5),lng:+p.coords.longitude.toFixed(5)};
-    state.loc="my area";const el=document.getElementById('loc');if(el)el.value="📍 Near me";
-    toast("📍 Got it — showing what's nearby");
+    const el=document.getElementById('loc');if(el&&!silent){el.value="📍 Near me";}
+    if(!silent){state.loc="my area";toast("📍 Got it — showing what's nearby");}
     if(curSub==="eats")genEats(eatsCuisine);if(curSub==="explore")genExplore(exploreCat);if(curMain==="today")renderToday();
-  },()=>toast("Couldn't get location — check permissions"),{enableHighAccuracy:true,timeout:8000});
+  },()=>{if(!silent)toast("Couldn't get location — check permissions");},{enableHighAccuracy:true,timeout:8000});
 }
+// Auto-use location if the user has already granted it (no surprise prompt).
+function autoLocate(){try{if(navigator.permissions&&navigator.geolocation){navigator.permissions.query({name:'geolocation'}).then(p=>{if(p.state==='granted')useMyLocation(true);}).catch(()=>{});}}catch(_){}}
 function saveBtn(title,sub,type,date){return `<button class="btn ghost savebtn" data-save-title="${esc(title)}" data-save-sub="${esc(sub)}" data-save-type="${type}" data-save-date="${date}">＋ Save to calendar</button>`;}
 function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){toast("Storage full — try a smaller photo");return false;}}
 function readImage(file,cb){if(!file){cb(null);return;}const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const max=900;let w=img.width,h=img.height;const sc=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7));};img.src=e.target.result;};r.readAsDataURL(file);}
@@ -1757,7 +1759,7 @@ document.addEventListener('click',e=>{
 try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
   const _loc=localStorage.getItem('le_loc');if(_loc){state.loc=_loc;const le=document.getElementById('loc');if(le)le.value=_loc;}
   document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));}catch(_){}
-renderToday();genPlan();maybeOnboard();checkPlanLink();
+renderToday();genPlan();maybeOnboard();checkPlanLink();autoLocate();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
 </body>

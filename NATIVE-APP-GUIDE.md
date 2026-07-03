@@ -70,7 +70,31 @@ npx @capgo/cli bundle upload --channel production
 Users get the new version next time they open Livo. (Native changes — new plugins,
 icons, permissions — still need a normal store release; JS/HTML/CSS go via Capgo.)
 
-## 7. Push notifications
+## 7. Location permission (required for "nearby")
+The web app uses the browser's geolocation, which works inside Capacitor once you
+declare the permission. After `npx cap add ios/android`:
+
+**iOS** — add to `ios/App/App/Info.plist`:
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Livo uses your location to show great places, events and directions near you.</string>
+```
+
+**Android** — add to `android/app/src/main/AndroidManifest.xml` (inside `<manifest>`):
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```
+
+For more reliable native geolocation you can also add the plugin:
+```bash
+npm i @capacitor/geolocation
+npx cap sync
+```
+The app already auto-uses location when it's been granted, and asks politely via the
+"Use my location" button otherwise — no code change needed.
+
+## 8. Push notifications
 The config already enables the push plugin. To turn it on:
 ```bash
 npm i @capacitor/push-notifications
