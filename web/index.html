@@ -507,13 +507,13 @@
   <section id="main-feed" class="hide">
     <div class="card">
       <h3>📸 Share a memory</h3>
-      <p class="sub">Did something good? Keep it for yourself, or share it with your roamies. Your call, every time.</p>
+      <p class="sub">Did something good? Keep it for yourself, or share it with your wanderers. Your call, every time.</p>
       <label class="fld"><b>What did you do?</b><input id="memAct" type="text" placeholder="e.g. Sunset at Crescent Beach"></label>
       <label class="fld"><b>Add a few words</b><textarea id="memCap" rows="2" placeholder="How was it?"></textarea></label>
       <label class="fld"><b>📷 Photo (optional)</b><input id="memPhoto" type="file" accept="image/*"></label>
       <div id="memPrev"></div>
-      <div class="row2"><button class="btn violet sm" id="memPrivate">🔒 Keep private</button><button class="btn pink sm" id="memShare">🌍 Share with roamies</button></div>
-      <div class="note">Private memories show only in your profile, on this device. Shared ones appear in your roamies' feeds.</div>
+      <div class="row2"><button class="btn violet sm" id="memPrivate">🔒 Keep private</button><button class="btn pink sm" id="memShare">🌍 Share with wanderers</button></div>
+      <div class="note">Private memories show only in your profile, on this device. Shared ones appear in your wanderers' feeds.</div>
     </div>
     <h3 style="margin:6px 4px 12px">Your feed</h3>
     <div id="feedOut"></div>
@@ -559,7 +559,7 @@
         <div class="pstats">
           <div class="pstat"><b id="stMem">0</b><span>memories</span></div>
           <div class="pstat"><b id="stShared">0</b><span>shared</span></div>
-          <div class="pstat"><b id="stFollowers">0</b><span>roamies</span></div>
+          <div class="pstat"><b id="stFollowers">0</b><span>wanderers</span></div>
           <div class="pstat"><b id="stFollowing">0</b><span>following</span></div>
         </div>
         <div class="row2"><button class="btn ghost sm" id="pfEdit">Edit profile</button><button class="btn ghost sm" id="pfShareJump">📸 Share a memory</button></div>
@@ -569,7 +569,7 @@
       <div class="addrow"><input id="goalInput" type="text" placeholder="Add a goal — e.g. Read 12 books this year"><button class="btn sm" id="goalAdd">Add</button></div>
       <h3 style="margin:22px 0 10px">My memories</h3>
       <div class="memgrid" id="memGrid"></div>
-      <h3 style="margin:22px 0 6px">Your roamies</h3>
+      <h3 style="margin:22px 0 6px">Your wanderers</h3>
       <div id="followList"></div>
     </div>
   </section>
@@ -692,7 +692,7 @@
       <h3 style="margin:14px 0 4px">ℹ️ About Livo</h3>
       <div class="legal">
         <p>Livo helps you plan your days, weekends, trips and time off — and remember it all. It's the friendly companion that makes life feel a little more planned, a little more lively, and a lot less lonely.</p>
-        <p>Tell the assistant your day and it organises it. Explore hidden gems, real eats and what's on near you. Save memories. Roam with the people you love.</p>
+        <p>Tell the assistant your day and it organises it. Explore hidden gems, real eats and what's on near you. Save memories. Wander together with the people you love.</p>
         <h4>Version</h4>
         <p>Livo v1.0</p>
         <h4>Made by</h4>
@@ -737,7 +737,7 @@
   <div class="opt-big" data-go="assistant"><div class="ic">💬</div><div><b>Chat with your planner</b><div class="muted" style="font-size:13px">Tell it your day in words — it schedules everything</div></div></div>
   <div class="opt-big" data-go="today"><div class="ic">🌅</div><div><b>Plan my day</b><div class="muted" style="font-size:13px">Build today's schedule around your life</div></div></div>
   <div class="opt-big" data-go="plan:weekend"><div class="ic">⚡</div><div><b>Plan a weekend</b><div class="muted" style="font-size:13px">Get a day plan for your mood & budget</div></div></div>
-  <div class="opt-big" data-go="feed"><div class="ic">📸</div><div><b>Share a memory</b><div class="muted" style="font-size:13px">Post a photo — private or with roamies</div></div></div>
+  <div class="opt-big" data-go="feed"><div class="ic">📸</div><div><b>Share a memory</b><div class="muted" style="font-size:13px">Post a photo — private or with wanderers</div></div></div>
   <div class="opt-big" data-go="plan:events"><div class="ic">🤝</div><div><b>Create a meetup</b><div class="muted" style="font-size:13px">Draft a joinable community event</div></div></div>
 </div></div>
 <div id="toast"></div>
@@ -1007,7 +1007,7 @@ function genPlan(){
   slots.forEach(s=>{html+=`<div class="slot"><div class="time">${s.time}</div><h4>${s.n}</h4><p>${s.d}</p><div class="meta"><span class="pill">📍 ${s.sub}</span>${costChip(s.cost)}${mapA(s.n,s.loc)}</div></div>`;});
   html+=`</div><div class="total"><div><div class="muted" style="font-size:13px">Rough cost / person</div><div style="font-size:12px;color:${within?'var(--green)':'var(--warn)'}">${within?'✓ Inside your budget':'⚠ A bit over — swap a paid stop for a free trail'}</div></div><b>$${est}</b></div>`;
   html+=saveBtn(title,slots.map(s=>s.n).join(" → "),"plan",nextSaturday());
-  html+=` <button class="btn ghost savebtn" data-shareplan="${esc(title+' — '+slots.map(s=>s.n).join(', '))}">🔗 Share / invite a roamie</button>`;
+  html+=` <button class="btn ghost savebtn" data-shareplan="${esc(title+' — '+slots.map(s=>s.n).join(', '))}">🔗 Share / invite a wanderer</button>`;
   out.innerHTML=html;out.classList.remove('hide');out.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function whoLabel(){return {couple:"Me + partner",solo:"Solo",friends:"Friends",family:"Family"}[state.who];}
@@ -1200,7 +1200,7 @@ function saveMemory(shared){
   const act=document.getElementById('memAct').value.trim();if(!act){toast("What did you do? Add a title");return;}
   const cap=document.getElementById('memCap').value.trim();
   const mems=getMems();mems.unshift({id:'m_'+Date.now(),act,cap,photo:pendingPhoto,ts:Date.now(),shared:!!shared,likes:0});
-  if(saveMems(mems)){toast(shared?"Shared with roamies 🌍":"Saved privately 🔒");
+  if(saveMems(mems)){toast(shared?"Shared with wanderers 🌍":"Saved privately 🔒");
     document.getElementById('memAct').value='';document.getElementById('memCap').value='';document.getElementById('memPhoto').value='';document.getElementById('memPrev').innerHTML='';pendingPhoto=null;renderFeed();renderProfile();}
 }
 function toggleShare(id){const m=getMems(),it=m.find(x=>x.id===id);if(it){it.shared=!it.shared;saveMems(m);toast(it.shared?"Now shared 🌍":"Now private 🔒");renderProfile();renderFeed();}}
@@ -1368,7 +1368,7 @@ function renderToday(){
   document.getElementById('homeEvents').innerHTML=EVENTS.slice(0,2).map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p></div></div>`).join("");
   // feed preview
   const follows=getFollows();const sp=SEED_POSTS.filter(x=>follows.includes(x.user))[0];
-  document.getElementById('homeFeed').innerHTML=sp?`<div class="post"><div class="phead"><div class="av">${SEED_USERS.find(u=>u.id===sp.user).emoji}</div><div><div class="nm">${SEED_USERS.find(u=>u.id===sp.user).name}</div><div class="tm">${sp.daysAgo}d ago</div></div></div><div class="photo" style="background:${sp.grad}">${sp.emoji}<div class="plabel">📍 ${sp.place}</div></div><div class="pbody"><div class="act">${sp.act}</div><p class="cap">${sp.cap}</p></div></div>`:`<div class="card"><p class="muted">Add some roamies to see their adventures here.</p></div>`;
+  document.getElementById('homeFeed').innerHTML=sp?`<div class="post"><div class="phead"><div class="av">${SEED_USERS.find(u=>u.id===sp.user).emoji}</div><div><div class="nm">${SEED_USERS.find(u=>u.id===sp.user).name}</div><div class="tm">${sp.daysAgo}d ago</div></div></div><div class="photo" style="background:${sp.grad}">${sp.emoji}<div class="plabel">📍 ${sp.place}</div></div><div class="pbody"><div class="act">${sp.act}</div><p class="cap">${sp.cap}</p></div></div>`:`<div class="card"><p class="muted">Add some wanderers to see their adventures here.</p></div>`;
 }
 
 /* ===== SEARCH ===== */
@@ -1408,7 +1408,7 @@ function renderNotifs(){
     {ic:"❤️",t:`Priya and ${4+shared} others liked your shared memory`,tm:"2h ago"},
     {ic:"🤝",t:"3 people joined your sunset meetup — it's happening!",tm:"5h ago"},
     {ic:"🌤️",t:"Clear skies this weekend — perfect for Crescent Beach",tm:"1d ago"},
-    {ic:"👤",t:"Maya R. is now one of your roamies",tm:"2d ago"},
+    {ic:"👤",t:"Maya R. is now one of your wanderers",tm:"2d ago"},
     {ic:"🎉",t:"Fusion Newton Street Festival is near you this Saturday",tm:"3d ago"}
   ];
   document.getElementById('notifOut').innerHTML=n.map(x=>`<div class="nrow"><div class="ni">${x.ic}</div><div><p>${x.t}</p><div class="tm">${x.tm}</div></div></div>`).join("");
@@ -1624,7 +1624,7 @@ async function sharePlan(text){
     }catch(e){}
   }
   if(navigator.share){navigator.share({title:'My Livo plan',text:full}).catch(()=>{});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(full).then(()=>toast('Invite copied — send it to a roamie ✓')).catch(()=>toast('Copy not supported'));}
+  else if(navigator.clipboard){navigator.clipboard.writeText(full).then(()=>toast('Invite copied — send it to a wanderer ✓')).catch(()=>toast('Copy not supported'));}
   else toast('Sharing not supported here');}
 
 /* ---- incoming roam invite (?plan=…) ---- */
@@ -1637,7 +1637,7 @@ function checkPlanLink(){
 function renderInvite(p,id){
   const items=(p.items||[]).filter(Boolean);
   document.getElementById('inviteOut').innerHTML=
-    `<span class="badge" style="background:#fdf2f8;color:var(--pink);border-color:#fbcfe1">🌿 You're invited to roam together</span>
+    `<span class="badge" style="background:#fdf2f8;color:var(--pink);border-color:#fbcfe1">🌿 You're invited to wander together</span>
      <h3 style="margin:12px 0 4px">${esc(p.title)}</h3>
      <p class="muted" style="margin:0 0 10px">${esc(p.created_by||'A friend')} wants you to come along.</p>
      ${items.length?`<div class="timeline">${items.map(it=>`<div class="slot"><h4>${esc(it)}</h4></div>`).join("")}</div>`:''}
@@ -1646,7 +1646,7 @@ function renderInvite(p,id){
      <button class="btn ghost sm" style="margin-top:8px" data-go="today">Explore Livo</button>`;
   setTimeout(()=>{const b=document.getElementById('rsvpBtn');if(b)b.onclick=()=>{
     fetch(LIVO_API.replace(/\/$/,"")+'/api/plans/'+encodeURIComponent(id)+'/rsvp',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({who:authedEmail()||(getProfile()?getProfile().name:'a roamie')})}).then(r=>r.json()).then(d=>{toast("You're in! 🙌");p.going=d.going;renderInvite(p,id);});
+      body:JSON.stringify({who:authedEmail()||(getProfile()?getProfile().name:'a wanderer')})}).then(r=>r.json()).then(d=>{toast("You're in! 🙌");p.going=d.going;renderInvite(p,id);});
   };},30);
 }
 
