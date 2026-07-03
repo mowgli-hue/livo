@@ -569,7 +569,7 @@
       <div class="addrow"><input id="goalInput" type="text" placeholder="Add a goal — e.g. Read 12 books this year"><button class="btn sm" id="goalAdd">Add</button></div>
       <h3 style="margin:22px 0 10px">My memories</h3>
       <div class="memgrid" id="memGrid"></div>
-      <h3 style="margin:22px 0 6px">Your wanderers</h3>
+      <h3 style="margin:22px 0 6px">Suggested wanderers</h3>
       <div id="followList"></div>
     </div>
   </section>
@@ -1182,7 +1182,7 @@ function getItems(){try{return JSON.parse(localStorage.getItem(itemsKey()))||[];
 function saveItems(a){lsSet(itemsKey(),JSON.stringify(a));}
 function getMems(){try{return JSON.parse(localStorage.getItem(memKey()))||[];}catch(e){return[];}}
 function saveMems(a){return lsSet(memKey(),JSON.stringify(a));}
-function getFollows(){try{const r=localStorage.getItem(followKey());return r?JSON.parse(r):SEED_USERS.map(u=>u.id);}catch(e){return SEED_USERS.map(u=>u.id);}}
+function getFollows(){try{const r=localStorage.getItem(followKey());return r?JSON.parse(r):[];}catch(e){return[];}}
 function setFollows(a){lsSet(followKey(),JSON.stringify(a));}
 function getCmts(id){try{return JSON.parse(localStorage.getItem(cmtKey(id)))||[];}catch(e){return[];}}
 function addCmt(id,text){const a=getCmts(id);a.push({name:(getProfile()?.name||"You"),text,ts:Date.now()});lsSet(cmtKey(id),JSON.stringify(a));renderFeed();}
@@ -1239,7 +1239,7 @@ function renderProfile(){
   const mems=getMems(),shared=mems.filter(m=>m.shared).length,follows=getFollows();
   document.getElementById('stMem').textContent=mems.length;
   document.getElementById('stShared').textContent=shared;
-  document.getElementById('stFollowers').textContent=12+shared*3;
+  document.getElementById('stFollowers').textContent=0;
   document.getElementById('stFollowing').textContent=follows.length;
   const grid=document.getElementById('memGrid');
   grid.innerHTML=mems.length?mems.map(m=>`<div class="memtile" data-share="${m.id}">${m.photo?`<img src="${m.photo}">`:`<div class="ph" style="background:linear-gradient(135deg,#38bdf8,#bae6fd)">📍</div>`}<div class="vis">${m.shared?'🌍':'🔒'}</div><div class="lab">${esc(m.act)}</div></div>`).join(""):`<p class="muted" style="grid-column:1/-1">No memories yet. Tap "Share a memory" to add your first.</p>`;
@@ -1405,11 +1405,10 @@ async function runSearch(qraw){
 function renderNotifs(){
   const p=getProfile(),shared=p?getMems().filter(m=>m.shared).length:0;
   const n=[
-    {ic:"❤️",t:`Priya and ${4+shared} others liked your shared memory`,tm:"2h ago"},
-    {ic:"🤝",t:"3 people joined your sunset meetup — it's happening!",tm:"5h ago"},
-    {ic:"🌤️",t:"Clear skies this weekend — perfect for Crescent Beach",tm:"1d ago"},
-    {ic:"👤",t:"Maya R. is now one of your wanderers",tm:"2d ago"},
-    {ic:"🎉",t:"Fusion Newton Street Festival is near you this Saturday",tm:"3d ago"}
+    {ic:"👋",t:"Welcome to Livo! Tell the assistant about your day to get started.",tm:"now"},
+    {ic:"✨",t:"Your daily spark is ready on the Today tab.",tm:"today"},
+    {ic:"🌤️",t:"A good weekend to explore something nearby — check the Explore tab.",tm:"today"},
+    {ic:"🎉",t:"See what's on near you in the Events tab.",tm:"today"}
   ];
   document.getElementById('notifOut').innerHTML=n.map(x=>`<div class="nrow"><div class="ni">${x.ic}</div><div><p>${x.t}</p><div class="tm">${x.tm}</div></div></div>`).join("");
   document.querySelector('#bellBtn .dot')?.remove();

@@ -1,0 +1,17 @@
+{
+  "name": "livo-repo",
+  "version": "1.0.0",
+  "description": "Your colourful life planner — plan your day, weekends, trips, stays, eats, events and hidden gems, and remember it all. Installable web app (PWA) + optional Node backend.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/ios": "^6.2.1"
+  }
+}
