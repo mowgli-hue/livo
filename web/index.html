@@ -1366,7 +1366,18 @@ function renderToday(){
   const a=t[0],b=f[0];
   document.getElementById('homeSuggest').innerHTML=`<div class="card"><div class="plan-head"><h3 style="margin:0">${a?a.n:'A local trail'} + ${b?b.n:'lunch'}</h3><span class="badge">Free-ish</span></div><p class="muted" style="margin:0 0 8px">${a?a.d:''}</p><div class="meta">${a?mapA(a.n,a.loc):''} ${a?saveBtn(a.n+' + '+(b?b.n:'lunch'),'Suggested weekend','plan',nextSaturday()):''}</div></div>`;
   // events
-  document.getElementById('homeEvents').innerHTML=EVENTS.slice(0,2).map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p></div></div>`).join("");
+  const evOut=document.getElementById('homeEvents');
+  if(LIVO_API){
+    evOut.innerHTML=`<p class="muted" style="font-size:13px">Loading events near you…</p>`;
+    fetch(LIVO_API.replace(/\/$/,"")+"/api/events?near="+encodeURIComponent(state.loc||"Surrey BC")).then(r=>r.json()).then(data=>{
+      if(Array.isArray(data)&&data.length){
+        evOut.innerHTML=data.slice(0,3).map(ev=>{const d=new Date(ev.startsAt||Date.now());const ok=!isNaN(d);const mo=ok?d.toLocaleString('en-CA',{month:'short'}):"";const day=ok?d.getDate():"";
+          return `<div class="evt"><div class="date"><div class="m">${mo}</div><div class="d">${day}</div></div><div style="flex:1"><h4>${esc(ev.title)}</h4><p>${esc(ev.area||"")}</p>${ev.url?`<a class="maplink" style="background:#fdf2f8;color:#be185d;border-color:#fbcfe1" target="_blank" rel="noopener" href="${esc(ev.url)}">🎟️ Tickets</a>`:''}</div></div>`;}).join("");
+      } else { evOut.innerHTML=`<div class="card"><p class="muted" style="margin:0">No events found near ${esc(state.loc||"you")} — try a bigger city in your location.</p></div>`; }
+    }).catch(()=>{ evOut.innerHTML=`<div class="card"><p class="muted" style="margin:0">See the Events tab for what's on near you.</p></div>`; });
+  } else {
+    evOut.innerHTML=EVENTS.slice(0,2).map(e=>`<div class="evt"><div class="date"><div class="m">${e.m}</div><div class="d">${e.d}</div></div><div style="flex:1"><h4>${e.n}</h4><p>${e.desc}</p></div></div>`).join("");
+  }
   // feed preview
   const follows=getFollows();const sp=SEED_POSTS.filter(x=>follows.includes(x.user))[0];
   document.getElementById('homeFeed').innerHTML=sp?`<div class="post"><div class="phead"><div class="av">${SEED_USERS.find(u=>u.id===sp.user).emoji}</div><div><div class="nm">${SEED_USERS.find(u=>u.id===sp.user).name}</div><div class="tm">${sp.daysAgo}d ago</div></div></div><div class="photo" style="background:${sp.grad}">${sp.emoji}<div class="plabel">📍 ${sp.place}</div></div><div class="pbody"><div class="act">${sp.act}</div><p class="cap">${sp.cap}</p></div></div>`:`<div class="card"><p class="muted">Add some wanderers to see their adventures here.</p></div>`;
