@@ -8,7 +8,8 @@
   :root{
     --bg:#eef6fc;--bg2:#f6fbff;--surface:#ffffff;--surface2:#f2f8fd;
     --ink:#0f2a40;--muted:#5f7c93;--line:#dceaf4;
-    --brand:#0ea5e9;--brand-d:#0284c7;--brand2:#38bdf8;--brand-soft:#e0f2fe;--sky:#bae6fd;
+    --brand:#059669;--brand-d:#047857;--brand2:#34d399;--brand-soft:#e8f7ef;--sky:#c9efd8;
+    --g1:#34d399;--g2:#059669;--g3:#065f46;
     --gold:#f59e0b;--green:#10b981;--pink:#ec4899;--violet:#7c3aed;--warn:#ef4444;
     --shadow:0 10px 30px rgba(3,105,161,.10);--shadow-sm:0 4px 14px rgba(3,105,161,.08);--r:20px;
   }
@@ -19,7 +20,7 @@
     background:linear-gradient(180deg,#ffe9f3 0%,#eaf1ff 26%,#e9fbf2 62%,#fff6e6 100%) fixed;min-height:100vh}
   /* top bar */
   .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
-    padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:linear-gradient(110deg,#ff7eb3,#7c6bff 52%,#36c5f0);color:#fff;box-shadow:0 6px 18px rgba(124,107,255,.28)}
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:linear-gradient(110deg,var(--g1),var(--g2) 52%,var(--g3));color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.18)}
   .brand{font-weight:800;font-size:19px;letter-spacing:.2px;display:flex;align-items:center;gap:7px}
   .tb-actions{display:flex;align-items:center;gap:8px}
   .iconbtn{width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
@@ -32,18 +33,18 @@
   /* sub-nav */
   .subnav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 16px;-webkit-overflow-scrolling:touch}
   .sb{flex:none;background:var(--surface);border:1px solid var(--line);color:var(--muted);padding:8px 15px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm)}
-  .sb.active{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border-color:transparent}
+  .sb.active{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-color:transparent}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
   .grid{display:grid;gap:14px}@media(min-width:720px){.controls{grid-template-columns:repeat(2,1fr)}}
   label.fld{display:block;margin-bottom:14px}
   label.fld b{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px}
   .opts{display:flex;gap:8px;flex-wrap:wrap}
   .opt{background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:8px 13px;border-radius:11px;cursor:pointer;font-size:13px;transition:.12s;user-select:none}
-  .opt.sel{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border-color:transparent;font-weight:700}
+  .opt.sel{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-color:transparent;font-weight:700}
   input,textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:12px;border-radius:12px;font-size:14px;font-family:inherit}
   input:focus,textarea:focus{outline:none;border-color:var(--brand);background:#fff}
   textarea{resize:vertical}
-  .btn{background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border:none;padding:13px 20px;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:.15s;box-shadow:0 8px 20px rgba(99,102,241,.32)}
+  .btn{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border:none;padding:13px 20px;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:.15s;box-shadow:0 8px 20px rgba(0,0,0,.18)}
   .btn:hover{filter:brightness(1.05)}
   .btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--brand);box-shadow:none}
   .btn.pink{background:var(--pink);box-shadow:0 6px 16px rgba(236,72,153,.28)}
@@ -87,7 +88,7 @@
   .evt h4{margin:0 0 3px;font-size:15px}.evt p{margin:0 0 6px;font-size:13px;color:var(--muted)}
   .savebtn{width:auto;padding:8px 12px;font-size:12px;margin-top:10px}
   /* home */
-  .hero{background:linear-gradient(120deg,#ff9a6b,#ff6fae 38%,#a06bff 70%,#5fa8ff 100%);color:#fff;border-radius:var(--r);padding:22px;box-shadow:0 14px 34px rgba(160,107,255,.28);margin-bottom:16px;position:relative;overflow:hidden}
+  .hero{background:linear-gradient(120deg,var(--g1),var(--g2) 45%,var(--g3));color:#fff;border-radius:var(--r);padding:22px;box-shadow:0 14px 34px rgba(0,0,0,.22);margin-bottom:16px;position:relative;overflow:hidden}
   .hero::before{content:"";position:absolute;left:-40px;bottom:-50px;width:140px;height:140px;background:rgba(255,255,255,.12);border-radius:50%}
   /* guide characters */
   .guiderow{display:flex;gap:8px;overflow-x:auto;margin-top:12px;-webkit-overflow-scrolling:touch}
@@ -195,11 +196,8 @@
   .bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:4px}
   .bn .bi{font-size:20px;transition:transform .15s}.bn.active{color:var(--brand)}
   .bn.active .bi{transform:scale(1.18)}
-  .bn.active[data-main="today"]{color:#f97316}.bn.active[data-main="plan"]{color:#0ea5e9}
-  .bn.active[data-main="feed"]{color:#ec4899}.bn.active[data-main="calendar"]{color:#8b5cf6}
-  .bn.active[data-main="profile"]{color:#10b981}
   .fab{position:fixed;right:18px;bottom:80px;z-index:55;width:58px;height:58px;border-radius:50%;border:none;
-    background:linear-gradient(135deg,#ff6fae,#a06bff 55%,#5fa8ff);color:#fff;font-size:28px;cursor:pointer;box-shadow:0 12px 26px rgba(160,107,255,.5)}
+    background:linear-gradient(135deg,var(--g1),var(--g2) 55%,var(--g3));color:#fff;font-size:28px;cursor:pointer;box-shadow:0 12px 26px rgba(0,0,0,.28)}
   .sheet{position:fixed;inset:0;z-index:70;background:rgba(15,42,64,.4);display:none;align-items:flex-end}
   .sheet.show{display:flex}
   .sheet .panel{background:#fff;width:100%;border-radius:22px 22px 0 0;padding:14px 16px 24px;max-width:880px;margin:0 auto}
@@ -215,7 +213,7 @@
   /* assistant chat */
   .chatlog{display:flex;flex-direction:column;gap:10px;max-height:46vh;overflow-y:auto;padding:6px 2px;margin:8px 0}
   .msg{max-width:85%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.45}
-  .msg.user{align-self:flex-end;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);color:#fff;border-bottom-right-radius:5px}
+  .msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-bottom-right-radius:5px}
   .msg.bot{align-self:flex-start;background:var(--surface2);border:1px solid var(--line);border-bottom-left-radius:5px}
   .msg .sched{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
   .msg .srow{display:flex;gap:10px;font-size:13px;padding:3px 0}
@@ -277,13 +275,6 @@
   .oblink{display:block;text-align:center;margin-top:10px;color:var(--muted);font-size:13px;cursor:pointer}
   footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 </style>
-<meta name="theme-color" content="#7c6bff">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Livo">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
 <div class="topbar">
@@ -855,12 +846,20 @@ const SEED_POSTS=[
 
 /* ===== CHARACTERS (guides) ===== */
 const CHARACTERS=[
-  {id:"otter",name:"Sunny",emoji:"🦦",color:"#0ea5e9",line:"Let's make a splash —"},
-  {id:"fox",name:"Pip",emoji:"🦊",color:"#f97316",line:"Adventure's calling —"},
-  {id:"owl",name:"Sage",emoji:"🦉",color:"#7c3aed",line:"A little wisdom —"},
-  {id:"bear",name:"Bruno",emoji:"🐻",color:"#16a34a",line:"Take it easy —"},
-  {id:"bird",name:"Zip",emoji:"🐦",color:"#ec4899",line:"Quick one —"}
+  {id:"jade",name:"Jade",emoji:"🐢",color:"#059669",line:"Breathe, then begin —"},
+  {id:"onyx",name:"Onyx",emoji:"🕶️",color:"#111827",line:"Time to level up —"},
+  {id:"ember",name:"Ember",emoji:"🔥",color:"#dc2626",line:"Let's make it count —"}
 ];
+const THEMES={
+  jade:{brand:'#059669',brandD:'#047857',brand2:'#34d399',soft:'#e8f7ef',sky:'#c9efd8',g1:'#34d399',g2:'#059669',g3:'#065f46'},
+  onyx:{brand:'#111827',brandD:'#000000',brand2:'#374151',soft:'#f1f1f4',sky:'#e3e3e8',g1:'#3f3f46',g2:'#18181b',g3:'#000000'},
+  ember:{brand:'#dc2626',brandD:'#b91c1c',brand2:'#f97316',soft:'#fdeaea',sky:'#f8cccc',g1:'#fbbf24',g2:'#ef4444',g3:'#b91c1c'}
+};
+function applyTheme(id){const t=THEMES[id]||THEMES.shifu;const r=document.documentElement.style;
+  r.setProperty('--brand',t.brand);r.setProperty('--brand-d',t.brandD);r.setProperty('--brand2',t.brand2);
+  r.setProperty('--brand-soft',t.soft);r.setProperty('--sky',t.sky);
+  r.setProperty('--g1',t.g1);r.setProperty('--g2',t.g2);r.setProperty('--g3',t.g3);
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t.g2);}
 /* ===== SCENIC / CAMPFIRE / ROAD TRIPS ===== */
 const SCENIC=[
   {n:"Lighthouse Park",loc:"West Vancouver (~50 min)",d:"Old-growth forest trails to Juniper Point — cliff views over Howe Sound, Bowen & Passage Island.",cost:0},
@@ -1168,8 +1167,8 @@ async function genEats(cuisine){
 function setEats(cuisine){eatsCuisine=cuisine;document.querySelectorAll('[data-ccat]').forEach(x=>x.classList.toggle('active',x.dataset.ccat===cuisine));genEats(cuisine);}
 
 /* ===== GUIDE CHARACTERS ===== */
-function getGuide(){try{return localStorage.getItem('le_guide')||'otter';}catch(e){return'otter';}}
-function setGuide(id){try{localStorage.setItem('le_guide',id);}catch(e){}renderGuides();renderSpark();const c=guideObj();toast(`${c.emoji} ${c.name} is now your guide`);}
+function getGuide(){try{return localStorage.getItem('le_guide')||'jade';}catch(e){return'jade';}}
+function setGuide(id){try{localStorage.setItem('le_guide',id);}catch(e){}applyTheme(id);renderGuides();renderSpark();const c=guideObj();toast(`${c.emoji} ${c.name} theme applied`);}
 function guideObj(){return CHARACTERS.find(c=>c.id===getGuide())||CHARACTERS[0];}
 function renderGuides(){const g=getGuide();document.getElementById('guideRow').innerHTML=CHARACTERS.map(c=>`<div class="guidec ${c.id===g?'sel':''}" data-guide="${c.id}" style="--gc:${c.color}"><span class="ge">${c.emoji}</span>${c.name}</div>`).join("");}
 
@@ -1770,12 +1769,12 @@ document.addEventListener('click',e=>{
 });
 /* Capgo: tell the native updater the bundle started OK (no-op on web) */
 window.addEventListener('load',function(){try{var C=window.Capacitor;if(C&&C.Plugins&&C.Plugins.CapacitorUpdater){C.Plugins.CapacitorUpdater.notifyAppReady();}}catch(e){}});
-/* init: restore saved travel mode + location */
+/* init: apply saved guide theme + restore travel/location */
+applyTheme(getGuide());
 try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
   const _loc=localStorage.getItem('le_loc');if(_loc){state.loc=_loc;const le=document.getElementById('loc');if(le)le.value=_loc;}
   document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));}catch(_){}
 renderToday();genPlan();maybeOnboard();checkPlanLink();autoLocate();
 </script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
 </body>
 </html>
