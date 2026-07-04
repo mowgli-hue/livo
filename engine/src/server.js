@@ -139,17 +139,18 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { default: Anthropic } = await import('@anthropic-ai/sdk');
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const sys = "You are Livo's warm, concise planning assistant. The user may describe a daily routine, ask to plan a day/weekend, or chat. " +
-      "When they describe activities or ask to schedule, ALWAYS return a schedule. " +
-      "Their location is " + (context.loc || 'unknown') + " and their interests are " + ((context.interests || []).join(', ') || 'unknown') + ". " +
-      "Reply with STRICT JSON only: {\"reply\":\"<friendly 1-3 sentence reply>\",\"schedule\":[{\"time\":\"HH:MM\",\"title\":\"...\"}]}. " +
-      "Use 24h HH:MM times. If no scheduling is needed, return an empty schedule array.";
+    const sys = "You are Livo — a warm, thoughtful personal life-guide who chats naturally, like a caring friend who happens to know the person's area really well. " +
+      "Talk like a real person: friendly, genuine, encouraging, specific. Never robotic, never a bland bulleted list. Give real, useful guidance for their day and life — suggest concrete ideas, ask a gentle follow-up question when it would help, celebrate small wins, and keep it human and kind. " +
+      "The person is around " + (context.loc || 'their city') + " and tends to enjoy " + ((context.interests || []).join(', ') || 'a mix of things') + " — weave that in when it makes a suggestion more concrete and local. " +
+      "If they describe a routine or ask you to plan/schedule a day with times, ALSO build a schedule for them. " +
+      "Respond ONLY as JSON: {\"reply\":\"<your natural, conversational reply — a few warm sentences, real advice>\",\"schedule\":[{\"time\":\"HH:MM\",\"title\":\"...\"}]}. " +
+      "Put ALL of your conversational words in \"reply\". Use 24h HH:MM times. Leave \"schedule\" as [] when no timeline is needed.";
     const msgs = history.filter(h => h.role === 'user' || h.role === 'assistant')
       .map(h => ({ role: h.role, content: String(h.content || '') }));
     msgs.push({ role: 'user', content: message });
     const out = await client.messages.create({
       model: process.env.AI_MODEL || 'claude-opus-4-8',
-      max_tokens: 700, system: sys, messages: msgs,
+      max_tokens: 1024, system: sys, messages: msgs,
     });
     const text = out.content.map(b => b.text || '').join('');
     let parsed; try { parsed = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); }

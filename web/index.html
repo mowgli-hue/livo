@@ -1558,7 +1558,7 @@ async function sendChat(text){
       const res=await fetch(LIVO_API.replace(/\/$/,"")+"/api/chat",{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({message:text,history:chatHistory.slice(-8),context:{loc:state.loc,interests:topVibes(3)}})});
       const data=await res.json();
-      if(data&&data.reply){typing.remove();let html=esc(data.reply);
+      if(data&&data.reply){typing.remove();let html=esc(data.reply).replace(/\n/g,'<br>');
         if(Array.isArray(data.schedule)&&data.schedule.length){const items=data.schedule.map(s=>({mins:typeof s.time==='string'?parseClockTime(s.time)??0:s.time,title:s.title}));html+=scheduleHTML(items);}
         addMsg('bot',html);chatHistory.push({role:'assistant',content:data.reply});return;}
     }catch(e){ /* fall back to local */ }
