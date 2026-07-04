@@ -56,17 +56,32 @@ app.get('/api/eats', async (req, res) => {
   try {
     const near = req.query.near || 'Surrey, BC';
     const vibe = req.query.cuisine || undefined; // e.g. "Vietnamese", "Indian"
-    const places = await maps.searchPlaces({ near, type: 'restaurant', vibe });
+    const places = await maps.searchPlaces({ near, type: 'restaurant', vibe, lat: req.query.lat, lng: req.query.lng });
     res.json(places);
   } catch (e) { res.status(502).json({ error: e.message }); }
+});
+
+// Photo proxy — streams a Google Places photo so the API key stays server-side.
+app.get('/api/photo', async (req, res) => {
+  const ref = req.query.ref, key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!ref || !key) return res.status(400).end();
+  try {
+    const url = 'https://places.googleapis.com/v1/' + ref + '/media?maxWidthPx=' + (req.query.w || 640) + '&key=' + key;
+    const r = await fetch(url);
+    if (!r.ok) return res.status(502).end();
+    res.set('Content-Type', r.headers.get('content-type') || 'image/jpeg');
+    res.set('Cache-Control', 'public, max-age=604800');
+    res.send(Buffer.from(await r.arrayBuffer()));
+  } catch (e) { res.status(502).end(); }
 });
 
 // --- Generic places (trails, cafes, parks, anything) — Google + Foursquare merged ---
 app.get('/api/places', async (req, res) => {
   try {
     const near = req.query.near || 'Surrey, BC', type = req.query.type || 'restaurant', vibe = req.query.vibe;
+    const lat = req.query.lat, lng = req.query.lng;
     const results = await Promise.allSettled([
-      maps.searchPlaces({ near, type, vibe }),
+      maps.searchPlaces({ near, type, vibe, lat, lng }),
       social.bestPlaces ? social.bestPlaces({ near, type, vibe }) : Promise.resolve([]),
     ]);
     const merged = [];

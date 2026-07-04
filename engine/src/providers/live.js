@@ -17,19 +17,22 @@ const PRICE_MAP = { PRICE_LEVEL_FREE: 0, PRICE_LEVEL_INEXPENSIVE: 1, PRICE_LEVEL
 
 export const maps = {
   // Paginates up to ~60 results (Google returns 20 per page, max 3 pages).
-  async searchPlaces({ near = 'Surrey, BC', type = 'restaurant', vibe } = {}) {
+  // When lat/lng are given, searches strictly around that point (locationBias).
+  async searchPlaces({ near = 'Surrey, BC', type = 'restaurant', vibe, lat, lng } = {}) {
     const key = process.env.GOOGLE_PLACES_API_KEY;
     if (!key) throw new Error('GOOGLE_PLACES_API_KEY missing');
-    const query = `${vibe && vibe !== 'any' ? vibe + ' ' : ''}${type} in ${near}`;
+    const hasCoords = lat != null && lng != null && !isNaN(+lat) && !isNaN(+lng);
+    const query = `${vibe && vibe !== 'any' ? vibe + ' ' : ''}${type}${hasCoords ? '' : ' in ' + near}`;
     const headers = {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': key,
-      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.location,places.types,nextPageToken',
+      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.location,places.types,places.photos,nextPageToken',
     };
     const out = [];
     let pageToken;
     for (let page = 0; page < 3; page++) {
       const body = { textQuery: query, maxResultCount: 20 };
+      if (hasCoords) body.locationBias = { circle: { center: { latitude: +lat, longitude: +lng }, radius: 15000 } };
       if (pageToken) body.pageToken = pageToken;
       const res = await fetch(PLACES_URL, { method: 'POST', headers, body: JSON.stringify(body) });
       if (!res.ok) throw new Error(`Places API ${res.status}: ${await res.text()}`);
@@ -46,6 +49,7 @@ export const maps = {
           ratingCount: p.userRatingCount || 0,
           lat: p.location?.latitude, lng: p.location?.longitude,
           url: p.googleMapsUri || '',
+          photoRef: p.photos?.[0]?.name || null,
           source: 'google-places',
         });
       }
