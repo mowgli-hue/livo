@@ -131,34 +131,34 @@ app.post('/api/plans/:id/rsvp', async (req, res) => {
 });
 
 // --- AI planner assistant (Claude) ---
-app.post('/api/chat', async (req, res) => {
-  const { message = '', history = [], context = {} } = req.body || {};
+async function chatReply({ message = '', history = [], context = {} }) {
   if (!process.env.ANTHROPIC_API_KEY) {
-    return res.json({ reply: "The assistant needs ANTHROPIC_API_KEY set on the server to chat. (Your schedule parser still works in the app.)", schedule: [] });
+    return { reply: "The assistant needs ANTHROPIC_API_KEY set on the server to chat. (Your schedule parser still works in the app.)", schedule: [], _noKey: true };
   }
-  try {
-    const { default: Anthropic } = await import('@anthropic-ai/sdk');
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const sys = "You are Livo — a warm, thoughtful personal life-guide who chats naturally, like a caring friend who happens to know the person's area really well. " +
-      "Talk like a real person: friendly, genuine, encouraging, specific. Never robotic, never a bland bulleted list. Give real, useful guidance for their day and life — suggest concrete ideas, ask a gentle follow-up question when it would help, celebrate small wins, and keep it human and kind. " +
-      "The person is around " + (context.loc || 'their city') + " and tends to enjoy " + ((context.interests || []).join(', ') || 'a mix of things') + " — weave that in when it makes a suggestion more concrete and local. " +
-      "If they describe a routine or ask you to plan/schedule a day with times, ALSO build a schedule for them. " +
-      "Respond ONLY as JSON: {\"reply\":\"<your natural, conversational reply — a few warm sentences, real advice>\",\"schedule\":[{\"time\":\"HH:MM\",\"title\":\"...\"}]}. " +
-      "Put ALL of your conversational words in \"reply\". Use 24h HH:MM times. Leave \"schedule\" as [] when no timeline is needed.";
-    const msgs = history.filter(h => h.role === 'user' || h.role === 'assistant')
-      .map(h => ({ role: h.role, content: String(h.content || '') }));
-    msgs.push({ role: 'user', content: message });
-    const out = await client.messages.create({
-      model: process.env.AI_MODEL || 'claude-opus-4-8',
-      max_tokens: 1024, system: sys, messages: msgs,
-    });
-    const text = out.content.map(b => b.text || '').join('');
-    let parsed; try { parsed = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); }
-    catch { parsed = { reply: text.trim() || "Here's what I'd suggest.", schedule: [] }; }
-    res.json({ reply: parsed.reply || '', schedule: Array.isArray(parsed.schedule) ? parsed.schedule : [] });
-  } catch (e) {
-    res.status(502).json({ reply: "Assistant error: " + e.message, schedule: [] });
-  }
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const sys = "You are Livo — a warm, thoughtful personal life-guide who chats naturally, like a caring friend who happens to know the person's area really well. " +
+    "Talk like a real person: friendly, genuine, encouraging, specific. Never robotic, never a bland bulleted list. Give real, useful guidance for their day and life — suggest concrete ideas, ask a gentle follow-up question when it would help, celebrate small wins, and keep it human and kind. " +
+    "The person is around " + (context.loc || 'their city') + " and tends to enjoy " + ((context.interests || []).join(', ') || 'a mix of things') + " — weave that in when it makes a suggestion more concrete and local. " +
+    "If they describe a routine or ask you to plan/schedule a day with times, ALSO build a schedule for them. " +
+    "Respond ONLY as JSON: {\"reply\":\"<your natural, conversational reply — a few warm sentences, real advice>\",\"schedule\":[{\"time\":\"HH:MM\",\"title\":\"...\"}]}. " +
+    "Put ALL of your conversational words in \"reply\". Use 24h HH:MM times. Leave \"schedule\" as [] when no timeline is needed.";
+  const msgs = history.filter(h => h.role === 'user' || h.role === 'assistant').map(h => ({ role: h.role, content: String(h.content || '') }));
+  msgs.push({ role: 'user', content: message });
+  const out = await client.messages.create({ model: process.env.AI_MODEL || 'claude-opus-4-8', max_tokens: 1024, system: sys, messages: msgs });
+  const text = out.content.map(b => b.text || '').join('');
+  let parsed; try { parsed = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)); }
+  catch { parsed = { reply: text.trim() || "Here's what I'd suggest.", schedule: [] }; }
+  return { reply: parsed.reply || '', schedule: Array.isArray(parsed.schedule) ? parsed.schedule : [], model: process.env.AI_MODEL || 'claude-opus-4-8' };
+}
+app.post('/api/chat', async (req, res) => {
+  try { res.json(await chatReply(req.body || {})); }
+  catch (e) { res.status(502).json({ reply: "Assistant error: " + e.message, schedule: [] }); }
+});
+// GET tester so you (and diagnostics) can verify Claude is live: /api/chat-test?q=hi
+app.get('/api/chat-test', async (req, res) => {
+  try { res.json(await chatReply({ message: req.query.q || "Say hi and suggest a relaxing Sunday.", context: { loc: req.query.near || 'Surrey, BC' } })); }
+  catch (e) { res.status(502).json({ reply: "error: " + e.message, schedule: [] }); }
 });
 
 // --- Events feed (provider-backed) ---
