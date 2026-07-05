@@ -17,7 +17,7 @@
   html,body{margin:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;
-    background:linear-gradient(180deg,#ffe9f3 0%,#eaf1ff 26%,#e9fbf2 62%,#fff6e6 100%) fixed;min-height:100vh}
+    background:linear-gradient(180deg,#fffdf0 0%,#fef9d9 34%,#f3fbe4 68%,#fff7e0 100%) fixed;min-height:100vh}
   /* top bar */
   .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
     padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:linear-gradient(110deg,var(--g1),var(--g2) 52%,var(--g3));color:var(--tg);box-shadow:0 6px 18px rgba(0,0,0,.12)}
@@ -196,8 +196,6 @@
   .bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:4px}
   .bn .bi{font-size:20px;transition:transform .15s}.bn.active{color:var(--brand)}
   .bn.active .bi{transform:scale(1.18)}
-  .fab{position:fixed;right:18px;bottom:80px;z-index:55;width:58px;height:58px;border-radius:50%;border:none;
-    background:linear-gradient(135deg,var(--g1),var(--g2) 55%,var(--g3));color:var(--tg);font-size:28px;cursor:pointer;box-shadow:0 12px 26px rgba(0,0,0,.22)}
   .sheet{position:fixed;inset:0;z-index:70;background:rgba(15,42,64,.4);display:none;align-items:flex-end}
   .sheet.show{display:flex}
   .sheet .panel{background:#fff;width:100%;border-radius:22px 22px 0 0;padding:14px 16px 24px;max-width:880px;margin:0 auto}
@@ -219,6 +217,9 @@
   .msg .srow{display:flex;gap:10px;font-size:13px;padding:3px 0}
   .msg .srow b{color:var(--brand-d);min-width:62px}
   .chatbar{display:flex;gap:8px;margin-top:6px}.chatbar input{flex:1}
+  .micbtn{flex:none;width:46px;border:none;border-radius:12px;background:var(--brand-soft);color:var(--brand-d);font-size:19px;cursor:pointer}
+  .micbtn.rec{background:var(--warn);color:#fff;animation:micpulse 1s infinite}
+  @keyframes micpulse{0%,100%{opacity:1}50%{opacity:.55}}
   .chat-suggest{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
   .chip-s{background:var(--brand-soft);color:var(--brand-d);border:1px solid var(--sky);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
   .chip-s:hover{filter:brightness(.97)}
@@ -264,8 +265,24 @@
   .gctl button{border:1px solid var(--line);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-weight:800;color:var(--brand-d)}
   .gctl .pct{font-size:12px;color:var(--muted);margin-left:auto}
   /* onboarding */
-  #onboard{position:fixed;inset:0;z-index:90;background:linear-gradient(150deg,#ff9a6b,#ff6fae 40%,#a06bff 75%,#5fa8ff);display:none;align-items:center;justify-content:center;padding:24px}
+  #onboard{position:fixed;inset:0;z-index:90;background:linear-gradient(150deg,#86efac,#fde047 45%,#facc15 78%,#fb923c);display:none;align-items:center;justify-content:center;padding:24px}
   #onboard.show{display:flex}
+  /* full-screen voice mode */
+  #voiceOverlay{position:fixed;inset:0;z-index:96;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#fffdf0,#fef3c7 45%,#fde047 100%)}
+  #voiceOverlay.show{display:flex}
+  .viconbtn{position:absolute;top:calc(16px + env(safe-area-inset-top));right:18px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(0,0,0,.08);color:#3f3a00;font-size:19px;cursor:pointer}
+  .vstage{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+  .vorb{width:172px;height:172px;border-radius:50%;border:none;cursor:pointer;font-size:56px;color:#fff;background:radial-gradient(circle at 35% 30%,#fde047,#f59e0b 68%,#ea580c);box-shadow:0 20px 60px rgba(245,158,11,.45);transition:transform .18s}
+  .vorb:active{transform:scale(.96)}
+  .vorb.listening{animation:vpulse 1.4s ease-in-out infinite}
+  .vorb.speaking{animation:vglow 1.6s ease-in-out infinite}
+  .vorb.thinking{animation:vspin 1s linear infinite}
+  @keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5),0 20px 60px rgba(245,158,11,.4)}50%{box-shadow:0 0 0 28px rgba(245,158,11,0),0 20px 60px rgba(245,158,11,.4)}}
+  @keyframes vglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.16)}}
+  @keyframes vspin{to{transform:rotate(360deg)}}
+  .vstate{font-weight:800;font-size:18px;color:#3f3a00}
+  .vcap{min-height:48px;max-width:540px;font-size:17px;color:#5b4a00;line-height:1.45}
+  .vhint{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom));font-size:13px;color:#7a6a1a;text-align:center;max-width:340px}
   #onboard .ob{background:#fff;border-radius:24px;padding:26px 22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
   #onboard h2{font-size:24px;margin:0 0 4px}#onboard .obsub{color:var(--muted);margin:0 0 16px;font-size:14px}
   .obfeat{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
@@ -275,11 +292,19 @@
   .oblink{display:block;text-align:center;margin-top:10px;color:var(--muted);font-size:13px;cursor:pointer}
   footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 </style>
+<meta name="theme-color" content="#facc15">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Livo">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
 <div class="topbar">
   <div class="brand">🌿 Livo</div>
   <div class="tb-actions">
+    <button class="iconbtn" id="addBtn" title="Quick add">＋</button>
     <button class="iconbtn" id="searchBtn">🔍</button>
     <button class="iconbtn" id="bellBtn">🔔<span class="dot"></span></button>
     <button class="iconbtn" id="settingsBtn">⚙️</button>
@@ -572,7 +597,8 @@
       <h3>💬 Your planner assistant</h3>
       <p class="sub">Tell me your day in plain words — "gym at 7, office 9 to 5, lunch at 1, evening walk, cook dinner, read before bed" — and I'll build your schedule and save it. Or ask me to plan anything.</p>
       <div id="chatLog" class="chatlog"></div>
-      <div class="chatbar"><input id="chatInput" type="text" placeholder="Tell me your day, or ask me to plan…"><button id="chatSend" class="btn" style="width:auto">Send</button></div>
+      <div class="chatbar"><button id="micBtn" type="button" class="micbtn" title="Tap to speak">🎙️</button><input id="chatInput" type="text" placeholder="Talk or type — e.g. “trails to trek near me”"><button id="chatSend" class="btn" style="width:auto">Send</button></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:6px"><button id="voiceBtn" type="button" class="btn ghost sm" style="width:auto;font-size:12px;padding:6px 12px">🔈 Voice replies: off</button></div>
       <div class="chat-suggest">
         <span class="chip-s" data-chat="Plan my normal weekday: gym at 7am, office 9 to 5, lunch at 1, evening walk at 6, cook dinner, read before bed">📋 My weekday</span>
         <span class="chip-s" data-chat="Plan a relaxing Sunday with nature and good food">🌿 Relaxing Sunday</span>
@@ -715,7 +741,6 @@
   <footer>Built by Jungle Labs · Always verify hours, prices & bookings before you go. Your data stays on your device.</footer>
 </div>
 
-<button class="fab" id="fab">＋</button>
 <div class="botnav">
   <button class="bn active" data-main="today"><span class="bi">🌅</span>Today</button>
   <button class="bn" data-main="plan"><span class="bi">🧭</span>Plan</button>
@@ -732,6 +757,15 @@
   <div class="opt-big" data-go="feed"><div class="ic">📸</div><div><b>Share a memory</b><div class="muted" style="font-size:13px">Post a photo — private or with wanderers</div></div></div>
   <div class="opt-big" data-go="plan:events"><div class="ic">🤝</div><div><b>Create a meetup</b><div class="muted" style="font-size:13px">Draft a joinable community event</div></div></div>
 </div></div>
+<div id="voiceOverlay">
+  <button id="vClose" class="viconbtn" title="Close">✕</button>
+  <div class="vstage">
+    <button id="vOrb" class="vorb">🎙️</button>
+    <div id="vState" class="vstate">Tap to talk</div>
+    <div id="vOrbCaption" class="vcap"></div>
+  </div>
+  <div class="vhint">Talk to Livo — “trails to trek near me”, “plan my Saturday”, “coffee nearby”…</div>
+</div>
 <div id="toast"></div>
 
 <div id="onboard"><div class="ob">
@@ -1080,9 +1114,9 @@ function genMeet(){
   const pool=SPOTS.filter(s=>s.vibes.includes(vibe)).concat(SPOTS.filter(s=>s.vibes.includes("cozy")));const venue=pool[0]||SPOTS[0];
   const today=new Date(),wantSun=(vibe==="calm"||vibe==="nature"),wantDay=wantSun?0:6;let target=new Date(today);target.setDate(today.getDate()+((wantDay-today.getDay()+7)%7||7));
   const ds=target.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'}),time=wantSun?"10:00 AM":(vibe==="party"?"7:30 PM":"4:30 PM");
-  const capN={small:"4–8",med:"10–25",big:"30+"}[size],interested=({small:6,med:14,big:31})[size]+Math.floor(Math.random()*6);
+  const capN={small:"4–8",med:"10–25",big:"30+"}[size];
   const seed=vibe==="party"?"Lively":vibe==="water"?"Waterside":vibe==="nature"?"Outdoor":vibe==="cozy"?"Cozy":"Easygoing",title=`${seed} ${size==="big"?"city":"local"} meetup — ${capFirst(idea)}`;
-  document.getElementById('meetOut').innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--pink)"><span class="badge" style="border-color:#fbcfe8;color:var(--pink);background:#fdf2f8">AI-generated · not by any organisation</span><h3 style="margin:10px 0 4px">${title}</h3><div class="timeline" style="margin-top:10px"><div class="slot"><div class="time">When</div><h4>${ds} · ${time}</h4><p>Auto-picked for this vibe; the group can vote to shift it.</p></div><div class="slot"><div class="time">Where</div><h4>${venue.n}</h4><p>${venue.cat} · ${venue.loc} — ${venue.d}</p><div class="meta" style="margin-top:6px">${mapA(venue.n,venue.loc)}</div></div><div class="slot"><div class="time">Who it's for</div><h4>${capN} people who want to meet new faces</h4><p>Open to anyone nearby — the system runs it, no host needed.</p></div></div><div class="total"><div><div class="muted" style="font-size:13px">Community interest (simulated)</div><div style="font-size:12px;color:var(--green)">✓ Posts to the city board for others to join</div></div><b style="color:var(--pink)">${interested} interested</b></div>${saveBtn(title,venue.n+" · "+ds+" "+time,"event",toISO(target))}</div>`;
+  document.getElementById('meetOut').innerHTML=`<div class="card" style="margin-top:14px;border-color:var(--pink)"><span class="badge" style="border-color:#fbcfe8;color:var(--pink);background:#fdf2f8">AI-generated · not by any organisation</span><h3 style="margin:10px 0 4px">${title}</h3><div class="timeline" style="margin-top:10px"><div class="slot"><div class="time">When</div><h4>${ds} · ${time}</h4><p>Auto-picked for this vibe; the group can vote to shift it.</p></div><div class="slot"><div class="time">Where</div><h4>${venue.n}</h4><p>${venue.cat} · ${venue.loc} — ${venue.d}</p><div class="meta" style="margin-top:6px">${mapA(venue.n,venue.loc)}</div></div><div class="slot"><div class="time">Who it's for</div><h4>${capN} people who want to meet new faces</h4><p>Open to anyone nearby — the system runs it, no host needed.</p></div></div><div class="total"><div class="muted" style="font-size:13px">A draft you can make real — save it, then share the plan to invite friends to join.</div></div>${saveBtn(title,venue.n+" · "+ds+" "+time,"event",toISO(target))}</div>`;
   document.getElementById('meetOut').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function capFirst(s){return s.charAt(0).toUpperCase()+s.slice(1);}
@@ -1511,7 +1545,7 @@ function parseClockTime(s){
   const m=s.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i);
   if(!m)return null;let h=+m[1],min=m[2]?+m[2]:0;const ap=(m[3]||'').toLowerCase();
   if(ap==='pm'&&h<12)h+=12;if(ap==='am'&&h===12)h=0;
-  if(!ap&&h<=7)h+=12; // bare "6" in a day routine usually means evening-ish; light heuristic
+  if(!ap&&h>=1&&h<=6)h+=12; // bare 1–6 → afternoon/evening; 7–11 stay AM (e.g. "gym at 7" = 7am)
   if(h>23)h=23;return h*60+min;
 }
 function parseRoutine(text){
@@ -1553,6 +1587,7 @@ async function sendChat(text){
   text=(text||document.getElementById('chatInput').value).trim();if(!text)return;
   document.getElementById('chatInput').value='';
   addMsg('user',esc(text));chatHistory.push({role:'user',content:text});
+  if(await chatPlaces(text))return;   // asking for places → show real place cards, not a paragraph
   const typing=addMsg('bot','<span class="typing">thinking…</span>');
   // try engine (Claude) first
   if(LIVO_API){
@@ -1562,16 +1597,104 @@ async function sendChat(text){
       const data=await res.json();
       if(data&&data.reply){typing.remove();let html=esc(data.reply).replace(/\n/g,'<br>');
         if(Array.isArray(data.schedule)&&data.schedule.length){const items=data.schedule.map(s=>({mins:typeof s.time==='string'?parseClockTime(s.time)??0:s.time,title:s.title}));html+=scheduleHTML(items);}
-        addMsg('bot',html);chatHistory.push({role:'assistant',content:data.reply});return;}
+        addMsg('bot',html);chatHistory.push({role:'assistant',content:data.reply});ttsSpeak(data.reply);return;}
     }catch(e){ /* fall back to local */ }
   }
   typing.remove();localReply(text);
+}
+/* ===== VOICE: full-screen talk mode (Web Speech API) ===== */
+let _recog=null,_voiceOn=false,_voiceActive=false;
+function _speakClean(txt){return String(txt).replace(/<[^>]+>/g,' ').replace(/&[a-z]+;/g,' ').replace(/\s+/g,' ').trim();}
+function ttsSpeak(txt){
+  if(!_voiceOn&&!_voiceActive)return;
+  const t=_speakClean(txt);
+  if(_voiceActive){ setVoiceCaption(t); setVoiceState('speaking'); }
+  try{
+    if(!t||!window.speechSynthesis){ if(_voiceActive)voiceListen(); return; }
+    const u=new SpeechSynthesisUtterance(t.slice(0,360)); u.rate=1.02;
+    u.onend=()=>{ if(_voiceActive)voiceListen(); };
+    u.onerror=()=>{ if(_voiceActive)voiceListen(); };
+    window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+  }catch(e){ if(_voiceActive)voiceListen(); }
+}
+function toggleVoice(){ _voiceOn=!_voiceOn; const b=document.getElementById('voiceBtn'); if(b)b.textContent=_voiceOn?'🔊 Voice replies: on':'🔈 Voice replies: off'; if(!_voiceOn){ try{window.speechSynthesis.cancel();}catch(e){} } else { toast("I'll read my replies aloud 🔊"); } }
+function setVoiceState(s){ const orb=document.getElementById('vOrb'),st=document.getElementById('vState'); if(orb)orb.className='vorb '+(s==='idle'?'':s); if(st)st.textContent=({idle:'Tap to talk',listening:'Listening…',thinking:'Thinking…',speaking:'Speaking…'})[s]||''; }
+function setVoiceCaption(t){ const c=document.getElementById('vOrbCaption'); if(c)c.textContent=t||''; }
+let _nativeListening=false,_nativeLast='',_nativePartialAdded=false;
+function nativeSR(){ try{ return (window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.SpeechRecognition)||null; }catch(e){ return null; } }
+function hasAnyVoice(){ return !!(nativeSR()||window.SpeechRecognition||window.webkitSpeechRecognition); }
+function openVoice(){
+  const ov=document.getElementById('voiceOverlay'); if(ov)ov.classList.add('show');
+  _voiceActive=true; setVoiceCaption(''); setVoiceState('idle');
+  if(!hasAnyVoice()){ setVoiceState('idle'); setVoiceCaption("Voice input isn't supported on this device — you can still type in the chat."); return; }
+  voiceListen();
+}
+function closeVoice(){ _voiceActive=false; _nativeListening=false; try{_recog&&_recog.stop();}catch(e){} _recog=null; const n=nativeSR(); if(n){try{n.stop();}catch(e){}} try{window.speechSynthesis.cancel();}catch(e){} const ov=document.getElementById('voiceOverlay'); if(ov)ov.classList.remove('show'); setVoiceState('idle'); }
+function voiceOrbTap(){ if(!_voiceActive)return; const n=nativeSR();
+  if(n){ if(_nativeListening){ try{n.stop();}catch(e){} } else { try{window.speechSynthesis.cancel();}catch(e){} voiceListen(); } return; }
+  if(_recog){ try{_recog.stop();}catch(e){} } else { try{window.speechSynthesis.cancel();}catch(e){} voiceListen(); } }
+function voiceListen(){
+  if(!_voiceActive)return;
+  const n=nativeSR(); if(n){ voiceListenNative(n); return; }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR)return;
+  try{
+    _recog=new SR(); _recog.lang='en-US'; _recog.interimResults=true; _recog.maxAlternatives=1;
+    let finalText='';
+    setVoiceState('listening'); setVoiceCaption('Listening…');
+    _recog.onresult=e=>{ let interim=''; for(let i=e.resultIndex;i<e.results.length;i++){ const tr=e.results[i][0].transcript; if(e.results[i].isFinal)finalText+=tr+' '; else interim+=tr; } setVoiceCaption((finalText+interim).trim()||'Listening…'); };
+    _recog.onerror=()=>{};
+    _recog.onend=()=>{ _recog=null; const t=finalText.trim(); if(!_voiceActive)return; if(t){ setVoiceState('thinking'); setVoiceCaption(t); sendChat(t); } else { setVoiceState('idle'); setVoiceCaption('Tap the circle and talk'); } };
+    _recog.start();
+  }catch(e){ setVoiceState('idle'); }
+}
+async function voiceListenNative(n){
+  try{
+    let perm=await n.checkPermissions();
+    if(perm.speechRecognition!=='granted'){ perm=await n.requestPermissions(); }
+    if(perm.speechRecognition!=='granted'){ setVoiceState('idle'); setVoiceCaption('Enable Microphone & Speech Recognition in Settings to talk.'); return; }
+    _nativeLast=''; _nativeListening=true; setVoiceState('listening'); setVoiceCaption('Listening…');
+    if(!_nativePartialAdded){ _nativePartialAdded=true;
+      n.addListener('partialResults',d=>{ const m=(d&&d.matches&&d.matches[0])||''; if(m){ _nativeLast=m; if(_voiceActive)setVoiceCaption(m); } });
+      n.addListener('listeningState',d=>{ if(d&&d.status==='stopped')nativeFinish(); });
+    }
+    const res=await n.start({language:'en-US',maxResults:2,partialResults:true,popup:false});
+    if(res&&res.matches&&res.matches[0])_nativeLast=res.matches[0];
+    nativeFinish();
+  }catch(e){ _nativeListening=false; if(_voiceActive){ setVoiceState('idle'); setVoiceCaption('Tap the circle and talk'); } }
+}
+function nativeFinish(){ if(!_nativeListening)return; _nativeListening=false; const t=(_nativeLast||'').trim(); if(!_voiceActive)return;
+  if(t){ setVoiceState('thinking'); setVoiceCaption(t); sendChat(t); } else { setVoiceState('idle'); setVoiceCaption('Tap the circle and talk'); } }
+/* ===== assistant → real place cards instead of long paragraphs ===== */
+function chatPlaceQuery(text){
+  const t=text.toLowerCase();
+  const asksPlaces=/(near|nearby|around|close by|by me|where can i|suggest|recommend|find me|show me|places?|spots?)/.test(t);
+  const map=[[/trek|hike|hiking|trail/,'hiking trail'],[/waterfall/,'waterfall'],[/beach/,'beach'],[/park|garden/,'park'],[/coffee|cafe|café/,'coffee shop'],[/brunch|breakfast/,'brunch restaurant'],[/restaurant|eat|food|dinner|lunch|hungry/,'restaurant'],[/bar|pub|drink/,'bar'],[/museum|gallery/,'museum'],[/viewpoint|scenic|lookout|sunset|view/,'scenic viewpoint'],[/lake/,'lake'],[/gym|workout/,'gym'],[/things?\s*to\s*do|explore|attraction|fun/,'things to do']];
+  for(const pair of map){ if(pair[0].test(t)) return pair[1]; }
+  return asksPlaces?'things to do':null;
+}
+async function chatPlaces(text){
+  const q=chatPlaceQuery(text); if(!q||!LIVO_API) return false;
+  const typing=addMsg('bot','<span class="typing">finding real places near you…</span>');
+  try{
+    const r=await fetch(LIVO_API.replace(/\/$/,"")+"/api/places?near="+encodeURIComponent(state.loc||"Surrey BC")+"&type="+encodeURIComponent(q)+coordQS());
+    const data=await r.json(); typing.remove();
+    if(Array.isArray(data)&&data.length){
+      const top=data.slice(0,6);
+      const where=(!state.loc||state.loc==='my area'||state.loc==='your area')?'you':state.loc;
+      const label=q==='things to do'?'great spots':(/h$|s$|x$/.test(q)?q+'es':q+'s');
+      const intro=`Here are ${top.length} ${label} near ${where} 👇 tap 🗺️ for directions.`;
+      const cards=top.map(p=>`<div class="sresult" style="padding:9px 0"><div class="sicon">📍</div><div style="flex:1"><h5>${esc(p.name)} ${p.rating?`<span style="color:#f59e0b;font-size:12px">★ ${p.rating}</span>`:''}</h5><p>${esc(p.area||'')}</p></div>${p.url?`<a class="maplink" target="_blank" rel="noopener" href="${esc(p.url)}">🗺️</a>`:mapA(p.name,p.area)}</div>`).join('');
+      addMsg('bot',intro+'<div style="margin-top:4px">'+cards+'</div>');
+      chatHistory.push({role:'assistant',content:intro}); ttsSpeak(intro); return true;
+    }
+    return false;   // nothing live → let Claude answer normally
+  }catch(e){ typing.remove(); return false; }
 }
 function localReply(text){
   const items=parseRoutine(text);
   if(items.length>=2){
     addMsg('bot',`Here's a schedule from that — tap to save it all. ${scheduleHTML(items)}`);
-    chatHistory.push({role:'assistant',content:'schedule'});return;
+    chatHistory.push({role:'assistant',content:'schedule'});ttsSpeak("Here's a schedule from that. Tap to save it all.");return;
   }
   // intent routing
   const t=text.toLowerCase();let reply;
@@ -1580,7 +1703,7 @@ function localReply(text){
   else if(/event|concert|show|festival/.test(t))reply=`See <b>Plan → Events</b> for what's on near you, with ticket links.`;
   else if(/gym|work|lunch|walk|cook|read|day|schedule|routine/.test(t))reply=`Tell me the times too and I'll build it — e.g. "gym at 7, office 9 to 5, lunch at 1, walk at 6, cook dinner, read at 9".`;
   else reply=`I can plan your day, weekend, trips, eats and events. Try telling me your routine with times, or tap a suggestion below. 🌿`;
-  addMsg('bot',reply);chatHistory.push({role:'assistant',content:reply});
+  addMsg('bot',reply);chatHistory.push({role:'assistant',content:reply});ttsSpeak(reply);
 }
 function saveSchedule(items){
   items.forEach(it=>{const a=getItems();a.push({id:'c_'+Date.now()+Math.random().toString(36).slice(2,5),title:fmtTime(it.mins)+" · "+it.title,sub:"From your assistant",type:"plan",date:toISO(new Date())});saveItems(a);});
@@ -1652,7 +1775,7 @@ function renderInvite(p,id){
   document.getElementById('inviteOut').innerHTML=
     `<span class="badge" style="background:#fdf2f8;color:var(--pink);border-color:#fbcfe1">🌿 You're invited to wander together</span>
      <h3 style="margin:12px 0 4px">${esc(p.title)}</h3>
-     <p class="muted" style="margin:0 0 10px">${esc(p.created_by||'A friend')} wants you to come along.</p>
+     <p class="muted" style="margin:0 0 10px">${esc(p.created_by||p.by||'A friend')} wants you to come along.</p>
      ${items.length?`<div class="timeline">${items.map(it=>`<div class="slot"><h4>${esc(it)}</h4></div>`).join("")}</div>`:''}
      <div class="total"><div class="muted" style="font-size:13px">People going</div><b style="color:var(--pink)">${p.going||0}</b></div>
      <button class="btn pink" id="rsvpBtn">I'm in 🙌</button>
@@ -1701,6 +1824,10 @@ document.getElementById('dayStart').addEventListener('input',e=>{e.target._touch
 document.getElementById('geoBtn').addEventListener('click',useMyLocation);
 document.getElementById('chatSend').addEventListener('click',()=>sendChat());
 document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+document.getElementById('micBtn').addEventListener('click',openVoice);
+document.getElementById('voiceBtn').addEventListener('click',toggleVoice);
+document.getElementById('vOrb').addEventListener('click',voiceOrbTap);
+document.getElementById('vClose').addEventListener('click',closeVoice);
 document.getElementById('habitAdd').addEventListener('click',addHabit);
 document.getElementById('habitInput').addEventListener('keydown',e=>{if(e.key==='Enter')addHabit();});
 document.getElementById('goalAdd').addEventListener('click',addGoal);
@@ -1718,7 +1845,7 @@ document.getElementById('pfShareJump').addEventListener('click',()=>showMain('fe
 /* FAB sheet */
 const sheet=document.getElementById('sheet');
 function openSheet(){sheet.classList.add('show');}function closeSheet(){sheet.classList.remove('show');}
-document.getElementById('fab').addEventListener('click',openSheet);
+document.getElementById('addBtn').addEventListener('click',openSheet);
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet();});
 /* profile setup */
 document.getElementById('pfAvatar').addEventListener('change',e=>{readImage(e.target.files[0],d=>{pendingAvatar=d;document.getElementById('pfAvPrev').innerHTML=d?`<img src="${d}">`:'🙂';const hint=document.getElementById('avHint');if(hint)hint.textContent=d?'Tap to change photo':'Tap to add a photo';});});
@@ -1777,5 +1904,6 @@ try{const _tv=localStorage.getItem('le_travel');if(_tv)state.travel=_tv;
   document.querySelectorAll('[data-group="travel"] .opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===state.travel));}catch(_){}
 renderToday();genPlan();maybeOnboard();checkPlanLink();autoLocate();
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){});});}</script>
 </body>
 </html>
