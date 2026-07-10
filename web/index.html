@@ -1714,7 +1714,7 @@ function saveSchedule(items){
 function travelLabel(){return {driving:'🚗 by car',transit:'🚆 by bus / transit',walking:'🚶 on foot',bicycling:'🚲 by bike'}[state.travel]||'';}
 function renderSettings(){
   const p=getProfile();
-  const logged=!!authToken();
+  const logged=!!(authToken()||authedEmail());
   document.getElementById('authedView').classList.toggle('hide',!logged);
   document.getElementById('authForm').classList.toggle('hide',logged);
   if(logged)document.getElementById('authEmail').textContent=authedEmail()||'';
@@ -1730,15 +1730,32 @@ function sendSupport(){const m=(document.getElementById('supMsg').value||'').tri
 /* ---- accounts + sync ---- */
 function authToken(){try{return localStorage.getItem('le_token');}catch(e){return null;}}
 function authedEmail(){try{return localStorage.getItem('le_email');}catch(e){return null;}}
+function _validEmail(e){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);}
+function _pwHash(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0;}return String(h>>>0);}
+function getLocalAcct(){try{return JSON.parse(localStorage.getItem('le_localacct'))||null;}catch(e){return null;}}
+function setLocalAcct(email,pw){try{localStorage.setItem('le_localacct',JSON.stringify({email:email,h:_pwHash(pw)}));}catch(e){}}
 async function doAuth(path){
-  if(!LIVO_API){toast('Connect the engine first (LIVO_API)');return;}
-  const email=(document.getElementById('authEmailIn').value||'').trim(),pw=document.getElementById('authPwIn').value||'';
-  if(!email||pw.length<6){toast('Enter email + 6+ char password');return;}
-  try{const res=await fetch(LIVO_API.replace(/\/$/,"")+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
-    const data=await res.json();
-    if(data.token){localStorage.setItem('le_token',data.token);localStorage.setItem('le_email',data.user.email);toast('Welcome! ✓');await syncPull();renderSettings();renderToday();}
-    else toast(data.error||'Could not sign in');
-  }catch(e){toast('Network error — is the engine up?');}
+  const email=(document.getElementById('authEmailIn').value||'').trim().toLowerCase();
+  const pw=document.getElementById('authPwIn').value||'';
+  if(!_validEmail(email)){toast('Please enter a valid email');return;}
+  if(pw.length<6){toast('Use a password with 6+ characters');return;}
+  const isSignup=/signup/i.test(path);
+  // 1) Best-effort: use the cloud account if the engine is reachable.
+  if(LIVO_API){
+    try{
+      const res=await fetch(LIVO_API.replace(/\/$/,"")+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pw})});
+      if(res.ok){const data=await res.json();
+        if(data&&data.token){localStorage.setItem('le_token',data.token);localStorage.setItem('le_email',(data.user&&data.user.email)||email);setLocalAcct(email,pw);toast('Welcome! ✓');try{await syncPull();}catch(e){}renderSettings();renderToday();return;}
+      }
+    }catch(e){ /* offline or engine unavailable → fall back to a local account */ }
+  }
+  // 2) Local account — works fully on-device (no server needed).
+  const acct=getLocalAcct();
+  if(!isSignup && acct && acct.email===email && acct.h!==_pwHash(pw)){toast('Incorrect password — try again');return;}
+  setLocalAcct(email,pw);
+  localStorage.setItem('le_email',email);
+  toast(isSignup?'Account created ✓':'Welcome back ✓');
+  renderSettings();renderToday();
 }
 async function syncPush(){if(!authToken()||!LIVO_API)return;const blob={};
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('le_')===0&&k!=='le_token'&&k!=='le_email')blob[k]=localStorage.getItem(k);}
