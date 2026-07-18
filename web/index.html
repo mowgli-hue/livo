@@ -8,16 +8,16 @@
   :root{
     --bg:#eef6fc;--bg2:#f6fbff;--surface:#ffffff;--surface2:#f2f8fd;
     --ink:#0f2a40;--muted:#5f7c93;--line:#dceaf4;
-    --brand:#16a34a;--brand-d:#15803d;--brand2:#86efac;--brand-soft:#fefce8;--sky:#fef3c7;
-    --g1:#86efac;--g2:#fde047;--g3:#facc15;--tg:#3f3a00;
-    --gold:#f59e0b;--green:#10b981;--pink:#ec4899;--violet:#7c3aed;--warn:#ef4444;
+    --brand:#3f7cc0;--brand-d:#2f66a8;--brand2:#a9d3f5;--brand-soft:#eef6fd;--sky:#dbeafe;
+    --g1:#7fb3e8;--g2:#5b93d6;--g3:#6fa8dd;--tg:#ffffff;
+    --gold:#d9a441;--green:#6fbfa8;--pink:#6f9fd6;--violet:#7f9bd8;--warn:#e29191;
     --shadow:0 10px 30px rgba(3,105,161,.10);--shadow-sm:0 4px 14px rgba(3,105,161,.08);--r:20px;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;
-    background:linear-gradient(180deg,#fffdf0 0%,#fef9d9 34%,#f3fbe4 68%,#fff7e0 100%) fixed;min-height:100vh}
+    background:linear-gradient(180deg,#f2f8ff 0%,#e6f1fb 40%,#eef6fd 72%,#f5faff 100%) fixed;min-height:100vh}
   /* top bar */
   .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
     padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:linear-gradient(110deg,var(--g1),var(--g2) 52%,var(--g3));color:var(--tg);box-shadow:0 6px 18px rgba(0,0,0,.12)}
@@ -265,24 +265,35 @@
   .gctl button{border:1px solid var(--line);background:#fff;border-radius:8px;width:28px;height:28px;cursor:pointer;font-weight:800;color:var(--brand-d)}
   .gctl .pct{font-size:12px;color:var(--muted);margin-left:auto}
   /* onboarding */
-  #onboard{position:fixed;inset:0;z-index:90;background:linear-gradient(150deg,#86efac,#fde047 45%,#facc15 78%,#fb923c);display:none;align-items:center;justify-content:center;padding:24px}
+  #onboard{position:fixed;inset:0;z-index:90;background:linear-gradient(150deg,#7fb3e8,#5b93d6 55%,#6fa8dd);display:none;align-items:center;justify-content:center;padding:24px}
   #onboard.show{display:flex}
   /* full-screen voice mode */
-  #voiceOverlay{position:fixed;inset:0;z-index:96;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#fffdf0,#fef3c7 45%,#fde047 100%)}
+  #voiceOverlay{position:fixed;inset:0;z-index:96;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#eef6ff,#cfe4fb 48%,#bcd9f5 100%)}
   #voiceOverlay.show{display:flex}
-  .viconbtn{position:absolute;top:calc(16px + env(safe-area-inset-top));right:18px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(0,0,0,.08);color:#3f3a00;font-size:19px;cursor:pointer}
+  .viconbtn{position:absolute;top:calc(16px + env(safe-area-inset-top));right:18px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(0,0,0,.06);color:#2b3a52;font-size:19px;cursor:pointer}
   .vstage{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
-  .vorb{width:172px;height:172px;border-radius:50%;border:none;cursor:pointer;font-size:56px;color:#fff;background:radial-gradient(circle at 35% 30%,#fde047,#f59e0b 68%,#ea580c);box-shadow:0 20px 60px rgba(245,158,11,.45);transition:transform .18s}
+  .vorb{width:172px;height:172px;border-radius:50%;border:none;cursor:pointer;font-size:56px;color:#fff;background:radial-gradient(circle at 35% 30%,#bfe0ff,#7fb0e6 60%,#4f86c6);box-shadow:0 20px 60px rgba(79,134,198,.4);transition:transform .18s}
   .vorb:active{transform:scale(.96)}
   .vorb.listening{animation:vpulse 1.4s ease-in-out infinite}
   .vorb.speaking{animation:vglow 1.6s ease-in-out infinite}
   .vorb.thinking{animation:vspin 1s linear infinite}
-  @keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5),0 20px 60px rgba(245,158,11,.4)}50%{box-shadow:0 0 0 28px rgba(245,158,11,0),0 20px 60px rgba(245,158,11,.4)}}
+  @keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(79,134,198,.5),0 20px 60px rgba(79,134,198,.4)}50%{box-shadow:0 0 0 28px rgba(79,134,198,0),0 20px 60px rgba(79,134,198,.4)}}
   @keyframes vglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.16)}}
   @keyframes vspin{to{transform:rotate(360deg)}}
-  .vstate{font-weight:800;font-size:18px;color:#3f3a00}
-  .vcap{min-height:48px;max-width:540px;font-size:17px;color:#5b4a00;line-height:1.45}
-  .vhint{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom));font-size:13px;color:#7a6a1a;text-align:center;max-width:340px}
+  .vstate{font-weight:800;font-size:18px;color:#2b3a52}
+  .vcap{min-height:48px;max-width:540px;font-size:17px;color:#2b3a52;line-height:1.45}
+  .vhint{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom));font-size:13px;color:#5f7fb0;text-align:center;max-width:340px}
+  /* mood cheer-up */
+  .cheer{margin-top:12px;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.5}
+  .cheer.low,.cheer.ok{background:var(--brand-soft);border:1px solid var(--sky)}
+  .cheer.good{background:#eafaf1;border:1px solid #cdeeda}
+  .cheermenu{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .cheeritem{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;font:inherit;width:100%}
+  .cheeritem:hover{border-color:var(--brand)}
+  .cheeritem.done{opacity:.55;border-color:var(--brand);background:var(--brand-soft)}
+  .cheeritem .ci{font-size:22px;flex:none}
+  .cheeritem b{display:block;font-size:14px;color:var(--ink)}
+  .cheeritem em{font-style:normal;color:var(--muted);font-size:12px}
   #onboard .ob{background:#fff;border-radius:24px;padding:26px 22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
   #onboard h2{font-size:24px;margin:0 0 4px}#onboard .obsub{color:var(--muted);margin:0 0 16px;font-size:14px}
   .obfeat{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
@@ -292,7 +303,7 @@
   .oblink{display:block;text-align:center;margin-top:10px;color:var(--muted);font-size:13px;cursor:pointer}
   footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 </style>
-<meta name="theme-color" content="#facc15">
+<meta name="theme-color" content="#5b93d6">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -316,7 +327,8 @@
   <!-- ===== TODAY ===== -->
   <section id="main-today">
     <div class="hero"><h2 id="heroHi">Hi there 👋</h2><p id="heroSub">Let's make today a good one.</p></div>
-    <button class="btn" data-go="assistant" style="margin-bottom:16px">💬 Chat with your planner assistant</button>
+    <button class="btn" data-go="assistant" style="margin-bottom:10px">💬 Chat with your planner assistant</button>
+    <button class="btn ghost" data-go="health" style="margin-bottom:16px">💪 Health & workouts</button>
     <div class="card" id="sparkCard" style="border-color:var(--sky)">
       <div style="display:flex;align-items:center;gap:6px;color:var(--brand-d);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.6px">✨ Today's spark · pick your guide</div>
       <div class="guiderow" id="guideRow"></div>
@@ -358,6 +370,7 @@
       </div>
       <input id="moodNote" type="text" placeholder="One line about today (optional)">
       <div class="moodstrip" id="moodStrip"></div>
+      <div id="moodCheer"></div>
     </div>
 
     <div class="card">
@@ -738,6 +751,61 @@
     </div>
   </section>
 
+  <section id="main-health" class="hide">
+    <h2 style="margin:6px 0 2px">💪 Health</h2>
+    <p class="muted" style="margin:0 0 14px">Log your workouts, track calories, and keep your streak alive. Share a session to challenge a buddy.</p>
+    <div class="card" style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:32px">👟</div>
+      <div style="flex:1"><b id="hSteps" style="font-size:22px">—</b> <span class="muted">steps today</span><div class="muted" id="hStepsNote" style="font-size:12px">Syncs from Apple Health on your iPhone</div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="pstats" style="margin:0">
+        <div class="pstat"><b id="hToday">0</b><span>cal today</span></div>
+        <div class="pstat"><b id="hStreak">0</b><span>day streak</span></div>
+        <div class="pstat"><b id="hWeek">0</b><span>cal / 7 days</span></div>
+        <div class="pstat"><b id="hBest">0</b><span>best day</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3 style="margin:0 0 10px">➕ Log a workout</h3>
+      <label class="fld"><b>Activity</b></label>
+      <div class="opts" id="hActs" data-group="hact" style="flex-wrap:wrap;gap:8px">
+        <div class="opt sel" data-v="Gym">🏋️ Gym</div><div class="opt" data-v="Run">🏃 Run</div><div class="opt" data-v="Walk">🚶 Walk</div><div class="opt" data-v="Cycle">🚴 Cycle</div><div class="opt" data-v="Yoga">🧘 Yoga</div><div class="opt" data-v="Swim">🏊 Swim</div><div class="opt" data-v="Sport">⚽ Sport</div><div class="opt" data-v="Other">✨ Other</div>
+      </div>
+      <div class="row2" style="margin-top:12px">
+        <label class="fld" style="flex:1"><b>Minutes</b><input id="hMin" type="number" min="1" placeholder="45"></label>
+        <label class="fld" style="flex:1"><b>Calories 🔥</b><input id="hCal" type="number" min="1" placeholder="300"></label>
+      </div>
+      <label class="fld" style="margin-top:10px;display:block"><b>Note (optional)</b><input id="hNote" type="text" placeholder="Leg day 💪 felt strong"></label>
+      <label class="fld" style="margin-top:10px;display:block"><b>📷 Photo (optional)</b><input id="hPhoto" type="file" accept="image/*"></label>
+      <button class="btn" id="hSave" style="margin-top:12px">Log it ✓</button>
+    </div>
+    <h3 style="margin:20px 0 8px">Your sessions</h3>
+    <div id="hList"></div>
+  </section>
+
+  <section id="main-capsule" class="hide">
+    <h2 style="margin:6px 0 2px">💌 Time Capsule</h2>
+    <p class="muted" style="margin:0 0 14px">Record a message today and open it years from now — for yourself, or someone you love.</p>
+    <div class="card">
+      <h3 style="margin:0 0 10px">Seal a new capsule</h3>
+      <label class="fld" style="display:block"><b>To</b><input id="capTo" type="text" placeholder="Myself — or a name"></label>
+      <label class="fld" style="margin-top:10px;display:block"><b>Your message</b><textarea id="capMsg" rows="3" placeholder="Dear future me…" style="width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+      <div style="margin-top:10px">
+        <button class="btn ghost sm" id="capRecBtn" type="button">🎙️ Record voice note</button>
+        <span id="capRecState" class="muted" style="font-size:12px;margin-left:8px"></span>
+      </div>
+      <label class="fld" style="margin-top:10px;display:block"><b>📷 Photo (optional)</b><input id="capPhoto" type="file" accept="image/*"></label>
+      <label class="fld" style="margin-top:10px;display:block"><b>Open in</b></label>
+      <div class="opts" id="capWhen" data-group="capwhen" style="flex-wrap:wrap;gap:8px">
+        <div class="opt sel" data-v="1">1 year</div><div class="opt" data-v="3">3 years</div><div class="opt" data-v="5">5 years</div><div class="opt" data-v="10">10 years</div>
+      </div>
+      <button class="btn" id="capSave" style="margin-top:14px">Seal it 🔒</button>
+    </div>
+    <h3 style="margin:20px 0 8px">Your capsules</h3>
+    <div id="capList"></div>
+  </section>
+
   <footer>Built by Jungle Labs · Always verify hours, prices & bookings before you go. Your data stays on your device.</footer>
 </div>
 
@@ -755,6 +823,8 @@
   <div class="opt-big" data-go="today"><div class="ic">🌅</div><div><b>Plan my day</b><div class="muted" style="font-size:13px">Build today's schedule around your life</div></div></div>
   <div class="opt-big" data-go="plan:weekend"><div class="ic">⚡</div><div><b>Plan a weekend</b><div class="muted" style="font-size:13px">Get a day plan for your mood & budget</div></div></div>
   <div class="opt-big" data-go="feed"><div class="ic">📸</div><div><b>Share a memory</b><div class="muted" style="font-size:13px">Post a photo — private or with wanderers</div></div></div>
+  <div class="opt-big" data-go="health"><div class="ic">💪</div><div><b>Log a workout</b><div class="muted" style="font-size:13px">Track calories, keep your streak, challenge buddies</div></div></div>
+  <div class="opt-big" data-go="capsule"><div class="ic">💌</div><div><b>Seal a time capsule</b><div class="muted" style="font-size:13px">A message to your future self or a loved one</div></div></div>
   <div class="opt-big" data-go="plan:events"><div class="ic">🤝</div><div><b>Create a meetup</b><div class="muted" style="font-size:13px">Draft a joinable community event</div></div></div>
 </div></div>
 <div id="voiceOverlay">
@@ -833,7 +903,24 @@ const DESTS=[
   {n:"Bangkok",flag:"🇹🇭",flight:760,hb:30,hm:85,daily:35,vibes:["party","cozy"],exp:"Grand Palace + markets (~$20)",best:"Lively + ultra-affordable"},
   {n:"Maui, Hawaii",flag:"🌺",flight:520,hb:160,hm:260,daily:85,vibes:["water","calm","nature"],exp:"Road to Hana + snorkel (~$60)",best:"Beach + nature, no passport"},
   {n:"Las Vegas",flag:"🎰",flight:250,hb:70,hm:160,daily:90,vibes:["party"],exp:"Show + Grand Canyon (~$120)",best:"Pure party weekend"},
-  {n:"Banff, Canada",flag:"🏔️",flight:230,hb:120,hm:200,daily:70,vibes:["nature","calm"],exp:"Lake Louise canoe (~$80)",best:"Mountain calm, short flight"}
+  {n:"Banff, Canada",flag:"🏔️",flight:230,hb:120,hm:200,daily:70,vibes:["nature","calm"],exp:"Lake Louise canoe (~$80)",best:"Mountain calm, short flight"},
+  {n:"Paris",flag:"🇫🇷",flight:720,hb:90,hm:180,daily:80,vibes:["cozy","calm","party"],exp:"Louvre + Eiffel climb (~$60)",best:"Iconic romance, art & cafés"},
+  {n:"Rome",flag:"🇮🇹",flight:750,hb:80,hm:150,daily:65,vibes:["cozy","party"],exp:"Colosseum + Vatican (~$60)",best:"Ancient history on every corner"},
+  {n:"Barcelona",flag:"🇪🇸",flight:720,hb:80,hm:150,daily:65,vibes:["party","water","cozy"],exp:"Sagrada Família (~$40)",best:"Beach, Gaudí & nightlife"},
+  {n:"London",flag:"🇬🇧",flight:700,hb:110,hm:210,daily:90,vibes:["cozy","party"],exp:"West End show (~$70)",best:"Museums, theatre, timeless"},
+  {n:"New York City",flag:"🗽",flight:300,hb:150,hm:280,daily:100,vibes:["party","cozy"],exp:"Broadway + Top of the Rock (~$120)",best:"The city that never sleeps"},
+  {n:"Dubai",flag:"🇦🇪",flight:900,hb:90,hm:230,daily:85,vibes:["party","calm"],exp:"Burj Khalifa + desert safari (~$90)",best:"Futuristic luxury meets desert"},
+  {n:"Santorini, Greece",flag:"🇬🇷",flight:820,hb:110,hm:250,daily:80,vibes:["calm","water","cozy"],exp:"Caldera sunset cruise (~$90)",best:"Dreamy blue-and-white sunsets"},
+  {n:"Amsterdam",flag:"🇳🇱",flight:700,hb:100,hm:190,daily:75,vibes:["cozy","party","water"],exp:"Canal cruise + Van Gogh (~$50)",best:"Canals, bikes & cozy charm"},
+  {n:"Singapore",flag:"🇸🇬",flight:860,hb:90,hm:200,daily:75,vibes:["cozy","calm","party"],exp:"Gardens by the Bay (~$30)",best:"Clean, futuristic, foodie heaven"},
+  {n:"Kyoto, Japan",flag:"⛩️",flight:700,hb:70,hm:160,daily:60,vibes:["calm","cozy","nature"],exp:"Fushimi Inari + temples (free–$20)",best:"Serene temples & tradition"},
+  {n:"Sydney",flag:"🇦🇺",flight:1100,hb:100,hm:210,daily:85,vibes:["water","nature","party"],exp:"Bondi + Opera House tour (~$50)",best:"Beaches & iconic harbour"},
+  {n:"Cape Town",flag:"🇿🇦",flight:1200,hb:60,hm:150,daily:55,vibes:["nature","water","calm"],exp:"Table Mountain + Cape Point (~$70)",best:"Mountains meet the ocean"},
+  {n:"Marrakech",flag:"🇲🇦",flight:860,hb:40,hm:120,daily:40,vibes:["cozy","party"],exp:"Medina souks + desert night (~$60)",best:"Exotic souks & the Sahara"},
+  {n:"Rio de Janeiro",flag:"🇧🇷",flight:900,hb:55,hm:150,daily:60,vibes:["party","water","nature"],exp:"Christ the Redeemer + Sugarloaf (~$70)",best:"Beaches, samba & mountains"},
+  {n:"Interlaken, Switzerland",flag:"🇨🇭",flight:780,hb:130,hm:240,daily:95,vibes:["nature","calm"],exp:"Jungfraujoch alpine train (~$130)",best:"Swiss Alps adventure base"},
+  {n:"Phuket, Thailand",flag:"🏝️",flight:820,hb:35,hm:120,daily:40,vibes:["water","party","calm"],exp:"Phi Phi islands boat (~$40)",best:"Islands & nightlife, budget-friendly"},
+  {n:"Istanbul",flag:"🇹🇷",flight:820,hb:55,hm:140,daily:50,vibes:["cozy","party","calm"],exp:"Hagia Sophia + Bosphorus cruise (~$40)",best:"Where Europe meets Asia"}
 ];
 const VENUES=[
   {n:"Central City Brew Pub",area:"Surrey Central",min:15,max:80,head:45,vibes:["party","cozy"],occ:["office","friends","birthday"],d:"House-brewed beer + shareable food in a lively private space."},
@@ -880,14 +967,14 @@ const SEED_POSTS=[
 
 /* ===== CHARACTERS (guides) ===== */
 const CHARACTERS=[
-  {id:"jade",name:"Jade",emoji:"🐢",color:"#059669",line:"Breathe, then begin —"},
-  {id:"onyx",name:"Onyx",emoji:"🕶️",color:"#111827",line:"Time to level up —"},
-  {id:"ember",name:"Ember",emoji:"🔥",color:"#dc2626",line:"Let's make it count —"}
+  {id:"jade",name:"Jade",emoji:"🐢",color:"#3f7cc0",line:"Breathe, then begin —"},
+  {id:"onyx",name:"Onyx",emoji:"🕶️",color:"#18181b",line:"Time to level up —"},
+  {id:"ember",name:"Ember",emoji:"🔥",color:"#e0724a",line:"Let's make it count —"}
 ];
 const THEMES={
-  jade:{brand:'#16a34a',brandD:'#15803d',brand2:'#86efac',soft:'#fefce8',sky:'#fef3c7',g1:'#86efac',g2:'#fde047',g3:'#facc15',tg:'#3f3a00'},
-  onyx:{brand:'#111827',brandD:'#000000',brand2:'#374151',soft:'#f1f1f4',sky:'#e3e3e8',g1:'#3f3f46',g2:'#18181b',g3:'#000000',tg:'#ffffff'},
-  ember:{brand:'#dc2626',brandD:'#b91c1c',brand2:'#f97316',soft:'#fdeaea',sky:'#f8cccc',g1:'#fbbf24',g2:'#ef4444',g3:'#b91c1c',tg:'#ffffff'}
+  jade:{brand:'#3f7cc0',brandD:'#2f66a8',brand2:'#a9d3f5',soft:'#eef6fd',sky:'#dbeafe',g1:'#7fb3e8',g2:'#5b93d6',g3:'#6fa8dd',tg:'#ffffff'},
+  onyx:{brand:'#18181b',brandD:'#000000',brand2:'#a1a1aa',soft:'#f4f4f5',sky:'#e4e4e7',g1:'#52525b',g2:'#27272a',g3:'#09090b',tg:'#ffffff'},
+  ember:{brand:'#e0724a',brandD:'#c85832',brand2:'#ffd0b0',soft:'#fff3ec',sky:'#ffe2d0',g1:'#ffe1c4',g2:'#ffb088',g3:'#f77c6a',tg:'#5a2417'}
 };
 function applyTheme(id){const t=THEMES[id]||THEMES.jade;const r=document.documentElement.style;
   r.setProperty('--brand',t.brand);r.setProperty('--brand-d',t.brandD);r.setProperty('--brand2',t.brand2);
@@ -1488,7 +1575,37 @@ function renderMood(){
   if(tv&&tv.note)document.getElementById('moodNote').value=tv.note;
   let strip="";for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=toISO(d);const e=m[k]?MOOD_E[m[k].score]:'<span class="blank"></span>';const dl=d.toLocaleDateString('en-CA',{weekday:'short'}).slice(0,2);strip+=`<div class="mday"><div class="e">${e}</div><div class="dl">${dl}</div></div>`;}
   document.getElementById('moodStrip').innerHTML=strip;
+  moodCheer(tv?tv.score:null);
 }
+/* ---- mood cheer-up: gentle dopamine boosters when you're low ---- */
+const DOPAMINE=[
+  {i:'🚶',t:'Take a 5-minute walk',d:'Movement + a change of scene is a quick lift.'},
+  {i:'☀️',t:'Step outside for daylight',d:'Even 2 minutes of sunlight helps you reset.'},
+  {i:'💧',t:'Drink a glass of water',d:'Simple — being a little dehydrated drags mood down.'},
+  {i:'📞',t:'Message someone you love',d:'A tiny connection beats sitting with it alone.'},
+  {i:'🎧',t:'Play a song you love',d:'Put one on loud and let it move you for 3 minutes.'},
+  {i:'🌬️',t:'Take 10 slow breaths',d:'In for 4, out for 6 — it calms your nervous system.'},
+  {i:'🧹',t:'Tidy one small thing',d:'One corner or desk. A small win you can see.'},
+  {i:'📝',t:'Note 3 good things',d:'However small — your brain starts looking for more.'},
+  {i:'🤸',t:'Stretch for 2 minutes',d:'Loosen your shoulders and neck; let the tension go.'},
+  {i:'🫶',t:'Be kind to yourself',d:'A hard day is not a failed one. Rest is allowed.'}
+];
+function moodCheer(score){
+  const el=document.getElementById('moodCheer');if(!el)return;
+  if(score==null){el.innerHTML='';return;}
+  const c=guideObj();
+  if(score>=4){el.innerHTML=`<div class="cheer good">${c.emoji} <b>${esc(c.name)}:</b> Love that — keep the good going. Maybe share the moment with someone. 💛</div>`;return;}
+  if(score===3){el.innerHTML=`<div class="cheer ok">${c.emoji} <b>${esc(c.name)}:</b> A steady day is a good day. One small nice thing could tip it up 👇</div>`+cheerMenu();return;}
+  el.innerHTML=`<div class="cheer low">${c.emoji} <b>${esc(c.name)}:</b> I'm really glad you told me. Rough days are real — let's do one tiny thing together, no pressure. 🫶</div>`+cheerMenu()+
+    `<p class="muted" style="font-size:12px;margin:10px 2px 0">If things feel heavy lately, talking to someone you trust can help — you don't have to carry it alone.</p>`;
+}
+function cheerMenu(){
+  const picks=shuffle(DOPAMINE.slice()).slice(0,4);
+  return `<div class="cheermenu">`+picks.map(x=>`<button class="cheeritem" onclick="doBooster(this,&quot;${x.t.replace(/&/g,'&amp;').replace(/"/g,'')}&quot;)"><span class="ci">${x.i}</span><span><b>${x.t}</b><em>${x.d}</em></span></button>`).join('')+
+    `</div><button class="btn ghost sm" style="margin-top:10px" onclick="reCheckMood()">I did one — check in again ↺</button>`;
+}
+function doBooster(btn,label){if(btn)btn.classList.add('done');toast('Nice — '+String(label).toLowerCase()+' 💪');}
+function reCheckMood(){const el=document.getElementById('moodCheer');if(el)el.innerHTML='<p class="muted" style="margin:8px 2px">How do you feel now? Tap an emoji above. 🐢</p>';const mc=document.getElementById('moodCard');if(mc)mc.scrollIntoView({behavior:'smooth',block:'start'});}
 
 /* ===== HABITS ===== */
 const DEFAULT_HABITS=[{id:'h1',name:'Move 30 minutes',done:[]},{id:'h2',name:'Read or learn',done:[]},{id:'h3',name:'Drink enough water',done:[]}];
@@ -1804,11 +1921,150 @@ function renderInvite(p,id){
 }
 
 /* ===== NAV ===== */
+/* ===== TIME CAPSULE ===== */
+function capKey(){return 'le_capsule_'+handle();}
+function getCaps(){try{return JSON.parse(localStorage.getItem(capKey()))||[];}catch(e){return[];}}
+function saveCaps(a){lsSet(capKey(),JSON.stringify(a));}
+let _capAudio='',_capRec=null,_capChunks=[];
+async function capRecordToggle(){
+  const btn=document.getElementById('capRecBtn'),st=document.getElementById('capRecState');
+  if(_capRec&&_capRec.state==='recording'){_capRec.stop();return;}
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast('Voice recording isn\'t supported here — you can still type your message');return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    _capChunks=[];_capRec=new MediaRecorder(stream);
+    _capRec.ondataavailable=e=>{if(e.data&&e.data.size)_capChunks.push(e.data);};
+    _capRec.onstop=()=>{const blob=new Blob(_capChunks,{type:(_capChunks[0]&&_capChunks[0].type)||'audio/webm'});const r=new FileReader();r.onload=()=>{_capAudio=r.result;if(st)st.textContent='Voice note attached ✓ ('+Math.round(blob.size/1024)+' KB)';};r.readAsDataURL(blob);stream.getTracks().forEach(t=>t.stop());if(btn){btn.textContent='🎙️ Re-record voice note';}};
+    _capRec.start();if(btn)btn.textContent='⏹️ Stop recording';if(st)st.textContent='Recording… tap stop when done';
+  }catch(e){toast('Allow microphone access to record');}
+}
+function saveCapsule(){
+  const to=(document.getElementById('capTo').value||'').trim()||'Myself';
+  const msg=(document.getElementById('capMsg').value||'').trim();
+  if(!msg&&!_capAudio){toast('Write a message or record a voice note first');return;}
+  const sel=document.querySelector('#capWhen .opt.sel');const yrs=parseInt(sel?sel.dataset.v:'1',10)||1;
+  const open=new Date();open.setFullYear(open.getFullYear()+yrs);
+  const file=document.getElementById('capPhoto').files[0];
+  readImage(file,function(photo){
+    const a=getCaps();
+    a.unshift({id:'cap_'+Date.now(),to:to,msg:msg,audio:_capAudio||'',photo:photo||'',created:toISO(new Date()),openISO:toISO(open),yrs:yrs});
+    saveCaps(a);_capAudio='';
+    ['capTo','capMsg','capPhoto'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const st=document.getElementById('capRecState');if(st)st.textContent='';const rb=document.getElementById('capRecBtn');if(rb)rb.textContent='🎙️ Record voice note';
+    toast('Sealed 🔒 — opens '+open.getFullYear());renderCaps();
+  });
+}
+function renderCaps(){
+  const a=getCaps(),list=document.getElementById('capList');if(!list)return;const today=toISO(new Date());
+  if(!a.length){list.innerHTML='<p class="muted">No capsules yet. Seal your first message to the future. 💌</p>';return;}
+  list.innerHTML=a.map(x=>{
+    const ready=x.openISO<=today;
+    if(ready){
+      return `<div class="card" style="margin-bottom:10px;border-color:var(--brand)">
+        <div style="font-weight:800;color:var(--brand-d)">📬 Ready to open · for ${esc(x.to)}</div>
+        <p class="muted" style="font-size:12px;margin:2px 0 8px">Sealed ${hFmtDate(x.created)}</p>
+        ${x.msg?`<p style="margin:0 0 8px;white-space:pre-wrap">${esc(x.msg)}</p>`:''}
+        ${x.audio?`<audio controls src="${x.audio}" style="width:100%"></audio>`:''}
+        ${x.photo?`<img src="${x.photo}" alt="capsule" style="width:100%;border-radius:12px;margin-top:8px">`:''}
+        <div class="row2" style="margin-top:10px">${String(x.to).toLowerCase()!=='myself'?`<button class="btn ghost sm" onclick="shareCapsule('${x.id}')">📣 Send to ${esc(x.to)}</button>`:''}<button class="btn ghost sm" onclick="delCapsule('${x.id}')">Delete</button></div>
+      </div>`;
+    }
+    const openTxt=new Date(x.openISO+'T12:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px"><div style="font-size:26px">🔒</div>
+      <div style="flex:1"><b>Sealed for ${esc(x.to)}</b><div class="muted" style="font-size:12px">Opens ${openTxt}${x.audio?' · 🎙️ voice':''}${x.photo?' · 📷':''}</div></div></div>
+      <div class="row2" style="margin-top:10px"><button class="btn ghost sm" onclick="delCapsule('${x.id}')">Delete</button></div>
+    </div>`;
+  }).join('');
+}
+function delCapsule(id){if(!confirm('Delete this capsule? This cannot be undone.'))return;saveCaps(getCaps().filter(x=>x.id!==id));renderCaps();}
+function shareCapsule(id){const x=getCaps().find(c=>c.id===id);if(!x)return;const t=`A time capsule I sealed for you on Livo (${x.created}):\n\n${x.msg||'(voice note attached in the app)'}\n\n💌`;if(navigator.share){navigator.share({title:'A time capsule for you',text:t}).catch(()=>{});}else if(navigator.clipboard){navigator.clipboard.writeText(t).then(()=>toast('Copied — send it to '+x.to+' ✓')).catch(()=>{});}else toast('Sharing not supported here');}
+
+/* ===== HEALTH / WORKOUTS ===== */
+const HICON={Gym:'🏋️',Run:'🏃',Walk:'🚶',Cycle:'🚴',Yoga:'🧘',Swim:'🏊',Sport:'⚽',Other:'✨'};
+function healthKey(){return 'le_health_'+handle();}
+function getHealth(){try{return JSON.parse(localStorage.getItem(healthKey()))||[];}catch(e){return[];}}
+function saveHealthArr(a){lsSet(healthKey(),JSON.stringify(a));}
+function hFmtDate(iso){try{return new Date(iso+'T12:00').toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});}catch(e){return iso;}}
+function saveWorkout(){
+  const sel=document.querySelector('#hActs .opt.sel')||document.querySelector('#hActs .opt');
+  const act=sel?sel.dataset.v:'Gym';
+  const min=parseInt(document.getElementById('hMin').value,10)||0;
+  const cal=parseInt(document.getElementById('hCal').value,10)||0;
+  const note=(document.getElementById('hNote').value||'').trim();
+  if(!min&&!cal){toast('Add minutes or calories');return;}
+  const file=document.getElementById('hPhoto').files[0];
+  readImage(file,function(photo){
+    const a=getHealth();
+    a.unshift({id:'w_'+Date.now(),act:act,min:min,cal:cal,note:note,photo:photo||'',date:toISO(new Date()),ts:Date.now()});
+    saveHealthArr(a);
+    document.getElementById('hMin').value='';document.getElementById('hCal').value='';document.getElementById('hNote').value='';document.getElementById('hPhoto').value='';
+    toast(HICON[act]+' '+act+' logged 💪');renderHealth();
+  });
+}
+function renderHealth(){
+  const a=getHealth(),today=toISO(new Date());
+  const calToday=a.filter(x=>x.date===today).reduce((s,x)=>s+(x.cal||0),0);
+  const wk=Date.now()-6*864e5,calWeek=a.filter(x=>x.ts>=wk).reduce((s,x)=>s+(x.cal||0),0);
+  const byDay={};a.forEach(x=>{byDay[x.date]=(byDay[x.date]||0)+(x.cal||0);});
+  const best=Object.values(byDay).reduce((m,v)=>Math.max(m,v),0);
+  const days=new Set(a.map(x=>x.date));let streak=0,d=new Date();
+  for(let i=0;i<400;i++){const iso=toISO(d);if(days.has(iso)){streak++;d.setDate(d.getDate()-1);}else if(i===0){d.setDate(d.getDate()-1);}else break;}
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('hToday',calToday);set('hStreak',streak);set('hWeek',calWeek);set('hBest',best);
+  loadSteps();
+  const list=document.getElementById('hList');if(!list)return;
+  if(!a.length){list.innerHTML='<p class="muted">No workouts yet — log your first one above. 💪</p>';return;}
+  list.innerHTML=a.map(x=>`<div class="card" style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:26px">${HICON[x.act]||'✨'}</div>
+      <div style="flex:1"><b>${esc(x.act)}</b>${x.min?` · ${x.min} min`:''}${x.cal?` · <span style="color:var(--gold);font-weight:700">🔥 ${x.cal} cal</span>`:''}<div class="muted" style="font-size:12px">${hFmtDate(x.date)}</div></div>
+    </div>
+    ${x.note?`<p style="margin:8px 0 0">${esc(x.note)}</p>`:''}
+    ${x.photo?`<img src="${x.photo}" alt="workout" style="width:100%;border-radius:12px;margin-top:8px">`:''}
+    <div class="row2" style="margin-top:10px">
+      <button class="btn ghost sm" onclick="shareWorkout('${x.id}')">📣 Challenge a buddy</button>
+      <button class="btn ghost sm" onclick="delWorkout('${x.id}')">Delete</button>
+    </div>
+  </div>`).join('');
+}
+function delWorkout(id){if(!confirm('Delete this workout?'))return;saveHealthArr(getHealth().filter(x=>x.id!==id));renderHealth();}
+/* ---- steps via Apple Health (native) with graceful web fallback ---- */
+let _stepsBusy=false;
+function healthKitPlugin(){try{const P=window.Capacitor&&window.Capacitor.Plugins;return (P&&(P.CapacitorHealthkit||P.CapacitorHealthKit||P.CapacitorHealth||P.Health||P.HealthKit))||null;}catch(e){return null;}}
+async function loadSteps(){
+  const el=document.getElementById('hSteps'),note=document.getElementById('hStepsNote');if(!el||_stepsBusy)return;
+  const hk=healthKitPlugin();
+  if(!hk){el.textContent='—';if(note)note.textContent='Open Livo on your iPhone to sync steps from Apple Health.';return;}
+  _stepsBusy=true;
+  try{
+    if(hk.requestAuthorization)await hk.requestAuthorization({all:[],read:['steps','stepCount'],write:[]});
+    const start=new Date();start.setHours(0,0,0,0);const end=new Date();
+    let steps=0;
+    if(hk.queryHKitSampleType){
+      const r=await hk.queryHKitSampleType({sampleName:'stepCount',startDate:start.toISOString(),endDate:end.toISOString(),limit:0});
+      const rows=(r&&(r.resultData||r.data))||[];
+      if(Array.isArray(rows))steps=rows.reduce((s,x)=>s+(+x.value||+x.quantity||0),0);
+      else if(r&&typeof r.countReturn==='number')steps=r.countReturn;
+    }else if(hk.queryAggregated){
+      const r=await hk.queryAggregated({dataType:'steps',startDate:start.toISOString(),endDate:end.toISOString(),bucket:'day'});
+      const rows=(r&&(r.aggregatedData||r.data))||[];steps=rows.reduce((s,x)=>s+(+x.value||0),0);
+    }
+    el.textContent=steps?Math.round(steps).toLocaleString():'0';
+    if(note)note.textContent='From Apple Health · today';
+  }catch(e){el.textContent='—';if(note)note.textContent='Allow Health access to see your steps.';}
+  _stepsBusy=false;
+}
+function shareWorkout(id){const x=getHealth().find(w=>w.id===id);if(!x)return;
+  const t=`I just did a ${x.act} workout on Livo${x.cal?` — 🔥 ${x.cal} cal`:''}${x.min?` in ${x.min} min`:''}${x.note?`. ${x.note}`:''}. Join me and let's compete! 💪`;
+  if(navigator.share){navigator.share({title:'My Livo workout',text:t}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(t).then(()=>toast('Copied — send it to a buddy ✓')).catch(()=>toast('Copy not supported'));}
+  else toast('Sharing not supported here');}
 function showMain(name){
   curMain=name;
-  ['today','plan','feed','calendar','profile','search','notifs','assistant','settings','privacy','support','about','terms','invite'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
+  ['today','plan','feed','calendar','profile','search','notifs','assistant','settings','privacy','support','about','terms','invite','health','capsule'].forEach(id=>{const el=document.getElementById('main-'+id);if(el)el.classList.toggle('hide',id!==name);});
   document.querySelectorAll('.bn').forEach(x=>x.classList.toggle('active',x.dataset.main===name));
-  if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();if(name==="assistant")chatInit();if(name==="settings")renderSettings();
+  if(name==="today")renderToday();if(name==="feed")renderFeed();if(name==="calendar")showCalendar();if(name==="profile")renderProfile();if(name==="notifs")renderNotifs();if(name==="assistant")chatInit();if(name==="settings")renderSettings();if(name==="health")renderHealth();if(name==="capsule")renderCaps();
   if(name==="search"){document.getElementById('searchOut').innerHTML="";setTimeout(()=>document.getElementById('searchInput').focus(),50);}
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1841,6 +2097,9 @@ document.getElementById('dayStart').addEventListener('input',e=>{e.target._touch
 document.getElementById('geoBtn').addEventListener('click',useMyLocation);
 document.getElementById('chatSend').addEventListener('click',()=>sendChat());
 document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+document.getElementById('hSave').addEventListener('click',saveWorkout);
+document.getElementById('capSave').addEventListener('click',saveCapsule);
+document.getElementById('capRecBtn').addEventListener('click',capRecordToggle);
 document.getElementById('micBtn').addEventListener('click',openVoice);
 document.getElementById('voiceBtn').addEventListener('click',toggleVoice);
 document.getElementById('vOrb').addEventListener('click',voiceOrbTap);
