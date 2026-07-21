@@ -754,11 +754,7 @@
   <section id="main-health" class="hide">
     <h2 style="margin:6px 0 2px">💪 Health</h2>
     <p class="muted" style="margin:0 0 14px">Log your workouts, track calories, and keep your streak alive. Share a session to challenge a buddy.</p>
-    <div class="card" style="display:flex;align-items:center;gap:14px">
-      <div style="font-size:32px">👟</div>
-      <div style="flex:1"><b id="hSteps" style="font-size:22px">—</b> <span class="muted">steps today</span><div class="muted" id="hStepsNote" style="font-size:12px">Syncs from Apple Health on your iPhone</div></div>
-    </div>
-    <div class="card" style="margin-top:14px">
+    <div class="card">
       <div class="pstats" style="margin:0">
         <div class="pstat"><b id="hToday">0</b><span>cal today</span></div>
         <div class="pstat"><b id="hStreak">0</b><span>day streak</span></div>
@@ -2012,7 +2008,6 @@ function renderHealth(){
   for(let i=0;i<400;i++){const iso=toISO(d);if(days.has(iso)){streak++;d.setDate(d.getDate()-1);}else if(i===0){d.setDate(d.getDate()-1);}else break;}
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('hToday',calToday);set('hStreak',streak);set('hWeek',calWeek);set('hBest',best);
-  loadSteps();
   const list=document.getElementById('hList');if(!list)return;
   if(!a.length){list.innerHTML='<p class="muted">No workouts yet — log your first one above. 💪</p>';return;}
   list.innerHTML=a.map(x=>`<div class="card" style="margin-bottom:10px">
@@ -2029,32 +2024,6 @@ function renderHealth(){
   </div>`).join('');
 }
 function delWorkout(id){if(!confirm('Delete this workout?'))return;saveHealthArr(getHealth().filter(x=>x.id!==id));renderHealth();}
-/* ---- steps via Apple Health (native) with graceful web fallback ---- */
-let _stepsBusy=false;
-function healthKitPlugin(){try{const P=window.Capacitor&&window.Capacitor.Plugins;return (P&&(P.CapacitorHealthkit||P.CapacitorHealthKit||P.CapacitorHealth||P.Health||P.HealthKit))||null;}catch(e){return null;}}
-async function loadSteps(){
-  const el=document.getElementById('hSteps'),note=document.getElementById('hStepsNote');if(!el||_stepsBusy)return;
-  const hk=healthKitPlugin();
-  if(!hk){el.textContent='—';if(note)note.textContent='Open Livo on your iPhone to sync steps from Apple Health.';return;}
-  _stepsBusy=true;
-  try{
-    if(hk.requestAuthorization)await hk.requestAuthorization({all:[],read:['steps','stepCount'],write:[]});
-    const start=new Date();start.setHours(0,0,0,0);const end=new Date();
-    let steps=0;
-    if(hk.queryHKitSampleType){
-      const r=await hk.queryHKitSampleType({sampleName:'stepCount',startDate:start.toISOString(),endDate:end.toISOString(),limit:0});
-      const rows=(r&&(r.resultData||r.data))||[];
-      if(Array.isArray(rows))steps=rows.reduce((s,x)=>s+(+x.value||+x.quantity||0),0);
-      else if(r&&typeof r.countReturn==='number')steps=r.countReturn;
-    }else if(hk.queryAggregated){
-      const r=await hk.queryAggregated({dataType:'steps',startDate:start.toISOString(),endDate:end.toISOString(),bucket:'day'});
-      const rows=(r&&(r.aggregatedData||r.data))||[];steps=rows.reduce((s,x)=>s+(+x.value||0),0);
-    }
-    el.textContent=steps?Math.round(steps).toLocaleString():'0';
-    if(note)note.textContent='From Apple Health · today';
-  }catch(e){el.textContent='—';if(note)note.textContent='Allow Health access to see your steps.';}
-  _stepsBusy=false;
-}
 function shareWorkout(id){const x=getHealth().find(w=>w.id===id);if(!x)return;
   const t=`I just did a ${x.act} workout on Livo${x.cal?` — 🔥 ${x.cal} cal`:''}${x.min?` in ${x.min} min`:''}${x.note?`. ${x.note}`:''}. Join me and let's compete! 💪`;
   if(navigator.share){navigator.share({title:'My Livo workout',text:t}).catch(()=>{});}

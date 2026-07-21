@@ -2,6 +2,7 @@ import express from 'express';
 import { generatePlan, budgetTrip } from './engine/aiPlanner.js';
 import { maps, events as eventsProvider, stays as staysProvider, social } from './providers/index.js';
 import * as store from './store.js';
+import * as socialdb from './social.js';
 import { DESTS, VENUES } from './data/seed.js';
 
 const app = express();
@@ -112,12 +113,14 @@ app.post('/api/auth/signup', async (req, res) => {
   if (!email || !password || password.length < 6) return res.status(400).json({ error: 'Email and a 6+ char password required.' });
   if (await store.auth.findByEmail(email)) return res.status(409).json({ error: 'That email is already registered. Try logging in.' });
   const user = await store.auth.create({ email, passwordHash: await hashPw(password), handle: slug(email) });
+  await socialdb.profiles.upsert(user.id, user.handle, { name: user.handle });
   res.json({ token: await signToken(user), user: { id: user.id, email: user.email, handle: user.handle } });
 });
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body || {};
   const user = await store.auth.findByEmail(email || '');
   if (!user || !(await checkPw(password || '', user.password_hash))) return res.status(401).json({ error: 'Wrong email or password.' });
+  await socialdb.profiles.upsert(user.id, user.handle);
   res.json({ token: await signToken(user), user: { id: user.id, email: user.email, handle: user.handle } });
 });
 
@@ -143,6 +146,96 @@ app.get('/api/plans/:id', async (req, res) => {
 });
 app.post('/api/plans/:id/rsvp', async (req, res) => {
   res.json({ going: await store.plans.rsvp(req.params.id, (req.body && req.body.who) || 'someone') });
+});
+
+// ===== v2 SOCIAL: profiles, follow graph, experience/workout posts, feed, discovery, moderation =====
+async function meProfile(userId) {
+  const u = await store.auth.byId(userId); if (!u) return null;
+  let p = await socialdb.profiles.get(userId);
+  if (!p) p = await socialdb.profiles.upsert(userId, u.handle, { name: u.handle });
+  return p;
+}
+async function pubProfile(profile, viewerId) {
+  const counts = await socialdb.profiles.counts(profile.userId);
+  const isFollowing = viewerId ? await socialdb.follows.isFollowing(viewerId, profile.userId) : false;
+  return { handle: profile.handle, name: profile.name, bio: profile.bio, avatar: profile.avatar, city: profile.city,
+    followers: counts.followers, following: counts.following, isFollowing, isMe: viewerId === profile.userId };
+}
+// Update my own profile
+app.post('/api/profile', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  const u = await store.auth.byId(tok.id);
+  const { name, bio, avatar, city } = req.body || {};
+  const p = await socialdb.profiles.upsert(tok.id, u && u.handle, {
+    name: String(name || '').slice(0, 60), bio: String(bio || '').slice(0, 240), avatar: avatar || '', city: String(city || '').slice(0, 80) });
+  res.json(await pubProfile(p, tok.id));
+});
+// View a public profile by handle (+ their posts)
+app.get('/api/u/:handle', async (req, res) => {
+  const tok = await verifyToken(req);
+  const p = await socialdb.profiles.byHandle(req.params.handle);
+  if (!p) return res.status(404).json({ error: 'not found' });
+  const full = await pubProfile(p, tok && tok.id);
+  const list = await socialdb.posts.byUser(p.userId);
+  res.json({ ...full, posts: list });
+});
+// Discover / search wanderers
+app.get('/api/discover', async (req, res) => {
+  const tok = await verifyToken(req);
+  const list = await socialdb.profiles.search(req.query.q || '');
+  const out = [];
+  for (const p of list) {
+    const c = await socialdb.profiles.counts(p.userId);
+    out.push({ handle: p.handle, name: p.name, avatar: p.avatar, city: p.city, followers: c.followers,
+      isFollowing: tok ? await socialdb.follows.isFollowing(tok.id, p.userId) : false, isMe: tok && tok.id === p.userId });
+  }
+  res.json(out);
+});
+app.post('/api/follow', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  await meProfile(tok.id);
+  const p = await socialdb.profiles.byHandle((req.body && req.body.handle) || '');
+  if (!p) return res.status(404).json({ error: 'user not found' });
+  await socialdb.follows.follow(tok.id, p.userId); res.json({ ok: true, following: true });
+});
+app.post('/api/unfollow', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  const p = await socialdb.profiles.byHandle((req.body && req.body.handle) || '');
+  if (p) await socialdb.follows.unfollow(tok.id, p.userId); res.json({ ok: true, following: false });
+});
+// Create / delete a post (experience or workout)
+app.post('/api/posts', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  await meProfile(tok.id);
+  res.json(await socialdb.posts.create(tok.id, req.body || {}));
+});
+app.delete('/api/posts/:id', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  await socialdb.posts.remove(tok.id, req.params.id); res.json({ ok: true });
+});
+// Feed of people you follow (+ your own), newest first, with author profile attached
+app.get('/api/feed', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  await meProfile(tok.id);
+  const following = await socialdb.follows.following(tok.id);
+  const list = await socialdb.posts.feed(tok.id, following);
+  const out = [];
+  for (const p of list) {
+    const au = await socialdb.profiles.get(p.userId) || { handle: 'user', name: '', avatar: '' };
+    out.push({ ...p, author: { handle: au.handle, name: au.name, avatar: au.avatar } });
+  }
+  res.json(out);
+});
+// Moderation — report + block (required for a social app)
+app.post('/api/report', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  const { targetType, targetId, reason } = req.body || {};
+  await socialdb.moderation.report(tok.id, targetType, targetId, reason); res.json({ ok: true });
+});
+app.post('/api/block', async (req, res) => {
+  const tok = await verifyToken(req); if (!tok) return res.status(401).json({ error: 'Sign in first.' });
+  const p = await socialdb.profiles.byHandle((req.body && req.body.handle) || '');
+  if (p) await socialdb.moderation.block(tok.id, p.userId); res.json({ ok: true });
 });
 
 // --- AI planner assistant (Claude) ---
